@@ -51,6 +51,17 @@ $queries = [
         jumlah INT NOT NULL,
         FOREIGN KEY (id_pengguna) REFERENCES pengguna(id) ON DELETE CASCADE,
         FOREIGN KEY (id_produk) REFERENCES produk(id) ON DELETE CASCADE
+    )",
+    "CREATE TABLE IF NOT EXISTS testimonial (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        id_pengguna INT NOT NULL,
+        nama VARCHAR(100) NOT NULL,
+        pekerjaan VARCHAR(100),
+        isi_ulasan TEXT NOT NULL,
+        rating INT DEFAULT 5,
+        tanggal_dibuat TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+        FOREIGN KEY (id_pengguna) REFERENCES pengguna(id) ON DELETE CASCADE
     )"
 ];
 
