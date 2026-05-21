@@ -38,101 +38,110 @@ if (isset($_POST['upload_bukti'])) {
 
 <?php include 'includes/header.php'; ?>
 
-<div class="py-12 bg-gray-50 min-h-screen">
+<div class="py-16 lg:py-24 bg-slate-50 min-h-screen">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-extrabold text-gray-900">Pembayaran</h1>
-            <p class="text-gray-500 mt-2">Selesaikan pembayaran untuk memproses pesanan Anda.</p>
+        
+        <div class="text-center mb-10 sm:mb-12">
+            <span class="inline-block py-1.5 px-3.5 rounded-full bg-lime-100 text-lime-700 text-xs sm:text-sm font-bold tracking-wider mb-4 shadow-sm">
+                SELESAIKAN TRANSAKSI
+            </span>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-800">Pembayaran</h1>
+            <p class="text-slate-500 mt-2 text-sm sm:text-base">Selesaikan pembayaran untuk memproses pesanan Anda.</p>
         </div>
 
         <?php if ($success): ?>
-            <div class="bg-green-50 text-green-600 p-6 rounded-3xl mb-8 border border-green-100 flex items-center shadow-sm">
+            <div class="bg-lime-50 text-lime-700 p-6 rounded-2xl mb-8 border border-lime-100 flex items-center shadow-sm transition-all">
                 <i class="fa-solid fa-circle-check text-2xl mr-4"></i>
                 <div>
-                    <p class="font-bold"><?= $success; ?></p>
-                    <p class="text-sm opacity-80">Mengalihkan Anda ke riwayat pesanan dalam 3 detik...</p>
+                    <p class="font-bold text-sm sm:text-base"><?= $success; ?></p>
+                    <p class="text-xs sm:text-sm text-lime-600 mt-1">Mengalihkan Anda ke riwayat pesanan dalam 3 detik...</p>
                 </div>
             </div>
         <?php endif; ?>
 
-        <div class="grid grid-cols-1 gap-8">
-            <!-- Instruksi Pembayaran -->
-            <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-                <div class="flex justify-between items-center mb-8 pb-6 border-b border-gray-50">
+        <div class="grid grid-cols-1 gap-6 sm:gap-8">
+            
+            <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-100 shadow-sm">
+                
+                <div class="flex justify-between items-center mb-8 pb-6 border-b border-slate-100">
                     <div>
-                        <p class="text-sm text-gray-400 uppercase tracking-widest font-bold">Total Tagihan</p>
-                        <p class="text-3xl font-extrabold text-amber-600">Rp <?= number_format($pesanan['total_harga'], 0, ',', '.'); ?></p>
+                        <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-widest font-bold mb-1">Total Tagihan</p>
+                        <p class="text-2xl sm:text-3xl font-extrabold text-lime-600">Rp <?= number_format($pesanan['total_harga'], 0, ',', '.'); ?></p>
                     </div>
                     <div class="text-right">
-                        <p class="text-sm text-gray-400 font-bold">ID Pesanan</p>
-                        <p class="font-mono text-gray-900 font-bold">#HM-<?= str_pad($pesanan['id'], 5, '0', STR_PAD_LEFT); ?></p>
+                        <p class="text-[10px] sm:text-xs text-slate-400 font-bold mb-1 uppercase tracking-widest">ID Pesanan</p>
+                        <p class="font-mono text-slate-800 font-bold bg-slate-50 px-2 py-1 rounded">#HM-<?= str_pad($pesanan['id'], 5, '0', STR_PAD_LEFT); ?></p>
                     </div>
                 </div>
 
-                <h3 class="text-xl font-bold text-gray-900 mb-6">Instruksi Transfer (<?= $pesanan['metode_pembayaran']; ?>)</h3>
+                <h3 class="text-lg sm:text-xl font-bold text-slate-800 mb-6">Instruksi Transfer (<?= $pesanan['metode_pembayaran']; ?>)</h3>
                 
                 <?php if ($pesanan['metode_pembayaran'] === 'Transfer Bank'): ?>
                     <div class="space-y-4">
-                        <div class="flex items-center p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA" class="h-6 mr-4">
+                        <div class="flex items-center p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA" class="h-6 w-16 object-contain mr-4">
                             <div>
-                                <p class="text-xs text-gray-400 font-bold">BCA</p>
-                                <p class="font-bold text-gray-900">1234567890</p>
-                                <p class="text-xs text-gray-500">a/n Handmade Katalog</p>
+                                <p class="text-xs text-slate-500 font-bold">BCA</p>
+                                <p class="font-bold text-slate-800 text-lg tracking-wide">1234567890</p>
+                                <p class="text-xs text-slate-500">a/n Handmade Katalog</p>
                             </div>
                         </div>
-                        <div class="flex items-center p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                            <img src="https://upload.wikimedia.org/wikipedia/id/f/fa/Bank_Mandiri_logo.svg" alt="Mandiri" class="h-6 mr-4">
+                        <div class="flex items-center p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <img src="https://upload.wikimedia.org/wikipedia/id/f/fa/Bank_Mandiri_logo.svg" alt="Mandiri" class="h-6 w-16 object-contain mr-4">
                             <div>
-                                <p class="text-xs text-gray-400 font-bold">MANDIRI</p>
-                                <p class="font-bold text-gray-900">0987654321</p>
-                                <p class="text-xs text-gray-500">a/n Handmade Katalog</p>
+                                <p class="text-xs text-slate-500 font-bold">MANDIRI</p>
+                                <p class="font-bold text-slate-800 text-lg tracking-wide">0987654321</p>
+                                <p class="text-xs text-slate-500">a/n Handmade Katalog</p>
                             </div>
                         </div>
                     </div>
                 <?php else: ?>
                     <div class="space-y-4">
-                        <div class="flex items-center p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="Gopay" class="h-6 mr-4">
+                        <div class="flex items-center p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="Gopay" class="h-6 w-16 object-contain mr-4">
                             <div>
-                                <p class="text-xs text-gray-400 font-bold">GOPAY / OVO</p>
-                                <p class="font-bold text-gray-900">0812-3456-7890</p>
-                                <p class="text-xs text-gray-500">a/n Handmade Katalog</p>
+                                <p class="text-xs text-slate-500 font-bold">GOPAY / OVO</p>
+                                <p class="font-bold text-slate-800 text-lg tracking-wide">0812-3456-7890</p>
+                                <p class="text-xs text-slate-500">a/n Handmade Katalog</p>
                             </div>
                         </div>
                     </div>
                 <?php endif; ?>
 
-                <div class="mt-8 bg-amber-50 p-6 rounded-2xl border border-amber-100">
-                    <p class="text-sm text-amber-800 leading-relaxed italic">
-                        <i class="fa-solid fa-circle-info mr-2"></i> Pastikan nominal transfer sesuai hingga 3 digit terakhir jika ada, untuk mempercepat proses verifikasi.
+                <div class="mt-8 bg-lime-50 p-5 sm:p-6 rounded-xl border border-lime-100 flex items-start">
+                    <i class="fa-solid fa-circle-info text-lime-600 mt-0.5 mr-3"></i>
+                    <p class="text-xs sm:text-sm text-lime-800 leading-relaxed">
+                        Pastikan nominal transfer sesuai hingga 3 digit terakhir jika ada, untuk mempercepat proses verifikasi pembayaran Anda.
                     </p>
                 </div>
             </div>
 
-            <!-- Upload Bukti -->
-            <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-                <h3 class="text-xl font-bold text-gray-900 mb-6">Konfirmasi Pembayaran</h3>
+            <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-100 shadow-sm">
+                <h3 class="text-lg sm:text-xl font-bold text-slate-800 mb-6">Konfirmasi Pembayaran</h3>
+                
                 <form action="" method="POST" enctype="multipart/form-data" class="space-y-6">
-                    <div class="border-2 border-dashed border-gray-100 rounded-[2rem] p-12 text-center hover:border-amber-200 transition bg-gray-50/50 group">
-                        <input type="file" name="bukti" id="buktiInput" required class="hidden" accept="image/*" onchange="previewFile()">
-                        <label for="buktiInput" class="cursor-pointer">
-                            <div id="uploadPlaceholder">
-                                <i class="fa-solid fa-cloud-arrow-up text-5xl text-gray-200 group-hover:text-amber-300 transition mb-4"></i>
-                                <p class="text-gray-500 font-medium">Klik untuk pilih foto bukti transfer</p>
-                                <p class="text-xs text-gray-400 mt-2">Format: JPG, PNG, WEBP (Maks. 2MB)</p>
-                            </div>
-                            <div id="previewContainer" class="hidden">
-                                <img id="previewImg" src="#" class="max-h-48 mx-auto rounded-xl shadow-lg mb-4">
-                                <p class="text-amber-600 font-bold text-sm">File terpilih!</p>
-                            </div>
-                        </label>
+                    <div class="border-2 border-dashed border-slate-200 rounded-2xl p-8 sm:p-12 text-center hover:border-lime-400 hover:bg-slate-50 transition-colors bg-white group cursor-pointer relative overflow-hidden">
+                        <input type="file" name="bukti" id="buktiInput" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*" onchange="previewFile()">
+                        
+                        <div id="uploadPlaceholder" class="pointer-events-none">
+                            <i class="fa-solid fa-cloud-arrow-up text-4xl sm:text-5xl text-slate-300 group-hover:text-lime-500 transition-colors mb-4"></i>
+                            <p class="text-slate-600 font-medium text-sm sm:text-base">Klik atau seret foto bukti transfer ke sini</p>
+                            <p class="text-xs text-slate-400 mt-2">Format yang didukung: JPG, PNG, WEBP (Maks. 2MB)</p>
+                        </div>
+                        
+                        <div id="previewContainer" class="hidden pointer-events-none">
+                            <img id="previewImg" src="#" class="max-h-48 mx-auto rounded-xl shadow-sm mb-4 border border-slate-100">
+                            <p class="text-lime-600 font-bold text-sm bg-lime-50 inline-block px-3 py-1 rounded-full"><i class="fa-solid fa-check mr-1"></i> File siap diunggah</p>
+                            <p class="text-xs text-slate-400 mt-2">Klik lagi jika ingin mengganti foto</p>
+                        </div>
                     </div>
-                    <button type="submit" name="upload_bukti" class="w-full bg-amber-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-amber-700 transition shadow-xl shadow-amber-200">
+                    
+                    <button type="submit" name="upload_bukti" class="w-full bg-lime-600 text-white py-3.5 sm:py-4 rounded-xl font-bold text-base hover:bg-lime-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-lime-200/50">
                         Kirim Bukti Pembayaran
                     </button>
                 </form>
             </div>
+            
         </div>
     </div>
 </div>

@@ -5,55 +5,74 @@ if (session_status() == PHP_SESSION_NONE) {
 $is_logged_in = isset($_SESSION['user_id']);
 $is_admin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
 $base_url = "http://" . $_SERVER['HTTP_HOST'] . "/uaspraktikumpbwd/";
+
+// Mengambil nama depan pengguna jika sudah login
+$user_first_name = '';
+if ($is_logged_in && isset($_SESSION['nama'])) {
+    $nama_parts = explode(' ', trim($_SESSION['nama']));
+    $user_first_name = $nama_parts[0];
+}
 ?>
 <!doctype html>
 <html lang="id">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Handmade Katalog</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    </style>
-  </head>
-  <body class="bg-gray-50 text-gray-900">
-    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-14 items-center">
-          <div class="flex items-center">
-            <a href="index.php" class="text-2xl font-bold bg-gradient-to-r from-lime-600 to-lime-500 bg-clip-text text-transparent">
-              Handmade.
-            </a>
-          </div>
-          
-          <div class="hidden md:flex items-center space-x-6">
-            <a href="index.php" class="text-gray-600 hover:text-lime-600 transition font-medium text-sm">Beranda</a>
-            <a href="katalog.php" class="text-gray-600 hover:text-lime-600 transition font-medium text-sm">Katalog</a>
-            <?php if ($is_logged_in): ?>
-              <a href="riwayat.php" class="text-gray-600 hover:text-lime-600 transition font-medium text-sm">Riwayat</a>
-              <?php if ($is_admin): ?>
-                <a href="../admin/index.php" class="bg-lime-100 text-lime-700 px-3 py-1 rounded-xl text-xs font-semibold border border-lime-200">Admin</a>
-              <?php endif; ?>
-            <?php endif; ?>
-          </div>
+</head>
+<body class="bg-slate-50 text-slate-800 selection:bg-lime-200 selection:text-lime-900">
+    
+    <nav class="bg-white/90 backdrop-blur-lg sticky top-0 z-50 border-b border-slate-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                
+                <div class="flex items-center flex-shrink-0">
+                    <a href="index.php" class="text-2xl font-extrabold text-slate-800 tracking-tight transition-transform hover:scale-105">
+                        Hand<span class="text-lime-600">made.</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.php" class="text-slate-500 hover:text-lime-600 transition-colors font-medium text-sm">Beranda</a>
+                    <a href="katalog.php" class="text-slate-500 hover:text-lime-600 transition-colors font-medium text-sm">Katalog</a>
+                    <?php if ($is_logged_in): ?>
+                        <a href="riwayat.php" class="text-slate-500 hover:text-lime-600 transition-colors font-medium text-sm">Riwayat Transaksi</a>
+                        <?php if ($is_admin): ?>
+                            <a href="../admin/index.php" class="bg-lime-50 text-lime-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-lime-200 hover:bg-lime-100 transition-colors">Dasbor Admin</a>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
 
-          <div class="flex items-center space-x-3">
-            <?php if ($is_logged_in): ?>
-              <a href="keranjang.php" class="relative text-gray-600 hover:text-lime-600 transition p-2">
-                <i class="fa-solid fa-cart-shopping text-lg"></i>
-                <span class="absolute top-0 right-0 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">0</span>
-              </a>
-              <div class="h-6 w-[1px] bg-gray-200 mx-1"></div>
-              <a href="logout.php" class="text-gray-600 hover:text-red-600 transition font-medium">Keluar</a>
-            <?php else: ?>
-              <a href="masuk.php" class="text-gray-600 hover:text-lime-600 transition font-medium">Masuk</a>
-              <a href="daftar.php" class="bg-lime-600 text-white px-5 py-2 rounded-xl hover:bg-lime-700 transition font-medium shadow-lg shadow-lime-200">Daftar</a>
-            <?php endif; ?>
-          </div>
+                <div class="flex items-center space-x-3 sm:space-x-5">
+                    <?php if ($is_logged_in): ?>
+                        
+                        <div class="hidden sm:flex items-center text-sm text-slate-500">
+                            Halo, <span class="font-bold text-slate-800 ml-1"><?= $user_first_name; ?></span>!
+                        </div>
+
+                        <a href="keranjang.php" class="relative text-slate-400 hover:text-lime-600 transition-colors p-2 rounded-full hover:bg-slate-50 group">
+                            <i class="fa-solid fa-cart-shopping text-lg group-hover:scale-110 transition-transform"></i>
+                        </a>
+                        
+                        <div class="h-6 w-px bg-slate-200 hidden sm:block mx-1"></div>
+                        
+                        <a href="logout.php" class="flex items-center text-slate-400 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-50 group" title="Keluar">
+                            <i class="fa-solid fa-arrow-right-from-bracket text-lg group-hover:translate-x-0.5 transition-transform"></i>
+                            <span class="hidden sm:inline-block ml-2 text-sm font-bold group-hover:text-red-600">Keluar</span>
+                        </a>
+                        
+                    <?php else: ?>
+                        
+                        <a href="masuk.php" class="text-slate-600 hover:text-lime-600 transition-colors font-bold text-sm">Masuk</a>
+                        <a href="daftar.php" class="bg-lime-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-lime-700 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-lime-200/50 transition-all duration-300">Daftar</a>
+                        
+                    <?php endif; ?>
+                </div>
+                
+            </div>
         </div>
-      </div>
     </nav>
+    
     <main class="min-h-screen">

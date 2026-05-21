@@ -39,87 +39,79 @@ if (isset($_POST['tambah_keranjang'])) {
 
 <?php include 'includes/header.php'; ?>
 
-<div class="py-20 bg-white">
+<div class="py-16 lg:py-24 bg-white min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="lg:flex lg:space-x-12">
-            <!-- Galeri Gambar -->
-            <div class="lg:w-1/2">
-                <div class="relative rounded-[2.5rem] overflow-hidden shadow-2xl bg-gray-100 aspect-square">
-                    <img src="<?= $produk['gambar'] ?: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&q=80&w=1000'; ?>" alt="<?= $produk['nama_produk']; ?>" class="w-full h-full object-cover transform hover:scale-110 transition duration-700">
-                    <div class="absolute top-6 left-6">
-                        <span class="bg-white/90 backdrop-blur px-4 py-2 rounded-full text-sm font-bold text-amber-600 shadow-lg uppercase tracking-widest">
+        
+        <div class="lg:flex lg:gap-12 xl:gap-16 items-start">
+            <div class="lg:w-1/2 w-full mb-10 lg:mb-0">
+                <div class="relative rounded-3xl overflow-hidden shadow-sm border border-slate-100 bg-slate-50 aspect-square group">
+                    <img 
+                        src="<?= $produk['gambar'] ?: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&q=80&w=1000'; ?>" 
+                        alt="<?= $produk['nama_produk']; ?>" 
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    >
+                    <div class="absolute top-4 left-4 sm:top-6 sm:left-6">
+                        <span class="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 shadow-sm border border-slate-100/50 uppercase tracking-widest">
                             <?= $produk['nama_kategori']; ?>
                         </span>
                     </div>
                 </div>
             </div>
 
-            <!-- Detail Produk -->
-            <div class="lg:w-1/2 mt-12 lg:mt-0">
-                <nav class="flex mb-4 text-sm font-medium text-gray-400">
-                    <a href="index.php" class="hover:text-amber-600">Beranda</a>
-                    <span class="mx-2">/</span>
-                    <a href="katalog.php" class="hover:text-amber-600">Katalog</a>
-                    <span class="mx-2">/</span>
-                    <span class="text-gray-900"><?= $produk['nama_produk']; ?></span>
+            <div class="lg:w-1/2 flex flex-col">
+                
+                <nav class="flex mb-4 sm:mb-6 text-xs sm:text-sm font-medium text-slate-400">
+                    <a href="index.php" class="hover:text-lime-600 transition-colors">Beranda</a>
+                    <span class="mx-2 text-slate-300">/</span>
+                    <a href="katalog.php" class="hover:text-lime-600 transition-colors">Katalog</a>
+                    <span class="mx-2 text-slate-300">/</span>
+                    <span class="text-slate-800 truncate"><?= $produk['nama_produk']; ?></span>
                 </nav>
 
-                <h1 class="text-4xl font-extrabold text-gray-900 leading-tight mb-4"><?= $produk['nama_produk']; ?></h1>
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-800 leading-tight mb-4 sm:mb-6">
+                    <?= $produk['nama_produk']; ?>
+                </h1>
                 
                 <div class="flex items-center space-x-4 mb-8">
-                    <span class="text-3xl font-extrabold text-amber-600">Rp <?= number_format($produk['harga'], 0, ',', '.'); ?></span>
-                    <div class="h-6 w-[1px] bg-gray-200"></div>
-                    <span class="text-gray-500 font-medium">Stok: <?= $produk['stok']; ?> unit</span>
+                    <span class="text-2xl sm:text-3xl font-extrabold text-lime-600">
+                        Rp <?= number_format($produk['harga'], 0, ',', '.'); ?>
+                    </span>
+                    <div class="h-6 w-px bg-slate-200"></div>
+                    <span class="text-sm sm:text-base text-slate-500 font-medium">
+                        Stok: <span class="text-slate-800 font-bold"><?= $produk['stok']; ?></span> unit
+                    </span>
                 </div>
 
-                <div class="bg-gray-50 rounded-3xl p-8 mb-8 border border-gray-100">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">Deskripsi Produk</h3>
-                    <p class="text-gray-600 leading-relaxed">
+                <div class="bg-slate-50 rounded-2xl p-6 sm:p-8 mb-8 border border-slate-100">
+                    <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-3">Deskripsi Produk</h3>
+                    <p class="text-slate-600 leading-relaxed text-sm sm:text-base">
                         <?= nl2br($produk['deskripsi']); ?>
                     </p>
                 </div>
 
-                <form action="" method="POST" class="space-y-6">
+                <form action="" method="POST" class="space-y-6 sm:space-y-8">
                     <div>
-                        <label class="block text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Jumlah</label>
-                        <div class="flex items-center space-x-4">
-                            <div class="flex items-center border-2 border-gray-100 rounded-2xl bg-white p-1">
-                                <button type="button" onclick="changeQty(-1)" class="w-12 h-12 flex items-center justify-center hover:bg-gray-50 rounded-xl transition text-gray-500">
-                                    <i class="fa-solid fa-minus"></i>
-                                </button>
-                                <input type="number" name="jumlah" id="qtyInput" value="1" min="1" max="<?= $produk['stok']; ?>" class="w-16 text-center font-bold bg-transparent border-none focus:ring-0 outline-none">
-                                <button type="button" onclick="changeQty(1)" class="w-12 h-12 flex items-center justify-center hover:bg-gray-50 rounded-xl transition text-gray-500">
-                                    <i class="fa-solid fa-plus"></i>
-                                </button>
-                            </div>
+                        <label class="block text-xs font-bold text-slate-400 mb-3 uppercase tracking-widest">Jumlah</label>
+                        <div class="inline-flex items-center border border-slate-200 rounded-xl bg-white p-1">
+                            <button type="button" onclick="changeQty(-1)" class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center hover:bg-slate-50 hover:text-lime-600 rounded-lg transition-colors text-slate-400">
+                                <i class="fa-solid fa-minus text-sm"></i>
+                            </button>
+                            
+                            <input type="number" name="jumlah" id="qtyInput" value="1" min="1" max="<?= $produk['stok']; ?>" class="w-14 sm:w-16 text-center font-bold text-slate-800 bg-transparent border-none focus:ring-0 outline-none p-0">
+                            
+                            <button type="button" onclick="changeQty(1)" class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center hover:bg-slate-50 hover:text-lime-600 rounded-lg transition-colors text-slate-400">
+                                <i class="fa-solid fa-plus text-sm"></i>
+                            </button>
                         </div>
                     </div>
 
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <button type="submit" name="tambah_keranjang" class="flex-1 bg-amber-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-amber-700 transition shadow-xl shadow-amber-200 flex items-center justify-center">
-                            <i class="fa-solid fa-cart-plus mr-3"></i> Tambah ke Keranjang
-                        </button>
-                    </div>
-                </form>
-
-                <div class="mt-12 pt-8 border-t border-gray-50">
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center text-green-600">
-                                <i class="fa-solid fa-truck-fast"></i>
-                            </div>
-                            <span class="text-sm font-medium text-gray-500">Pengiriman Cepat</span>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
-                                <i class="fa-solid fa-shield-check"></i>
-                            </div>
-                            <span class="text-sm font-medium text-gray-500">Kualitas Terjamin</span>
-                        </div>
-                    </div>
-                </div>
+                    <button type="submit" name="tambah_keranjang" class="group w-full sm:w-auto inline-flex bg-lime-600 text-white py-3.5 sm:py-4 px-8 rounded-xl font-bold text-base hover:bg-lime-700 hover:-translate-y-1 hover:shadow-lg hover:shadow-lime-200/50 transition-all duration-300 items-center justify-center">
+                        <i class="fa-solid fa-cart-plus mr-3 group-hover:scale-110 transition-transform duration-300"></i> Tambah ke Keranjang
+                    </button>
+                </form>                
             </div>
         </div>
+        
     </div>
 </div>
 
@@ -127,8 +119,11 @@ if (isset($_POST['tambah_keranjang'])) {
     function changeQty(amt) {
         const input = document.getElementById('qtyInput');
         let val = parseInt(input.value) + amt;
+        
+        // Batasan Minimal dan Maksimal
         if (val < 1) val = 1;
         if (val > <?= $produk['stok']; ?>) val = <?= $produk['stok']; ?>;
+        
         input.value = val;
     }
 </script>
