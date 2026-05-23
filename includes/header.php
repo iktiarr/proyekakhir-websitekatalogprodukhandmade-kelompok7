@@ -4,6 +4,13 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 $is_logged_in = isset($_SESSION['user_id']);
 $is_admin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+
+// Jika admin mengakses halaman pengguna, arahkan langsung ke dasbor admin
+if ($is_admin) {
+    header("Location: admin/index.php");
+    exit();
+}
+
 $base_url = "http://" . $_SERVER['HTTP_HOST'] . "/uaspraktikumpbwd/";
 
 // Mengambil nama depan pengguna jika sudah login
@@ -29,18 +36,21 @@ if ($is_logged_in && isset($_SESSION['nama'])) {
             <div class="flex justify-between h-16 items-center">
                 
                 <div class="flex items-center flex-shrink-0">
-                    <a href="index.php" class="text-2xl font-extrabold text-slate-800 tracking-tight transition-transform hover:scale-105">
+                    <a href="<?= $is_admin ? 'admin/index.php' : 'index.php'; ?>" class="text-2xl font-extrabold text-slate-800 tracking-tight transition-transform hover:scale-105">
                         Hand<span class="text-lime-600">made.</span>
                     </a>
                 </div>
                 
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="index.php" class="text-slate-500 hover:text-lime-600 transition-colors font-medium text-sm">Beranda</a>
-                    <a href="katalog.php" class="text-slate-500 hover:text-lime-600 transition-colors font-medium text-sm">Katalog</a>
-                    <?php if ($is_logged_in): ?>
-                        <a href="riwayat.php" class="text-slate-500 hover:text-lime-600 transition-colors font-medium text-sm">Riwayat Transaksi</a>
-                        <?php if ($is_admin): ?>
-                            <a href="../admin/index.php" class="bg-lime-50 text-lime-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-lime-200 hover:bg-lime-100 transition-colors">Dasbor Admin</a>
+                    <?php if ($is_admin): ?>
+                        <a href="admin/index.php" class="bg-lime-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-lime-700 hover:shadow-lg hover:shadow-lime-200/50 transition-all duration-300 flex items-center gap-2">
+                            <i class="fa-solid fa-user-shield text-xs"></i> Dasbor Admin
+                        </a>
+                    <?php else: ?>
+                        <a href="index.php" class="text-slate-500 hover:text-lime-600 transition-colors font-medium text-sm">Beranda</a>
+                        <a href="katalog.php" class="text-slate-500 hover:text-lime-600 transition-colors font-medium text-sm">Katalog</a>
+                        <?php if ($is_logged_in): ?>
+                            <a href="riwayat.php" class="text-slate-500 hover:text-lime-600 transition-colors font-medium text-sm">Riwayat Transaksi</a>
                         <?php endif; ?>
                     <?php endif; ?>
                 </div>
@@ -52,9 +62,11 @@ if ($is_logged_in && isset($_SESSION['nama'])) {
                             Halo, <span class="font-bold text-slate-800 ml-1"><?= $user_first_name; ?></span>!
                         </div>
 
+                        <?php if (!$is_admin): ?>
                         <a href="keranjang.php" class="relative text-slate-400 hover:text-lime-600 transition-colors p-2 rounded-full hover:bg-slate-50 group">
                             <i class="fa-solid fa-cart-shopping text-lg group-hover:scale-110 transition-transform"></i>
                         </a>
+                        <?php endif; ?>
                         
                         <div class="h-6 w-px bg-slate-200 hidden sm:block mx-1"></div>
                         

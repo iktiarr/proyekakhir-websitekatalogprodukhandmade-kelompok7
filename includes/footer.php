@@ -5,7 +5,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
           
           <div class="space-y-4">
-            <a href="index.php" class="inline-block text-2xl font-extrabold text-slate-800 tracking-tight">
+            <?php 
+            $footer_is_admin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+            ?>
+            <a href="<?= $footer_is_admin ? 'admin/index.php' : 'index.php'; ?>" class="inline-block text-2xl font-extrabold text-slate-800 tracking-tight">
                 Hand<span class="text-lime-600">made.</span>
             </a>
             <p class="text-slate-500 text-sm sm:text-base max-w-sm leading-relaxed">
