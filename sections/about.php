@@ -4,9 +4,6 @@
 
       <div class="order-2 lg:order-1 space-y-8">
         <div>
-          <span class="inline-block py-1.5 px-3.5 rounded-full bg-lime-100 text-lime-700 text-xs sm:text-sm font-bold tracking-wider mb-4 shadow-sm">
-            TENTANG KAMI
-          </span>
           <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-800 leading-tight mb-4">
             Mengapa <span class="text-lime-600">Handmade?</span>
           </h2>

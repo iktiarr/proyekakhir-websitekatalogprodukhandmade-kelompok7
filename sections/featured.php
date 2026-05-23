@@ -3,9 +3,6 @@
     
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 sm:gap-0 mb-10 sm:mb-12">
       <div>
-        <span class="inline-block py-1.5 px-3.5 rounded-full bg-lime-100 text-lime-700 text-xs sm:text-sm font-bold tracking-wider mb-4 shadow-sm">
-          PILIHAN KAMI
-        </span>
         <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-800 mb-2">Produk Unggulan</h2>
         <p class="text-slate-600 text-base sm:text-lg">Koleksi terbaik minggu ini yang dikurasi khusus untuk Anda.</p>
       </div>

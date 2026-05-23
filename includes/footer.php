@@ -35,10 +35,10 @@
         
         <div class="border-t border-slate-100 mt-10 pt-6 text-center sm:flex sm:justify-between sm:items-center">
           <p class="text-slate-400 text-xs sm:text-sm mb-2 sm:mb-0">
-            &copy; <?= date('Y'); ?> Handmade Katalog. Hak cipta dilindungi.
+            &copy; <?= date('Y'); ?> Handmade Katalog.
           </p>
           <p class="text-slate-400 text-xs sm:text-sm flex items-center justify-center sm:justify-end">
-            Dibuat dengan <i class="fa-solid fa-heart text-red-400 text-xs mx-1.5 animate-pulse"></i> untuk melestarikan karya lokal.
+            Dibuat oleh kami sendiri.
           </p>
         </div>
         

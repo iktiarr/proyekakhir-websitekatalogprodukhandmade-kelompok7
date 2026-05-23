@@ -1,9 +1,6 @@
 <section class="py-16 lg:py-24 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12 sm:mb-16">
-            <span class="inline-block py-1.5 px-3.5 rounded-full bg-lime-100 text-lime-700 text-xs sm:text-sm font-bold tracking-wider mb-4 shadow-sm">
-                KATEGORI PRODUK
-            </span>
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-800 mb-4">Jelajahi Kategori</h2>
             <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto">Temukan apa yang Anda butuhkan berdasarkan kategori pilihan.</p>
         </div>
