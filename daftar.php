@@ -9,20 +9,20 @@ if (isset($_POST['daftar'])) {
     $password = $_POST['password'];
     $konfirmasi = $_POST['konfirmasi_password'];
 
-    // Validasi konfirmasi password
+    
     if ($password !== $konfirmasi) {
         $error = "Konfirmasi password tidak cocok!";
     } else {
-        // Cek apakah email sudah terdaftar
+        
         $check = mysqli_query($conn, "SELECT id FROM pengguna WHERE email = '$email'");
         if (mysqli_num_rows($check) > 0) {
             $error = "Email sudah terdaftar!";
         } else {
-            // Hash password untuk keamanan
+            
             $hashed = password_hash($password, PASSWORD_DEFAULT);
             $query = "INSERT INTO pengguna (nama, email, password, role) VALUES ('$nama', '$email', '$hashed', 'user')";
             if (mysqli_query($conn, $query)) {
-                // Berhasil daftar, langsung arahkan ke login dengan pesan sukses
+                
                 header("Location: masuk.php?registrasi=sukses");
                 exit();
             } else {

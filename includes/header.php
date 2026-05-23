@@ -5,7 +5,7 @@ if (session_status() == PHP_SESSION_NONE) {
 $is_logged_in = isset($_SESSION['user_id']);
 $is_admin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
 
-// Jika admin mengakses halaman pengguna, arahkan langsung ke dasbor admin
+
 if ($is_admin) {
     header("Location: admin/index.php");
     exit();
@@ -13,7 +13,7 @@ if ($is_admin) {
 
 $base_url = "http://" . $_SERVER['HTTP_HOST'] . "/uaspraktikumpbwd/";
 
-// Mengambil nama depan pengguna jika sudah login
+
 $user_first_name = '';
 if ($is_logged_in && isset($_SESSION['nama'])) {
     $nama_parts = explode(' ', trim($_SESSION['nama']));

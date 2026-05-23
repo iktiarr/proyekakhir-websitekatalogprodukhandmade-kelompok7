@@ -62,7 +62,10 @@ $queries = [
         tanggal_dibuat TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
         FOREIGN KEY (id_pengguna) REFERENCES pengguna(id) ON DELETE CASCADE
-    )"
+    )",
+    "ALTER TABLE produk MODIFY COLUMN harga DECIMAL(10, 2) NOT NULL",
+    "ALTER TABLE pesanan MODIFY COLUMN total_harga DECIMAL(10, 2) NOT NULL",
+    "ALTER TABLE detail_pesanan MODIFY COLUMN harga DECIMAL(10, 2) NOT NULL"
 ];
 
 echo "<div style='font-family: sans-serif; padding: 20px;'>";
@@ -76,7 +79,6 @@ foreach ($queries as $query) {
     }
 }
 
-// Cek jika sudah ada admin, jika belum buat satu
 $checkAdmin = mysqli_query($conn, "SELECT * FROM pengguna WHERE role = 'admin'");
 if (mysqli_num_rows($checkAdmin) == 0) {
     $namaAdmin = 'Admin Handmade';
@@ -88,7 +90,6 @@ if (mysqli_num_rows($checkAdmin) == 0) {
     }
 }
 
-// Tambah kategori default jika kosong
 $checkKategori = mysqli_query($conn, "SELECT * FROM kategori");
 if (mysqli_num_rows($checkKategori) == 0) {
     mysqli_query($conn, "INSERT INTO kategori (nama_kategori) VALUES ('Aksesoris'), ('Dekorasi'), ('Pakaian'), ('Lainnya')");

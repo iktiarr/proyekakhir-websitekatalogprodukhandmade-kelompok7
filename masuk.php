@@ -4,7 +4,7 @@ include 'koneksi.php';
 $error = '';
 $success = '';
 
-// Cek jika dialihkan dari pendaftaran sukses
+
 if (isset($_GET['registrasi']) && $_GET['registrasi'] === 'sukses') {
     $success = "Pendaftaran berhasil! Silakan masuk.";
 }
@@ -13,17 +13,17 @@ if (isset($_POST['masuk'])) {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
 
-    // Ambil data pengguna berdasarkan email
+    
     $query = mysqli_query($conn, "SELECT * FROM pengguna WHERE email = '$email'");
     if (mysqli_num_rows($query) > 0) {
         $user = mysqli_fetch_assoc($query);
-        // Verifikasi password terenkripsi
+        
         if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['nama'] = $user['nama'];
             $_SESSION['role'] = $user['role'];
 
-            // Arahkan sesuai role
+            
             if ($user['role'] === 'admin') {
                 header("Location: admin/index.php");
             } else {
