@@ -5,7 +5,7 @@
             <p class="text-slate-500 text-sm">Temukan apa yang Anda butuhkan berdasarkan kategori pilihan.</p>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <?php
             $kategori_icons = [
                 'Batik' => 'fa-palette',
