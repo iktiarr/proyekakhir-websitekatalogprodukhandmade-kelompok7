@@ -121,14 +121,6 @@ if (isset($_POST['submit_testimonial'])) {
             </div>
             
         </form>
-
-        <div class="mt-4 pt-4 border-t border-slate-50">
-            <p class="text-[10px] text-slate-400 text-center bg-slate-50 p-2 rounded-lg border border-slate-100 leading-normal">
-                <i class="fa-solid fa-shield-check text-lime-600 mr-1"></i>
-                Ulasan Anda akan dimoderasi (diperiksa) terlebih dahulu sebelum ditampilkan di halaman utama demi kenyamanan bersama.
-            </p>
-        </div>
-        
     </div>
 </div>
 

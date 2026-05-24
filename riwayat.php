@@ -61,10 +61,6 @@ $query = mysqli_query($conn, "SELECT * FROM pesanan WHERE id_pengguna = $id_peng
                                 <span class="px-2.5 py-1 rounded-lg text-xs font-bold border <?= $status_color; ?> capitalize whitespace-nowrap">
                                     <?= $row['status']; ?>
                                 </span>
-                                
-                                <a href="pembayaran.php?id=<?= $row['id']; ?>" class="w-8 h-8 flex items-center justify-center bg-slate-50 text-slate-400 hover:text-white hover:bg-lime-600 rounded-xl transition-all duration-300 flex-shrink-0 cursor-pointer">
-                                    <i class="fa-solid fa-chevron-right text-xs"></i>
-                                </a>
                             </div>
                             
                         </div>
