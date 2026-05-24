@@ -34,41 +34,41 @@ $admin_first_name = explode(' ', trim($_SESSION['nama']))[0];
 </head>
 <body class="bg-slate-50 text-slate-800 flex selection:bg-lime-200 selection:text-lime-900">
     
-    <aside class="w-56 bg-white min-h-screen border-r border-slate-200 flex flex-col sticky top-0 shadow-sm z-10">
+    <aside class="w-56 bg-white min-h-screen border-r border-slate-200 flex flex-col sticky top-0 z-10">
         <div class="p-5 pb-3">
-            <a href="../index.php" class="text-xl font-extrabold text-slate-800 tracking-tight transition-transform hover:scale-105 inline-block">
+            <a href="../index.php" class="text-xl font-extrabold text-slate-800 tracking-tight inline-block">
                 Hand<span class="text-lime-600">made.</span>
             </a>
             <p class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mt-0.5">Admin Panel</p>
         </div>
         
         <nav class="flex-1 px-3 space-y-1">
-            <a href="index.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 text-lime-700 rounded-lg font-bold text-sm transition-colors">
+            <a href="index.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 text-lime-700 rounded-lg font-bold text-sm">
                 <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center"></i> Dasbor
             </a>
-            <a href="produk.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-box-open mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Produk
+            <a href="produk.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm group">
+                <i class="fa-solid fa-box-open mr-2.5 w-4 text-center"></i> Produk
             </a>
-            <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pembayaran
+            <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm group">
+                <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center"></i> Pembayaran
                 <?php if ($pendingPayments > 0): ?>
-                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm"><?= $pendingPayments; ?></span>
+                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pendingPayments; ?></span>
                 <?php endif; ?>
             </a>
-            <a href="testimonial.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-comments mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Testimonial
+            <a href="testimonial.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm group">
+                <i class="fa-solid fa-comments mr-2.5 w-4 text-center"></i> Testimonial
                 <?php if ($pendingTestimonial > 0): ?>
-                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm"><?= $pendingTestimonial; ?></span>
+                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pendingTestimonial; ?></span>
                 <?php endif; ?>
             </a>
-            <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-users mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pengguna
+            <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm group">
+                <i class="fa-solid fa-users mr-2.5 w-4 text-center"></i> Pengguna
             </a>
         </nav>
         
         <div class="p-3 border-t border-slate-100">
-            <a href="../logout.php" class="flex items-center px-3.5 py-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg font-bold text-sm transition-colors group">
-                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center group-hover:-translate-x-1 transition-transform"></i> Keluar
+            <a href="../logout.php" class="flex items-center px-3.5 py-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg font-bold text-sm group">
+                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center"></i> Keluar
             </a>
         </div>
     </aside>
@@ -81,7 +81,7 @@ $admin_first_name = explode(' ', trim($_SESSION['nama']))[0];
                 <p class="text-slate-500 text-xs mt-0.5">Selamat datang kembali, <span class="font-bold text-slate-700"><?= $admin_first_name; ?></span>.</p>
             </div>
             <div class="flex items-center space-x-3">
-                <div class="bg-white px-3 py-2 rounded-lg border border-slate-200 flex items-center space-x-2.5 shadow-sm">
+                <div class="bg-white px-3 py-2 rounded-lg border border-slate-200 flex items-center space-x-2.5">
                     <div class="w-7 h-7 bg-lime-100 rounded-md flex items-center justify-center text-lime-600">
                         <i class="fa-solid fa-user-shield text-xs"></i>
                     </div>
@@ -91,32 +91,32 @@ $admin_first_name = explode(' ', trim($_SESSION['nama']))[0];
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-100 shadow-sm hover:shadow-md hover:border-lime-200 hover:-translate-y-0.5 transition-all duration-300 group">
-                <div class="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 mb-3 group-hover:bg-lime-50 group-hover:text-lime-600 transition-colors">
+            <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200">
+                <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500 mb-3">
                     <i class="fa-solid fa-users text-lg"></i>
                 </div>
                 <p class="text-slate-400 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Pengguna</p>
                 <h2 class="text-2xl font-extrabold text-slate-800"><?= $countUser; ?></h2>
             </div>
             
-            <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-100 shadow-sm hover:shadow-md hover:border-lime-200 hover:-translate-y-0.5 transition-all duration-300 group">
-                <div class="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 mb-3 group-hover:bg-lime-50 group-hover:text-lime-600 transition-colors">
+            <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200">
+                <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500 mb-3">
                     <i class="fa-solid fa-box-open text-lg"></i>
                 </div>
                 <p class="text-slate-400 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Produk</p>
                 <h2 class="text-2xl font-extrabold text-slate-800"><?= $countProduct; ?></h2>
             </div>
             
-            <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-100 shadow-sm hover:shadow-md hover:border-lime-200 hover:-translate-y-0.5 transition-all duration-300 group">
-                <div class="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 mb-3 group-hover:bg-lime-50 group-hover:text-lime-600 transition-colors">
+            <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200">
+                <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500 mb-3">
                     <i class="fa-solid fa-wallet text-lg"></i>
                 </div>
                 <p class="text-slate-400 text-[9px] font-bold uppercase tracking-widest mb-0.5">Pendapatan Bersih</p>
                 <h2 class="text-2xl font-extrabold text-slate-800">Rp <?= number_format($totalSales ?: 0, 0, ',', '.'); ?></h2>
             </div>
             
-            <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-100 shadow-sm hover:shadow-md hover:border-lime-200 hover:-translate-y-0.5 transition-all duration-300 group">
-                <div class="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 mb-3 group-hover:bg-lime-50 group-hover:text-lime-600 transition-colors">
+            <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200">
+                <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500 mb-3">
                     <i class="fa-solid fa-user-tie text-lg"></i>
                 </div>
                 <p class="text-slate-400 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Admin</p>
@@ -126,7 +126,7 @@ $admin_first_name = explode(' ', trim($_SESSION['nama']))[0];
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <div class="lg:col-span-2 bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+            <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 overflow-hidden flex flex-col">
                 <div class="p-4 sm:p-5 border-b border-slate-100 flex justify-between items-center">
                     <h3 class="text-base font-bold text-slate-800">Pesanan Terbaru</h3>
                     <a href="pembayaran.php" class="text-xs font-bold text-lime-600 hover:text-lime-700 hover:underline">Lihat Semua</a>
@@ -138,9 +138,9 @@ $admin_first_name = explode(' ', trim($_SESSION['nama']))[0];
                         if(mysqli_num_rows($latest) > 0):
                             while($row = mysqli_fetch_assoc($latest)):
                         ?>
-                        <div class="flex items-center justify-between group p-2.5 hover:bg-slate-50 rounded-lg transition-colors border border-transparent hover:border-slate-100 cursor-default">
+                        <div class="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-100 rounded-lg cursor-default">
                             <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 border border-slate-100 group-hover:bg-white group-hover:text-lime-600 group-hover:border-lime-100 transition-all">
+                                <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-slate-500 border border-slate-200">
                                     <i class="fa-solid fa-bag-shopping text-xs"></i>
                                 </div>
                                 <div>
@@ -148,7 +148,7 @@ $admin_first_name = explode(' ', trim($_SESSION['nama']))[0];
                                     <p class="text-[10px] text-slate-400 mt-0.5"><i class="fa-regular fa-clock mr-1"></i><?= date('H:i, d M Y', strtotime($row['tanggal_pesanan'])); ?></p>
                                 </div>
                             </div>
-                            <span class="text-xs font-extrabold text-slate-800 group-hover:text-lime-600 transition-colors">Rp <?= number_format($row['total_harga'], 0, ',', '.'); ?></span>
+                            <span class="text-xs font-extrabold text-slate-800">Rp <?= number_format($row['total_harga'], 0, ',', '.'); ?></span>
                         </div>
                         <?php 
                             endwhile; 
