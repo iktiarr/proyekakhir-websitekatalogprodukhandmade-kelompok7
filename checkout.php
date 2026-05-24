@@ -7,7 +7,19 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $id_pengguna = $_SESSION['user_id'];
-$query_cart = mysqli_query($conn, "SELECT k.*, p.harga, p.stok, p.nama_produk FROM keranjang k JOIN produk p ON k.id_produk = p.id WHERE k.id_pengguna = $id_pengguna");
+$cart_ids = [];
+if (isset($_POST['cart_ids'])) {
+    $cart_ids = $_POST['cart_ids'];
+} elseif (isset($_POST['checked_cart_ids'])) {
+    $cart_ids = $_POST['checked_cart_ids'];
+}
+
+if (!empty($cart_ids)) {
+    $ids_str = implode(',', array_map('intval', $cart_ids));
+    $query_cart = mysqli_query($conn, "SELECT k.*, p.harga, p.stok, p.nama_produk FROM keranjang k JOIN produk p ON k.id_produk = p.id WHERE k.id_pengguna = $id_pengguna AND k.id IN ($ids_str)");
+} else {
+    $query_cart = mysqli_query($conn, "SELECT k.*, p.harga, p.stok, p.nama_produk FROM keranjang k JOIN produk p ON k.id_produk = p.id WHERE k.id_pengguna = $id_pengguna");
+}
 
 if (mysqli_num_rows($query_cart) == 0) {
     header("Location: katalog.php");
@@ -22,7 +34,9 @@ while ($row = mysqli_fetch_assoc($query_cart)) {
 }
 
 if (isset($_POST['buat_pesanan'])) {
-    $alamat = mysqli_real_escape_string($conn, $_POST['alamat']);
+    $alamat_lengkap = mysqli_real_escape_string($conn, $_POST['alamat']);
+    $no_telp = mysqli_real_escape_string($conn, $_POST['no_telp']);
+    $alamat = $alamat_lengkap . " | Telp: " . $no_telp;
     $metode = mysqli_real_escape_string($conn, $_POST['metode_pembayaran']);
 
     
@@ -45,7 +59,15 @@ if (isset($_POST['buat_pesanan'])) {
         }
 
         
-        mysqli_query($conn, "DELETE FROM keranjang WHERE id_pengguna = $id_pengguna");
+        // Delete only the checked-out items from the cart
+        $checkout_cart_ids = [];
+        foreach ($items as $item) {
+            $checkout_cart_ids[] = $item['id'];
+        }
+        if (!empty($checkout_cart_ids)) {
+            $checkout_ids_str = implode(',', array_map('intval', $checkout_cart_ids));
+            mysqli_query($conn, "DELETE FROM keranjang WHERE id_pengguna = $id_pengguna AND id IN ($checkout_ids_str)");
+        }
 
         mysqli_commit($conn);
         header("Location: pembayaran.php?id=$id_pesanan");
@@ -77,6 +99,9 @@ if (isset($_POST['buat_pesanan'])) {
         <?php endif; ?>
 
         <form action="" method="POST" class="lg:flex lg:gap-6 items-start">
+            <?php foreach ($items as $item): ?>
+                <input type="hidden" name="checked_cart_ids[]" value="<?= $item['id']; ?>">
+            <?php endforeach; ?>
             
             <div class="lg:w-2/3 space-y-4 w-full mb-6 lg:mb-0">
                 
@@ -91,6 +116,10 @@ if (isset($_POST['buat_pesanan'])) {
                         <div>
                             <label class="block text-xs font-bold text-slate-600 mb-1">Nama Penerima</label>
                             <input type="text" value="<?= $_SESSION['nama']; ?>" readonly class="w-full px-3.5 py-2.5 rounded-xl border border-slate-100 bg-slate-50 text-slate-500 outline-none cursor-not-allowed text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Nomor Telepon</label>
+                            <input type="tel" name="no_telp" required class="w-full px-3.5 py-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:bg-white focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all duration-300 text-sm text-slate-800 placeholder-slate-400" placeholder="Contoh: 081234567890">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-600 mb-1">Alamat Lengkap</label>

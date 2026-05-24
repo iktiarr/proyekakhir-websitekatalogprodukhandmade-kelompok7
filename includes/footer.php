@@ -19,17 +19,21 @@
           <div class="md:justify-self-end">
             <h3 class="font-bold text-slate-800 text-sm sm:text-base mb-4 tracking-wider uppercase">Hubungi Kami</h3>
             <ul class="space-y-3 text-slate-500 text-sm sm:text-base">
-              <li class="flex items-center hover:text-lime-600 transition-colors duration-300 w-fit cursor-pointer group">
-                <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center mr-3 text-slate-400 group-hover:bg-lime-50 group-hover:text-lime-600 transition-colors">
-                  <i class="fa-solid fa-envelope"></i>
-                </div>
-                info@handmade.com
+              <li>
+                <a href="mailto:info@handmade.com" class="flex items-center hover:text-lime-600 transition-colors duration-300 w-fit cursor-pointer group">
+                  <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center mr-3 text-slate-400 group-hover:bg-lime-50 group-hover:text-lime-600 transition-colors">
+                    <i class="fa-solid fa-envelope"></i>
+                  </div>
+                  info@handmade.com
+                </a>
               </li>
-              <li class="flex items-center hover:text-lime-600 transition-colors duration-300 w-fit cursor-pointer group">
-                <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center mr-3 text-slate-400 group-hover:bg-lime-50 group-hover:text-lime-600 transition-colors">
-                  <i class="fa-solid fa-phone"></i>
-                </div>
-                +62 812 3456 7890
+              <li>
+                <a href="tel:+6281234567890" class="flex items-center hover:text-lime-600 transition-colors duration-300 w-fit cursor-pointer group">
+                  <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center mr-3 text-slate-400 group-hover:bg-lime-50 group-hover:text-lime-600 transition-colors">
+                    <i class="fa-solid fa-phone"></i>
+                  </div>
+                  +62 812 3456 7890
+                </a>
               </li>
             </ul>
           </div>

@@ -8,9 +8,11 @@
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <?php
             $kategori_icons = [
+                'Batik' => 'fa-palette',
+                'Anyaman' => 'fa-rug',
                 'Aksesoris' => 'fa-gem',
                 'Dekorasi' => 'fa-couch',
-                'Pakaian' => 'fa-shirt',
+                'Rajut' => 'fa-scissors',
                 'Lainnya' => 'fa-shapes'
             ];
             $res_kat = mysqli_query($conn, "SELECT * FROM kategori");

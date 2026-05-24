@@ -27,6 +27,9 @@ if (isset($_POST['update_cart'])) {
 }
 
 $query = mysqli_query($conn, "SELECT k.*, p.nama_produk, p.harga, p.gambar, p.stok FROM keranjang k JOIN produk p ON k.id_produk = p.id WHERE k.id_pengguna = $id_pengguna");
+
+$countQuery = mysqli_fetch_assoc(mysqli_query($conn, "SELECT SUM(jumlah) as total_qty FROM keranjang WHERE id_pengguna = $id_pengguna"));
+$total_qty = (int)$countQuery['total_qty'];
 ?>
 
 <?php include 'includes/header.php'; ?>
@@ -35,14 +38,20 @@ $query = mysqli_query($conn, "SELECT k.*, p.nama_produk, p.harga, p.gambar, p.st
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div class="mb-6 sm:mb-8">
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800">Keranjang Belanja</h1>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800">Keranjang Belanja <span class="text-slate-400 font-normal text-lg sm:text-xl">(<?= $total_qty; ?> Item)</span></h1>
         </div>
 
         <?php if (mysqli_num_rows($query) > 0): ?>
-            <div class="lg:flex lg:gap-6 items-start">
-                
-                <div class="lg:w-2/3 w-full mb-6 lg:mb-0">
-                    <form action="" method="POST">
+            <form action="checkout.php" method="POST" id="cartForm">
+                <div class="lg:flex lg:gap-6 items-start">
+                    
+                    <div class="lg:w-2/3 w-full mb-6 lg:mb-0">
+                        <!-- Pilih Semua Header -->
+                        <div class="bg-white px-4 py-2.5 rounded-xl border border-slate-100 shadow-sm mb-3 flex items-center">
+                            <input type="checkbox" id="selectAll" checked class="w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500 cursor-pointer mr-2">
+                            <label for="selectAll" class="text-xs font-bold text-slate-700 cursor-pointer select-none">Pilih Semua</label>
+                        </div>
+                        
                         <div class="space-y-3">
                             <?php 
                             $total = 0;
@@ -51,6 +60,11 @@ $query = mysqli_query($conn, "SELECT k.*, p.nama_produk, p.harga, p.gambar, p.st
                                 $total += $subtotal;
                             ?>
                             <div class="group bg-white p-3 sm:p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 hover:shadow-md hover:border-lime-200 transition-all duration-300 relative">
+                                
+                                <!-- Checkbox Item -->
+                                <div class="flex items-center flex-shrink-0">
+                                    <input type="checkbox" name="cart_ids[]" value="<?= $row['id']; ?>" checked class="cart-checkbox w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500 cursor-pointer" data-price="<?= $row['harga']; ?>" data-id="<?= $row['id']; ?>">
+                                </div>
                                 
                                 <a href="keranjang.php?hapus=<?= $row['id']; ?>" class="absolute top-3 right-3 sm:static sm:order-last text-slate-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors duration-300 flex-shrink-0" title="Hapus Item">
                                     <i class="fa-solid fa-trash-can text-base"></i>
@@ -66,17 +80,17 @@ $query = mysqli_query($conn, "SELECT k.*, p.nama_produk, p.harga, p.gambar, p.st
                                     
                                     <div class="mt-auto flex items-center justify-between sm:hidden pt-2 border-t border-slate-100">
                                         <div class="flex items-center border border-slate-200 rounded bg-white">
-                                            <input type="number" name="jumlah[<?= $row['id']; ?>]" value="<?= $row['jumlah']; ?>" min="1" max="<?= $row['stok']; ?>" class="w-12 text-center font-bold text-slate-800 bg-transparent border-none focus:ring-0 text-xs py-1 p-0">
+                                            <input type="number" name="jumlah[<?= $row['id']; ?>]" value="<?= $row['jumlah']; ?>" min="1" max="<?= $row['stok']; ?>" class="w-12 text-center font-bold text-slate-800 bg-transparent border-none focus:ring-0 text-xs py-1 p-0 quantity-input" data-id="<?= $row['id']; ?>">
                                         </div>
-                                        <p class="text-slate-800 font-bold text-xs">Rp <?= number_format($subtotal, 0, ',', '.'); ?></p>
+                                        <p class="text-slate-800 font-bold text-xs subtotal-val">Rp <?= number_format($subtotal, 0, ',', '.'); ?></p>
                                     </div>
                                 </div>
 
                                 <div class="hidden sm:flex flex-col items-end gap-1.5 flex-shrink-0">
                                     <div class="flex items-center border border-slate-200 rounded bg-white overflow-hidden focus-within:border-lime-500 focus-within:ring-2 focus-within:ring-lime-500/20 transition-all">
-                                        <input type="number" name="jumlah[<?= $row['id']; ?>]" value="<?= $row['jumlah']; ?>" min="1" max="<?= $row['stok']; ?>" class="w-12 text-center font-bold text-slate-800 bg-transparent border-none focus:ring-0 text-xs py-1 px-1">
+                                        <input type="number" name="jumlah[<?= $row['id']; ?>]" value="<?= $row['jumlah']; ?>" min="1" max="<?= $row['stok']; ?>" class="w-12 text-center font-bold text-slate-800 bg-transparent border-none focus:ring-0 text-xs py-1 px-1 quantity-input" data-id="<?= $row['id']; ?>">
                                     </div>
-                                    <p class="text-slate-800 font-extrabold text-xs sm:text-sm">Rp <?= number_format($subtotal, 0, ',', '.'); ?></p>
+                                    <p class="text-slate-800 font-extrabold text-xs sm:text-sm subtotal-val">Rp <?= number_format($subtotal, 0, ',', '.'); ?></p>
                                 </div>
                                 
                             </div>
@@ -87,11 +101,10 @@ $query = mysqli_query($conn, "SELECT k.*, p.nama_produk, p.harga, p.gambar, p.st
                             <a href="katalog.php" class="group flex items-center text-slate-500 font-medium hover:text-lime-600 transition-colors duration-300 text-xs sm:text-sm">
                                 <i class="fa-solid fa-arrow-left mr-1.5 transition-transform duration-300 group-hover:-translate-x-1"></i> Lanjut Belanja
                             </a>
-                            <button type="submit" name="update_cart" class="w-full sm:w-auto bg-slate-100 text-slate-600 px-4 py-2 rounded-lg font-bold hover:bg-lime-50 hover:text-lime-700 hover:border-lime-200 border border-transparent transition-all duration-300 flex items-center justify-center text-xs sm:text-sm">
+                            <button type="submit" name="update_cart" formaction="keranjang.php" class="w-full sm:w-auto bg-slate-100 text-slate-600 px-4 py-2 rounded-lg font-bold hover:bg-lime-50 hover:text-lime-700 hover:border-lime-200 border border-transparent transition-all duration-300 flex items-center justify-center text-xs sm:text-sm cursor-pointer">
                                 <i class="fa-solid fa-rotate mr-1.5"></i> Update Keranjang
                             </button>
                         </div>
-                    </form>
                 </div>
 
                 <div class="lg:w-1/3 w-full">
@@ -101,7 +114,7 @@ $query = mysqli_query($conn, "SELECT k.*, p.nama_produk, p.harga, p.gambar, p.st
                         <div class="space-y-3 mb-6">
                             <div class="flex justify-between text-slate-500 text-xs sm:text-sm">
                                 <span>Subtotal</span>
-                                <span class="font-medium text-slate-700">Rp <?= number_format($total, 0, ',', '.'); ?></span>
+                                <span class="font-medium text-slate-700 total-val">Rp <?= number_format($total, 0, ',', '.'); ?></span>
                             </div>
                             <div class="flex justify-between text-slate-500 text-xs sm:text-sm">
                                 <span>Estimasi Pengiriman</span>
@@ -112,17 +125,18 @@ $query = mysqli_query($conn, "SELECT k.*, p.nama_produk, p.harga, p.gambar, p.st
                             
                             <div class="flex justify-between items-center">
                                 <span class="text-sm sm:text-base font-bold text-slate-800">Total</span>
-                                <span class="text-lg sm:text-xl font-extrabold text-lime-600">Rp <?= number_format($total, 0, ',', '.'); ?></span>
+                                <span class="text-lg sm:text-xl font-extrabold text-lime-600 total-val">Rp <?= number_format($total, 0, ',', '.'); ?></span>
                             </div>
                         </div>
                         
-                        <a href="checkout.php" class="group w-full inline-flex items-center justify-center bg-lime-600 text-white py-2.5 rounded-lg font-bold text-sm hover:bg-lime-700 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-lime-200/50 transition-all duration-300">
+                        <button type="submit" name="checkout" class="group w-full inline-flex items-center justify-center bg-lime-600 text-white py-2.5 rounded-lg font-bold text-sm hover:bg-lime-700 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-lime-200/50 transition-all duration-300 cursor-pointer border-none outline-none">
                             Checkout Sekarang <i class="fa-solid fa-arrow-right ml-1.5 transition-transform duration-300 group-hover:translate-x-1"></i>
-                        </a>
+                        </button>
                     </div>
                 </div>
                 
             </div>
+        </form>
             
         <?php else: ?>
             
@@ -143,5 +157,96 @@ $query = mysqli_query($conn, "SELECT k.*, p.nama_produk, p.harga, p.gambar, p.st
         
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.cart-checkbox');
+    const qtyInputs = document.querySelectorAll('.quantity-input');
+
+    function calculateTotal() {
+        let total = 0;
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                const id = cb.getAttribute('data-id');
+                const price = parseFloat(cb.getAttribute('data-price'));
+                
+                // Find quantity input
+                const qtyInput = document.querySelector(`.quantity-input[data-id="${id}"]`);
+                const qty = qtyInput ? parseInt(qtyInput.value) || 0 : 0;
+                const subtotal = price * qty;
+                
+                // Update subtotal elements
+                const group = cb.closest('.group');
+                if (group) {
+                    const subtotalElements = group.querySelectorAll('.subtotal-val');
+                    subtotalElements.forEach(el => {
+                        el.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(subtotal);
+                    });
+                }
+                
+                total += subtotal;
+            } else {
+                // If not checked, set subtotal to 0 or update it based on quantity anyway
+                const id = cb.getAttribute('data-id');
+                const price = parseFloat(cb.getAttribute('data-price'));
+                const qtyInput = document.querySelector(`.quantity-input[data-id="${id}"]`);
+                const qty = qtyInput ? parseInt(qtyInput.value) || 0 : 0;
+                const subtotal = price * qty;
+                const group = cb.closest('.group');
+                if (group) {
+                    const subtotalElements = group.querySelectorAll('.subtotal-val');
+                    subtotalElements.forEach(el => {
+                        el.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(subtotal);
+                    });
+                }
+            }
+        });
+        
+        // Update all total-val elements
+        const totalElements = document.querySelectorAll('.total-val');
+        totalElements.forEach(el => {
+            el.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(total);
+        });
+    }
+
+    // Sync quantity inputs and recalculate
+    qtyInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const id = this.getAttribute('data-id');
+            const val = this.value;
+            const matches = document.querySelectorAll(`.quantity-input[data-id="${id}"]`);
+            matches.forEach(m => {
+                if (m !== this) m.value = val;
+            });
+            calculateTotal();
+        });
+        input.addEventListener('change', function() {
+            const id = this.getAttribute('data-id');
+            const val = this.value;
+            const matches = document.querySelectorAll(`.quantity-input[data-id="${id}"]`);
+            matches.forEach(m => {
+                if (m !== this) m.value = val;
+            });
+            calculateTotal();
+        });
+    });
+
+    // Checkboxes change listeners
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', calculateTotal);
+    });
+
+    // Select All listener
+    if (checkAll) {
+        checkAll.addEventListener('change', function() {
+            checkboxes.forEach(cb => {
+                cb.checked = this.checked;
+            });
+            calculateTotal();
+        });
+    }
+});
+</script>
 
 <?php include 'includes/footer.php'; ?>

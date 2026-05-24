@@ -15,7 +15,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <?php
-      $produk = mysqli_query($conn, "SELECT p.*, k.nama_kategori FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LIMIT 4");
+      $produk = mysqli_query($conn, "SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id LIMIT 4");
       if (mysqli_num_rows($produk) > 0):
         while($row = mysqli_fetch_assoc($produk)):
       ?>
@@ -28,10 +28,15 @@
             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&q=80&w=500';"
           >
-          <div class="absolute top-2.5 left-2.5">
+          <div class="absolute top-2.5 left-2.5 flex gap-1.5">
             <span class="bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-[9px] font-bold text-slate-700 uppercase tracking-widest shadow-sm">
               <?= $row['nama_kategori']; ?>
             </span>
+            <?php if(!empty($row['nama_daerah'])): ?>
+              <span class="bg-lime-600/90 backdrop-blur-sm px-2 py-1 rounded text-[9px] font-bold text-white uppercase tracking-widest shadow-sm flex items-center gap-0.5">
+                <i class="fa-solid fa-location-dot"></i> <?= $row['nama_daerah']; ?>
+              </span>
+            <?php endif; ?>
           </div>
         </div>
         

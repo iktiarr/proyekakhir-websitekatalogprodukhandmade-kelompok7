@@ -14,6 +14,10 @@ $queries = [
         id INT AUTO_INCREMENT PRIMARY KEY,
         nama_kategori VARCHAR(50) NOT NULL
     )",
+    "CREATE TABLE IF NOT EXISTS daerah (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nama_daerah VARCHAR(50) NOT NULL UNIQUE
+    )",
     "CREATE TABLE IF NOT EXISTS produk (
         id INT AUTO_INCREMENT PRIMARY KEY,
         nama_produk VARCHAR(100) NOT NULL,
@@ -22,7 +26,9 @@ $queries = [
         stok INT NOT NULL,
         gambar VARCHAR(255),
         id_kategori INT,
-        FOREIGN KEY (id_kategori) REFERENCES kategori(id) ON DELETE SET NULL
+        id_daerah INT,
+        FOREIGN KEY (id_kategori) REFERENCES kategori(id) ON DELETE SET NULL,
+        FOREIGN KEY (id_daerah) REFERENCES daerah(id) ON DELETE SET NULL
     )",
     "CREATE TABLE IF NOT EXISTS pesanan (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -90,10 +96,35 @@ if (mysqli_num_rows($checkAdmin) == 0) {
     }
 }
 
-$checkKategori = mysqli_query($conn, "SELECT * FROM kategori");
-if (mysqli_num_rows($checkKategori) == 0) {
-    mysqli_query($conn, "INSERT INTO kategori (nama_kategori) VALUES ('Aksesoris'), ('Dekorasi'), ('Pakaian'), ('Lainnya')");
-    echo "<p style='color: blue;'>Kategori default dibuat.</p>";
+$checkBatik = mysqli_query($conn, "SELECT * FROM kategori WHERE nama_kategori = 'Batik'");
+if (mysqli_num_rows($checkBatik) == 0) {
+    mysqli_query($conn, "SET FOREIGN_KEY_CHECKS = 0");
+    mysqli_query($conn, "TRUNCATE TABLE kategori");
+    mysqli_query($conn, "INSERT INTO kategori (nama_kategori) VALUES ('Batik'), ('Anyaman'), ('Aksesoris'), ('Dekorasi'), ('Rajut')");
+    mysqli_query($conn, "SET FOREIGN_KEY_CHECKS = 1");
+    echo "<p style='color: blue;'>Kategori didefinisikan ulang: Batik, Anyaman, Aksesoris, Dekorasi, Rajut.</p>";
+}
+
+$checkDaerahTable = mysqli_query($conn, "SHOW TABLES LIKE 'daerah'");
+if ($checkDaerahTable && mysqli_num_rows($checkDaerahTable) > 0) {
+    $checkDaerah = mysqli_query($conn, "SELECT * FROM daerah");
+    if (!$checkDaerah || mysqli_num_rows($checkDaerah) == 0) {
+        mysqli_query($conn, "INSERT INTO daerah (nama_daerah) VALUES ('Sumenep'), ('Pamekasan'), ('Sampang'), ('Bangkalan')");
+        echo "<p style='color: blue;'>Seeder daerah berhasil dimasukkan: Sumenep, Pamekasan, Sampang, Bangkalan.</p>";
+    }
+}
+
+$checkOldColumn = mysqli_query($conn, "SHOW COLUMNS FROM produk LIKE 'daerah'");
+if ($checkOldColumn && mysqli_num_rows($checkOldColumn) > 0) {
+    mysqli_query($conn, "ALTER TABLE produk DROP COLUMN daerah");
+    echo "<p style='color: blue;'>Kolom daerah (lama) berhasil dihapus dari tabel produk.</p>";
+}
+
+$checkNewColumn = mysqli_query($conn, "SHOW COLUMNS FROM produk LIKE 'id_daerah'");
+if ($checkNewColumn && mysqli_num_rows($checkNewColumn) == 0) {
+    mysqli_query($conn, "ALTER TABLE produk ADD COLUMN id_daerah INT NULL");
+    mysqli_query($conn, "ALTER TABLE produk ADD CONSTRAINT fk_produk_daerah FOREIGN KEY (id_daerah) REFERENCES daerah(id) ON DELETE SET NULL");
+    echo "<p style='color: blue;'>Kolom id_daerah (baru) dan relasi berhasil ditambahkan ke tabel produk.</p>";
 }
 
 echo "</div>";

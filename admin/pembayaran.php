@@ -36,35 +36,35 @@ $query = mysqli_query($conn, "SELECT p.*, u.nama FROM pesanan p JOIN pengguna u 
 <body class="bg-slate-50 flex text-slate-800 selection:bg-lime-200 selection:text-lime-900">
     
     <!-- Sidebar Admin -->
-    <aside class="w-56 bg-white min-h-screen border-r border-slate-200 flex flex-col sticky top-0 shadow-sm z-10">
+    <aside class="w-56 bg-white min-h-screen border-r border-slate-200 flex flex-col sticky top-0 z-10">
         <div class="p-5 pb-3">
-            <a href="../index.php" class="text-xl font-extrabold text-slate-800 tracking-tight transition-transform hover:scale-105 inline-block">
+            <a href="../index.php" class="text-xl font-extrabold text-slate-800 tracking-tight inline-block">
                 Hand<span class="text-lime-600">made.</span>
             </a>
             <p class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mt-0.5">Admin Panel</p>
         </div>
         
         <nav class="flex-1 px-3 space-y-1">
-            <a href="index.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Dasbor
+            <a href="index.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm group">
+                <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center"></i> Dasbor
             </a>
-            <a href="produk.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-box-open mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Produk
+            <a href="produk.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm group">
+                <i class="fa-solid fa-box-open mr-2.5 w-4 text-center"></i> Produk
             </a>
-            <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 text-lime-700 rounded-lg font-bold text-sm transition-colors">
+            <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 text-lime-700 rounded-lg font-bold text-sm">
                 <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center"></i> Pembayaran
             </a>
-            <a href="testimonial.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-comments mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Testimonial
+            <a href="testimonial.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm group">
+                <i class="fa-solid fa-comments mr-2.5 w-4 text-center"></i> Testimonial
             </a>
-            <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-users mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pengguna
+            <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm group">
+                <i class="fa-solid fa-users mr-2.5 w-4 text-center"></i> Pengguna
             </a>
         </nav>
         
         <div class="p-3 border-t border-slate-100">
-            <a href="../logout.php" class="flex items-center px-3.5 py-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg font-bold text-sm transition-colors group">
-                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center group-hover:-translate-x-1 transition-transform"></i> Keluar
+            <a href="../logout.php" class="flex items-center px-3.5 py-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg font-bold text-sm group">
+                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center"></i> Keluar
             </a>
         </div>
     </aside>
@@ -77,7 +77,7 @@ $query = mysqli_query($conn, "SELECT p.*, u.nama FROM pesanan p JOIN pengguna u 
         </div>
 
         <!-- Tabel Pembayaran -->
-        <div class="bg-white rounded-xl border border-slate-100 shadow-sm">
+        <div class="bg-white rounded-xl border border-slate-200">
             <table class="w-full text-left">
                 <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase tracking-wider font-bold border-b border-slate-100">
                     <tr>
@@ -101,8 +101,9 @@ $query = mysqli_query($conn, "SELECT p.*, u.nama FROM pesanan p JOIN pengguna u 
                                 'dibatalkan' => 'bg-red-50 text-red-600 border-red-200'
                             ];
                     ?>
-                    <tr class="hover:bg-slate-50/80 transition-colors duration-200 text-xs sm:text-sm">
+                    <tr class="hover:bg-slate-50/80 text-xs sm:text-sm">
                         <td class="px-4 py-3 pl-6 font-mono text-[11px] font-bold text-slate-400">
+                            #HM-<?= str_pad($row['id'], 5, '0', STR_PAD_LEFT); ?>
                         </td>
                         <td class="px-4 py-3">
                             <span class="font-bold text-slate-800"><?= $row['nama']; ?></span>

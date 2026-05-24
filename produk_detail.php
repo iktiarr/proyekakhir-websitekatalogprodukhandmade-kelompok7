@@ -7,7 +7,7 @@ if (!isset($_GET['id'])) {
 }
 
 $id = (int)$_GET['id'];
-$query = mysqli_query($conn, "SELECT p.*, k.nama_kategori FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id WHERE p.id = $id");
+$query = mysqli_query($conn, "SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id WHERE p.id = $id");
 $produk = mysqli_fetch_assoc($query);
 
 if (!$produk) {
@@ -52,10 +52,15 @@ if (isset($_POST['tambah_keranjang'])) {
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&q=80&w=1000';"
                     >
-                    <div class="absolute top-3 left-3">
+                    <div class="absolute top-3 left-3 flex gap-2">
                         <span class="bg-white/95 backdrop-blur-sm px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-slate-700 shadow-sm border border-slate-100 uppercase tracking-widest">
                             <?= $produk['nama_kategori']; ?>
                         </span>
+                        <?php if(!empty($produk['nama_daerah'])): ?>
+                            <span class="bg-lime-600/95 backdrop-blur-sm px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-white shadow-sm border border-lime-600 uppercase tracking-widest flex items-center gap-1">
+                                <i class="fa-solid fa-location-dot"></i> <?= $produk['nama_daerah']; ?>
+                            </span>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

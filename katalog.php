@@ -2,15 +2,28 @@
 include 'koneksi.php';
 
 $kat_id = isset($_GET['kategori']) ? (int)$_GET['kategori'] : 0;
+$daerah_id = isset($_GET['daerah']) ? (int)$_GET['daerah'] : 0;
+
 $query_kat = "SELECT * FROM kategori";
 $res_kat = mysqli_query($conn, $query_kat);
 
-$where = "";
+$query_daerah = "SELECT * FROM daerah";
+$res_daerah = mysqli_query($conn, $query_daerah);
+
+$where = [];
 if ($kat_id > 0) {
-    $where = " WHERE id_kategori = $kat_id";
+    $where[] = "p.id_kategori = $kat_id";
+}
+if ($daerah_id > 0) {
+    $where[] = "p.id_daerah = $daerah_id";
 }
 
-$query_produk = "SELECT p.*, k.nama_kategori FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id $where";
+$where_clause = "";
+if (count($where) > 0) {
+    $where_clause = " WHERE " . implode(" AND ", $where);
+}
+
+$query_produk = "SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id $where_clause";
 $res_produk = mysqli_query($conn, $query_produk);
 ?>
 
@@ -24,19 +37,40 @@ $res_produk = mysqli_query($conn, $query_produk);
             <p class="text-slate-500 text-xs sm:text-sm mt-1 max-w-2xl">Jelajahi karya seni terbaik dari pengrajin kami. Temukan produk yang sesuai dengan selera Anda.</p>
         </div>
 
-        <!-- Filter Kategori (Compact) -->
-        <div class="flex flex-wrap items-center gap-2 mb-6">
-            <a href="katalog.php" class="<?= $kat_id == 0 ? 'bg-lime-600 text-white shadow-sm border-lime-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-lime-600 hover:border-lime-200' ?> px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all duration-300 border">
-                Semua Produk
-            </a>
-            
-            <?php 
-            mysqli_data_seek($res_kat, 0);
-            while($k = mysqli_fetch_assoc($res_kat)): ?>
-                <a href="katalog.php?kategori=<?= $k['id']; ?>" class="<?= $kat_id == $k['id'] ? 'bg-lime-600 text-white shadow-sm border-lime-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-lime-600 hover:border-lime-200' ?> px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all duration-300 border">
-                    <?= $k['nama_kategori']; ?>
-                </a>
-            <?php endwhile; ?>
+        <!-- Filter Kategori & Daerah -->
+        <div class="mb-5 space-y-4">
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5"><i class="fa-solid fa-tags mr-1"></i>Kategori</p>
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <a href="katalog.php<?= $daerah_id > 0 ? '?daerah=' . $daerah_id : ''; ?>" class="<?= $kat_id == 0 ? 'bg-lime-600 text-white shadow-sm border-lime-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-lime-600 hover:border-lime-200' ?> px-3 py-1 rounded-xl font-bold text-xs border">
+                        Semua Kategori
+                    </a>
+                    
+                    <?php 
+                    mysqli_data_seek($res_kat, 0);
+                    while($k = mysqli_fetch_assoc($res_kat)): ?>
+                        <a href="katalog.php?kategori=<?= $k['id']; ?><?= $daerah_id > 0 ? '&daerah=' . $daerah_id : ''; ?>" class="<?= $kat_id == $k['id'] ? 'bg-lime-600 text-white shadow-sm border-lime-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-lime-600 hover:border-lime-200' ?> px-3 py-1 rounded-xl font-bold text-xs border">
+                            <?= $k['nama_kategori']; ?>
+                        </a>
+                    <?php endwhile; ?>
+                </div>
+            </div>
+
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5"><i class="fa-solid fa-location-dot mr-1"></i>Asal Daerah</p>
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <a href="katalog.php<?= $kat_id > 0 ? '?kategori=' . $kat_id : ''; ?>" class="<?= $daerah_id == 0 ? 'bg-lime-600 text-white shadow-sm border-lime-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-lime-600 hover:border-lime-200' ?> px-3 py-1 rounded-xl font-bold text-xs border">
+                        Semua Daerah
+                    </a>
+                    
+                    <?php 
+                    while($d = mysqli_fetch_assoc($res_daerah)): ?>
+                        <a href="katalog.php?daerah=<?= $d['id']; ?><?= $kat_id > 0 ? '&kategori=' . $kat_id : ''; ?>" class="<?= $daerah_id == $d['id'] ? 'bg-lime-600 text-white shadow-sm border-lime-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-lime-600 hover:border-lime-200' ?> px-3 py-1 rounded-xl font-bold text-xs border">
+                            <?= $d['nama_daerah']; ?>
+                        </a>
+                    <?php endwhile; ?>
+                </div>
+            </div>
         </div>
 
         <!-- Grid Produk (Compact) -->
@@ -53,10 +87,15 @@ $res_produk = mysqli_query($conn, $query_produk);
                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&q=80&w=500';"
                         >
-                        <div class="absolute top-2.5 left-2.5">
+                        <div class="absolute top-2.5 left-2.5 flex gap-1.5">
                             <span class="bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-[9px] font-bold text-slate-700 uppercase tracking-widest shadow-sm">
                                 <?= $row['nama_kategori']; ?>
                             </span>
+                            <?php if(!empty($row['nama_daerah'])): ?>
+                                <span class="bg-lime-600/90 backdrop-blur-sm px-2 py-1 rounded text-[9px] font-bold text-white uppercase tracking-widest shadow-sm flex items-center gap-0.5">
+                                    <i class="fa-solid fa-location-dot"></i> <?= $row['nama_daerah']; ?>
+                                </span>
+                            <?php endif; ?>
                         </div>
                     </div>
                     
