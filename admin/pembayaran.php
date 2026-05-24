@@ -18,6 +18,8 @@ if (isset($_GET['id']) && isset($_GET['status'])) {
 
 
 $query = mysqli_query($conn, "SELECT p.*, u.nama FROM pesanan p JOIN pengguna u ON p.id_pengguna = u.id ORDER BY p.tanggal_pesanan DESC");
+$pendingPayments = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
+$pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
 ?>
 
 <!doctype html>
@@ -27,59 +29,79 @@ $query = mysqli_query($conn, "SELECT p.*, u.nama FROM pesanan p JOIN pengguna u 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Verifikasi Pembayaran - Handmade Admin</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link class="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
+    <style type="text/tailwindcss">
+        @import "tailwindcss";
+        @custom-variant dark (&:where(.dark, .dark *));
+    </style>
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 </head>
-<body class="bg-slate-50 flex text-slate-800 selection:bg-lime-200 selection:text-lime-900">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex selection:bg-lime-200 selection:text-lime-900 transition-colors duration-300 min-h-screen">
     
     <!-- Sidebar Admin -->
-    <aside class="w-56 bg-white min-h-screen border-r border-slate-200 flex flex-col sticky top-0 z-10">
+    <aside class="w-56 bg-white dark:bg-slate-900 min-h-screen border-r border-slate-200 dark:border-slate-800 flex flex-col sticky top-0 z-10 transition-colors duration-300">
         <div class="p-5 pb-3">
-            <a href="../index.php" class="text-xl font-extrabold text-slate-800 tracking-tight inline-block">
+            <a href="../index.php" class="text-xl font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block hover:scale-105 transition-transform">
                 Hand<span class="text-lime-600">made.</span>
             </a>
-            <p class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mt-0.5">Admin Panel</p>
+            <p class="text-[9px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold mt-0.5">Admin Panel</p>
         </div>
         
         <nav class="flex-1 px-3 space-y-1">
-            <a href="index.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm group">
-                <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center"></i> Dasbor
+            <a href="index.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+                <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Dasbor
             </a>
-            <a href="produk.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm group">
-                <i class="fa-solid fa-box-open mr-2.5 w-4 text-center"></i> Produk
+            <a href="produk.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+                <i class="fa-solid fa-box-open mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Produk
             </a>
-            <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 text-lime-700 rounded-lg font-bold text-sm">
+            <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-lg font-bold text-sm transition-colors">
                 <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center"></i> Pembayaran
+                <?php if ($pendingPayments > 0): ?>
+                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pendingPayments; ?></span>
+                <?php endif; ?>
             </a>
-            <a href="testimonial.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm group">
-                <i class="fa-solid fa-comments mr-2.5 w-4 text-center"></i> Testimonial
+            <a href="testimonial.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+                <i class="fa-solid fa-comments mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Testimonial
+                <?php if ($pendingTestimonial > 0): ?>
+                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pendingTestimonial; ?></span>
+                <?php endif; ?>
             </a>
-            <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-lime-600 rounded-lg font-medium text-sm group">
-                <i class="fa-solid fa-users mr-2.5 w-4 text-center"></i> Pengguna
+            <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+                <i class="fa-solid fa-users mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pengguna
             </a>
         </nav>
         
-        <div class="p-3 border-t border-slate-100">
-            <a href="../logout.php" class="flex items-center px-3.5 py-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg font-bold text-sm group">
-                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center"></i> Keluar
+        <div class="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
+            <a href="../logout.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg font-bold text-sm transition-colors group flex-grow">
+                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center group-hover:-translate-x-0.5 transition-transform"></i> Keluar
             </a>
+            <button id="theme-toggle" class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Ubah Tema">
+                <i id="theme-toggle-icon" class="fa-solid fa-moon text-base"></i>
+            </button>
         </div>
     </aside>
 
-    <main class="flex-1 p-5 sm:p-6 max-w-7xl">
+    <main class="flex-grow p-5 sm:p-6 max-w-7xl">
         
         <div class="mb-6">
-            <h1 class="text-2xl font-extrabold text-slate-800">Verifikasi Pembayaran</h1>
-            <p class="text-slate-500 text-xs mt-0.5">Tinjau bukti konfirmasi dari pelanggan dan perbarui status pesanan.</p>
+            <h1 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100">Verifikasi Pembayaran</h1>
+            <p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Tinjau bukti konfirmasi dari pelanggan dan perbarui status pesanan.</p>
         </div>
 
         <!-- Tabel Pembayaran -->
-        <div class="bg-white rounded-xl border border-slate-200">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm transition-colors duration-300">
             <table class="w-full text-left">
-                <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase tracking-wider font-bold border-b border-slate-100">
+                <thead class="bg-slate-50 dark:bg-slate-900/50 text-slate-400 dark:text-slate-500 text-[10px] uppercase tracking-wider font-bold border-b border-slate-100 dark:border-slate-800">
                     <tr>
                         <th class="px-4 py-3.5 pl-6">ID Pesanan</th>
                         <th class="px-4 py-3.5">Pelanggan</th>
@@ -89,62 +111,62 @@ $query = mysqli_query($conn, "SELECT p.*, u.nama FROM pesanan p JOIN pengguna u 
                         <th class="px-4 py-3.5 pr-6 text-right">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-50">
+                <tbody class="divide-y divide-slate-50 dark:divide-slate-800/60">
                     <?php 
                     if(mysqli_num_rows($query) > 0):
                         while($row = mysqli_fetch_assoc($query)): 
                             $status_colors = [
-                                'menunggu'   => 'bg-amber-50 text-amber-600 border-amber-200',
-                                'dibayar'    => 'bg-blue-50 text-blue-600 border-blue-200',
-                                'dikirim'    => 'bg-indigo-50 text-indigo-600 border-indigo-200',
-                                'selesai'    => 'bg-lime-50 text-lime-700 border-lime-200',
-                                'dibatalkan' => 'bg-red-50 text-red-600 border-red-200'
+                                'menunggu'   => 'bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/30',
+                                'dibayar'    => 'bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-900/30',
+                                'dikirim'    => 'bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-900/30',
+                                'selesai'    => 'bg-lime-50 dark:bg-lime-950/20 text-lime-700 dark:text-lime-400 border-lime-200 dark:border-lime-900/30',
+                                'dibatalkan' => 'bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 border-red-200 dark:border-red-900/30'
                             ];
                     ?>
-                    <tr class="hover:bg-slate-50/80 text-xs sm:text-sm">
-                        <td class="px-4 py-3 pl-6 font-mono text-[11px] font-bold text-slate-400">
+                    <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 text-xs sm:text-sm transition-colors duration-200">
+                        <td class="px-4 py-3 pl-6 font-mono text-[11px] font-bold text-slate-400 dark:text-slate-500">
                             #HM-<?= str_pad($row['id'], 5, '0', STR_PAD_LEFT); ?>
                         </td>
                         <td class="px-4 py-3">
-                            <span class="font-bold text-slate-800"><?= $row['nama']; ?></span>
+                            <span class="font-bold text-slate-800 dark:text-slate-200"><?= $row['nama']; ?></span>
                         </td>
-                        <td class="px-4 py-3 font-extrabold text-slate-800 whitespace-nowrap">
+                        <td class="px-4 py-3 font-extrabold text-slate-800 dark:text-slate-200 whitespace-nowrap">
                             Rp <?= number_format($row['total_harga'], 0, ',', '.'); ?>
                         </td>
                         <td class="px-4 py-3">
                             <?php if ($row['bukti_pembayaran']): ?>
-                                <span class="inline-flex items-center text-lime-700 font-bold text-[10px] bg-lime-50 px-2 py-1 rounded border border-lime-100">
-                                    <i class="fa-solid fa-file-invoice-dollar mr-1 text-lime-600"></i> <?= $row['bukti_pembayaran']; ?>
+                                <span class="inline-flex items-center text-lime-700 dark:text-lime-400 font-bold text-[10px] bg-lime-50 dark:bg-lime-950/40 px-2 py-1 rounded border border-lime-100 dark:border-lime-900/40 whitespace-nowrap">
+                                    <i class="fa-solid fa-file-invoice-dollar mr-1 text-lime-600 dark:text-lime-450"></i> <?= $row['bukti_pembayaran']; ?>
                                 </span>
                             <?php else: ?>
-                                <span class="text-slate-300 italic text-[11px] whitespace-nowrap">Belum Konfirmasi</span>
+                                <span class="text-slate-350 dark:text-slate-600 italic text-[11px] whitespace-nowrap">Belum Konfirmasi</span>
                             <?php endif; ?>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <span class="inline-block px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border whitespace-nowrap <?= $status_colors[$row['status']] ?? 'bg-slate-50 text-slate-400 border-slate-200'; ?>">
+                            <span class="inline-block px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border whitespace-nowrap <?= $status_colors[$row['status']] ?? 'bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-800'; ?>">
                                 <?= $row['status']; ?>
                             </span>
                         </td>
                         <td class="px-4 py-3 pr-6 text-right">
                             <div class="relative inline-block text-left group/menu">
-                                <button class="p-1.5 w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none cursor-pointer">
+                                <button class="p-1.5 w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none cursor-pointer">
                                     <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
                                 </button>
                                 
-                                <div class="absolute right-0 w-44 mt-1 bg-white rounded-xl shadow-lg border border-slate-100 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible group-hover/menu:-translate-y-1 transition-all duration-200 z-50 overflow-hidden transform origin-top-right">
+                                <div class="absolute right-0 w-44 mt-1 bg-white dark:bg-slate-900 rounded-xl shadow-lg dark:shadow-none border border-slate-100 dark:border-slate-850 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible group-hover/menu:-translate-y-1 transition-all duration-200 z-50 overflow-hidden transform origin-top-right">
                                     <div class="py-1 text-left">
-                                        <p class="px-4 py-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50">Ubah Status</p>
-                                        <a href="pembayaran.php?id=<?= $row['id']; ?>&status=dibayar" class="block px-4 py-2 text-xs font-bold text-blue-600 hover:bg-blue-50 transition-colors">
+                                        <p class="px-4 py-2 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest border-b border-slate-50 dark:border-slate-850">Ubah Status</p>
+                                        <a href="pembayaran.php?id=<?= $row['id']; ?>&status=dibayar" class="block px-4 py-2 text-xs font-bold text-blue-650 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors">
                                             <i class="fa-solid fa-check w-4"></i> Konfirmasi Bayar
                                         </a>
-                                        <a href="pembayaran.php?id=<?= $row['id']; ?>&status=dikirim" class="block px-4 py-2 text-xs font-bold text-indigo-600 hover:bg-indigo-50 transition-colors">
+                                        <a href="pembayaran.php?id=<?= $row['id']; ?>&status=dikirim" class="block px-4 py-2 text-xs font-bold text-indigo-655 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors">
                                             <i class="fa-solid fa-truck-fast w-4"></i> Kirim Produk
                                         </a>
-                                        <a href="pembayaran.php?id=<?= $row['id']; ?>&status=selesai" class="block px-4 py-2 text-xs font-bold text-lime-600 hover:bg-lime-50 transition-colors">
+                                        <a href="pembayaran.php?id=<?= $row['id']; ?>&status=selesai" class="block px-4 py-2 text-xs font-bold text-lime-650 dark:text-lime-400 hover:bg-lime-50 dark:hover:bg-lime-950/30 transition-colors">
                                             <i class="fa-solid fa-flag-checkered w-4"></i> Selesaikan
                                         </a>
-                                        <div class="h-px bg-slate-50 my-1"></div>
-                                        <a href="pembayaran.php?id=<?= $row['id']; ?>&status=dibatalkan" class="block px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors">
+                                        <div class="h-px bg-slate-55 dark:bg-slate-800 my-1"></div>
+                                        <a href="pembayaran.php?id=<?= $row['id']; ?>&status=dibatalkan" class="block px-4 py-2 text-xs font-bold text-red-650 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
                                             <i class="fa-solid fa-xmark w-4"></i> Batalkan
                                         </a>
                                     </div>
@@ -157,9 +179,9 @@ $query = mysqli_query($conn, "SELECT p.*, u.nama FROM pesanan p JOIN pengguna u 
                     else:
                     ?>
                     <tr>
-                        <td colspan="6" class="px-4 py-10 text-center text-slate-400">
+                        <td colspan="6" class="px-4 py-10 text-center text-slate-400 dark:text-slate-500">
                             <div class="flex flex-col items-center justify-center">
-                                <i class="fa-solid fa-inbox text-2xl mb-2.5 text-slate-300"></i>
+                                <i class="fa-solid fa-inbox text-2xl mb-2.5 text-slate-350 dark:text-slate-700"></i>
                                 <p class="text-xs">Belum ada pesanan masuk.</p>
                             </div>
                         </td>
@@ -169,5 +191,48 @@ $query = mysqli_query($conn, "SELECT p.*, u.nama FROM pesanan p JOIN pengguna u 
             </table>
         </div>
     </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleIcon = document.getElementById('theme-toggle-icon');
+
+        function updateIcon() {
+            if (document.documentElement.classList.contains('dark')) {
+                if (themeToggleIcon) {
+                    themeToggleIcon.classList.replace('fa-moon', 'fa-sun');
+                }
+            } else {
+                if (themeToggleIcon) {
+                    themeToggleIcon.classList.replace('fa-sun', 'fa-moon');
+                }
+            }
+        }
+
+        updateIcon();
+
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', () => {
+                if (themeToggleIcon) {
+                    themeToggleIcon.style.transform = 'rotate(360deg)';
+                }
+                
+                setTimeout(() => {
+                    if (document.documentElement.classList.contains('dark')) {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('theme', 'light');
+                    } else {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('theme', 'dark');
+                    }
+                    updateIcon();
+                    if (themeToggleIcon) {
+                        themeToggleIcon.style.transform = '';
+                    }
+                }, 150);
+            });
+        }
+    });
+    </script>
 </body>
 </html>
