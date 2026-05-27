@@ -5,15 +5,18 @@ $user = 'o1gMRaidvREj2xW.root';
 $pass = 'aU9NXWLYnVHzPiNC';
 $db   = 'uas_bersama';
 
-$conn = mysqli_init();
+$koneksi = mysqli_init();
 
-mysqli_ssl_set($conn, NULL, NULL, NULL, NULL, NULL);
+mysqli_ssl_set($koneksi, NULL, NULL, NULL, NULL, NULL);
 
-$koneksi = mysqli_real_connect($conn, $host, $user, $pass, $db, $port, NULL, MYSQLI_CLIENT_SSL);
+$berhasil_koneksi = mysqli_real_connect($koneksi, $host, $user, $pass, $db, $port, NULL, MYSQLI_CLIENT_SSL);
 
-if (!$koneksi) {
+if (!$berhasil_koneksi) {
     die("Koneksi Gagal: " . mysqli_connect_error());
 }
+
+mysqli_query($koneksi, "ALTER TABLE pengguna ADD COLUMN IF NOT EXISTS alamat TEXT NULL");
+mysqli_query($koneksi, "ALTER TABLE pengguna ADD COLUMN IF NOT EXISTS no_telp VARCHAR(20) NULL");
 
 date_default_timezone_set('Asia/Jakarta');
 

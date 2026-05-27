@@ -1,12 +1,16 @@
-<?php include 'koneksi.php'; ?>
-<?php include 'includes/header.php'; ?>
+<?php 
+$awalan = ""; 
+include 'koneksi.php'; 
+include 'bagian/atas.php'; 
+?>
 
-<?php include 'sections/hero.php'; ?>
-<?php include 'sections/about.php'; ?>
-<?php include 'sections/badge.php'; ?>
-<?php include 'sections/categories.php'; ?>
-<?php include 'sections/featured.php'; ?>
-<?php include 'sections/testimonials.php'; ?>
-<?php include 'sections/faq.php'; ?>
+<?php include 'bagian/utama.php'; ?>
+<?php include 'bagian/tentang.php'; ?>
+<?php include 'bagian/lencana.php'; ?>
+<?php include 'bagian/unggulan.php'; ?>
+<?php include 'bagian/galeri.php'; ?>
+<?php include 'bagian/harga.php'; ?>
+<?php include 'bagian/testimoni.php'; ?>
+<?php include 'bagian/tanya_jawab.php'; ?>
 
-<?php include 'includes/footer.php'; ?>
+<?php include 'bagian/bawah.php'; ?>

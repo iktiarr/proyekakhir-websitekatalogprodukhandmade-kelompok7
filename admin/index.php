@@ -1,22 +1,90 @@
 <?php
 include '../koneksi.php';
 
-
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../masuk.php");
     exit();
 }
 
+mysqli_query($koneksi, "
+    CREATE TABLE IF NOT EXISTS log_aktivitas (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        id_pengguna INT NULL,
+        nama_pengguna VARCHAR(100) NOT NULL,
+        tipe_aktivitas VARCHAR(50) NOT NULL,
+        aksi VARCHAR(50) NOT NULL,
+        keterangan TEXT NOT NULL,
+        tanggal_dibuat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+");
 
-$countUser = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pengguna WHERE role = 'user'"))['total'];
-$countAdmin = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pengguna WHERE role = 'admin'"))['total'];
-$countProduct = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM produk"))['total'];
-$totalSales = mysqli_fetch_assoc(mysqli_query($conn, "SELECT SUM(total_harga) as total FROM pesanan WHERE status != 'menunggu'"))['total'];
-$pendingPayments = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
-$pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
+$cek_log = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM log_aktivitas");
+$total_log = $cek_log ? mysqli_fetch_assoc($cek_log)['total'] : 0;
+if ($total_log == 0) {
+    $res_u = mysqli_query($koneksi, "SELECT * FROM pengguna ORDER BY tanggal_dibuat ASC LIMIT 10");
+    while ($row = mysqli_fetch_assoc($res_u)) {
+        $id = $row['id'];
+        $nama = mysqli_real_escape_string($koneksi, $row['nama']);
+        $role = $row['role'];
+        $tgl = $row['tanggal_dibuat'];
+        if ($role === 'admin') {
+            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES ($id, '$nama', 'pengguna', 'daftar', 'Menginisialisasi sebagai akun Administrator', '$tgl')");
+        } else {
+            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES ($id, '$nama', 'pengguna', 'daftar', 'Mendaftar sebagai pengguna baru', '$tgl')");
+        }
+    }
 
+    $res_p = mysqli_query($koneksi, "SELECT * FROM produk LIMIT 5");
+    $res_admin = mysqli_query($koneksi, "SELECT id, nama FROM pengguna WHERE role='admin' LIMIT 1");
+    if ($admin_row = mysqli_fetch_assoc($res_admin)) {
+        $admin_id = $admin_row['id'];
+        $admin_nama = mysqli_real_escape_string($koneksi, $admin_row['nama']);
+        while ($row = mysqli_fetch_assoc($res_p)) {
+            $nama_p = mysqli_real_escape_string($koneksi, $row['nama_produk']);
+            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($admin_id, '$admin_nama', 'produk', 'tambah', 'Menambahkan produk baru \'$nama_p\'')");
+        }
+    }
 
-$admin_first_name = explode(' ', trim($_SESSION['nama']))[0];
+    $res_t = mysqli_query($koneksi, "SELECT t.*, p.nama FROM testimonial t JOIN pengguna p ON t.id_pengguna = p.id LIMIT 5");
+    while ($row = mysqli_fetch_assoc($res_t)) {
+        $nama_pengulas = mysqli_real_escape_string($koneksi, $row['nama']);
+        $status_t = $row['status'];
+        $tgl = $row['tanggal_dibuat'];
+        mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES ({$row['id_pengguna']}, '$nama_pengulas', 'testimoni', 'tambah', 'Menulis ulasan baru', '$tgl')");
+        if ($status_t === 'approved' && isset($admin_id)) {
+            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES ($admin_id, '$admin_nama', 'testimoni', 'setujui', 'Menyetujui testimoni dari \'$nama_pengulas\'', '$tgl')");
+        }
+    }
+
+    $res_o = mysqli_query($koneksi, "SELECT p.*, u.nama FROM pesanan p JOIN pengguna u ON p.id_pengguna = u.id LIMIT 5");
+    while ($row = mysqli_fetch_assoc($res_o)) {
+        $nama_pembeli = mysqli_real_escape_string($koneksi, $row['nama']);
+        $id_o = $row['id'];
+        $tgl = $row['tanggal_pesanan'];
+        $status_o = $row['status'];
+        $tag = "#HM-" . str_pad($id_o, 5, '0', STR_PAD_LEFT);
+        mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES ({$row['id_pengguna']}, '$nama_pembeli', 'pesanan', 'tambah', 'Membuat pesanan baru $tag', '$tgl')");
+        if ($status_o !== 'menunggu' && isset($admin_id)) {
+            $status_keterangan = [
+                'dibayar' => 'Mengonfirmasi pembayaran pesanan',
+                'dikirim' => 'Mengirim produk untuk pesanan',
+                'selesai' => 'Menyelesaikan pesanan',
+                'dibatalkan' => 'Membatalkan pesanan'
+            ];
+            $ket_aksi = isset($status_keterangan[$status_o]) ? $status_keterangan[$status_o] : "Mengubah status pesanan menjadi '$status_o'";
+            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES ($admin_id, '$admin_nama', 'pesanan', '$status_o', '$ket_aksi $tag dari \'$nama_pembeli\'', '$tgl')");
+        }
+    }
+}
+
+$jumlah_pengguna = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pengguna WHERE role = 'user'"))['total'];
+$jumlah_admin = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pengguna WHERE role = 'admin'"))['total'];
+$jumlah_produk = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM produk"))['total'];
+$total_penjualan = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT SUM(total_harga) as total FROM pesanan WHERE status != 'menunggu'"))['total'];
+$pembayaran_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
+$testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
+
+$nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
 ?>
 
 <!doctype html>
@@ -24,7 +92,7 @@ $admin_first_name = explode(' ', trim($_SESSION['nama']))[0];
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dasbor Admin - Handmade</title>
+    <title>Dasbor Admin - HandMadura</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -45,44 +113,44 @@ $admin_first_name = explode(' ', trim($_SESSION['nama']))[0];
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex selection:bg-lime-200 selection:text-lime-900 transition-colors duration-300 min-h-screen">
     
-    <aside class="w-56 bg-white dark:bg-slate-900 min-h-screen border-r border-slate-200 dark:border-slate-800 flex flex-col sticky top-0 z-10 transition-colors duration-300">
+    <aside class="w-56 bg-white dark:bg-slate-900 h-screen border-r border-slate-200 dark:border-slate-800 flex flex-col sticky top-0 z-10 transition-colors duration-300 overflow-y-auto">
         <div class="p-5 pb-3">
             <a href="../index.php" class="text-xl font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block hover:scale-105 transition-transform">
-                Hand<span class="text-lime-600">made.</span>
+                Hand<span class="text-lime-600">Madura.</span>
             </a>
             <p class="text-[9px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold mt-0.5">Admin Panel</p>
         </div>
         
         <nav class="flex-1 px-3 space-y-1">
-            <a href="index.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-lg font-bold text-sm transition-colors">
+            <a href="index.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-xl font-bold text-sm transition-colors">
                 <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center"></i> Dasbor
             </a>
-            <a href="produk.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+            <a href="produk.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
                 <i class="fa-solid fa-box-open mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Produk
             </a>
-            <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+            <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
                 <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pembayaran
-                <?php if ($pendingPayments > 0): ?>
-                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pendingPayments; ?></span>
+                <?php if ($pembayaran_tertunda > 0): ?>
+                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pembayaran_tertunda; ?></span>
                 <?php endif; ?>
             </a>
-            <a href="testimonial.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+            <a href="testimoni.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
                 <i class="fa-solid fa-comments mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Testimonial
-                <?php if ($pendingTestimonial > 0): ?>
-                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pendingTestimonial; ?></span>
+                <?php if ($testimoni_tertunda > 0): ?>
+                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $testimoni_tertunda; ?></span>
                 <?php endif; ?>
             </a>
-            <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+            <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
                 <i class="fa-solid fa-users mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pengguna
             </a>
         </nav>
         
         <div class="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
-            <a href="../logout.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg font-bold text-sm transition-colors group flex-grow">
+            <a href="../keluar.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl font-bold text-sm transition-colors group flex-grow">
                 <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center group-hover:-translate-x-0.5 transition-transform"></i> Keluar
             </a>
-            <button id="theme-toggle" class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Ubah Tema">
-                <i id="theme-toggle-icon" class="fa-solid fa-moon text-base"></i>
+            <button id="tombol-tema" class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Ubah Tema">
+                <i id="ikon-tombol-tema" class="fa-solid fa-moon text-base"></i>
             </button>
         </div>
     </aside>
@@ -92,10 +160,10 @@ $admin_first_name = explode(' ', trim($_SESSION['nama']))[0];
         <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
             <div>
                 <h1 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100">Dasbor Overview</h1>
-                <p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Selamat datang kembali, <span class="font-bold text-slate-700 dark:text-slate-350"><?= $admin_first_name; ?></span>.</p>
+                <p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Selamat datang kembali, <span class="font-bold text-slate-700 dark:text-slate-350"><?= $nama_depan_admin; ?></span>.</p>
             </div>
             <div class="flex items-center space-x-3">
-                <div class="bg-white dark:bg-slate-900 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-800 flex items-center space-x-2.5">
+                <div class="bg-white dark:bg-slate-900 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center space-x-2.5">
                     <div class="w-7 h-7 bg-lime-100 dark:bg-lime-950/40 rounded-md flex items-center justify-center text-lime-600 dark:text-lime-400">
                         <i class="fa-solid fa-user-shield text-xs"></i>
                     </div>
@@ -105,64 +173,72 @@ $admin_first_name = explode(' ', trim($_SESSION['nama']))[0];
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800">
-                <div class="w-10 h-10 bg-slate-100 dark:bg-slate-950 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-400 mb-3">
-                    <i class="fa-solid fa-users text-lg"></i>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
+                <div>
+                    <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Pengguna</p>
+                    <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100"><?= $jumlah_pengguna; ?></h2>
                 </div>
-                <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Pengguna</p>
-                <h2 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100"><?= $countUser; ?></h2>
+                <div class="w-8 h-8 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-450 flex-shrink-0">
+                    <i class="fa-solid fa-users text-sm"></i>
+                </div>
             </div>
             
-            <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800">
-                <div class="w-10 h-10 bg-slate-100 dark:bg-slate-950 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-400 mb-3">
-                    <i class="fa-solid fa-box-open text-lg"></i>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
+                <div>
+                    <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Produk</p>
+                    <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100"><?= $jumlah_produk; ?></h2>
                 </div>
-                <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Produk</p>
-                <h2 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100"><?= $countProduct; ?></h2>
+                <div class="w-8 h-8 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-455 flex-shrink-0">
+                    <i class="fa-solid fa-box-open text-sm"></i>
+                </div>
             </div>
             
-            <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800">
-                <div class="w-10 h-10 bg-slate-100 dark:bg-slate-950 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-400 mb-3">
-                    <i class="fa-solid fa-wallet text-lg"></i>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
+                <div>
+                    <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Pendapatan Bersih</p>
+                    <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100">Rp <?= number_format($total_penjualan ?: 0, 0, ',', '.'); ?></h2>
                 </div>
-                <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Pendapatan Bersih</p>
-                <h2 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100">Rp <?= number_format($totalSales ?: 0, 0, ',', '.'); ?></h2>
+                <div class="w-8 h-8 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-455 flex-shrink-0">
+                    <i class="fa-solid fa-wallet text-sm"></i>
+                </div>
             </div>
             
-            <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800">
-                <div class="w-10 h-10 bg-slate-100 dark:bg-slate-950 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-400 mb-3">
-                    <i class="fa-solid fa-user-tie text-lg"></i>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
+                <div>
+                    <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Admin</p>
+                    <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100"><?= $jumlah_admin; ?></h2>
                 </div>
-                <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Admin</p>
-                <h2 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100"><?= $countAdmin; ?></h2>
+                <div class="w-8 h-8 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-455 flex-shrink-0">
+                    <i class="fa-solid fa-user-tie text-sm"></i>
+                </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col">
-                <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <div class="p-3.5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                     <h3 class="text-base font-bold text-slate-800 dark:text-slate-100">Pesanan Terbaru</h3>
                     <a href="pembayaran.php" class="text-xs font-bold text-lime-600 dark:text-lime-400 hover:text-lime-700 dark:hover:text-lime-300 hover:underline">Lihat Semua</a>
                 </div>
-                <div class="p-4 sm:p-5 flex-grow">
+                <div class="p-3.5 flex-grow">
                     <div class="space-y-3">
                         <?php
-                        $latest = mysqli_query($conn, "SELECT p.*, u.nama FROM pesanan p JOIN pengguna u ON p.id_pengguna = u.id ORDER BY p.tanggal_pesanan DESC LIMIT 5");
-                        if(mysqli_num_rows($latest) > 0):
-                            while($row = mysqli_fetch_assoc($latest)):
+                        $kueri_pesanan_terbaru = mysqli_query($koneksi, "SELECT p.*, u.nama FROM pesanan p JOIN pengguna u ON p.id_pengguna = u.id ORDER BY p.tanggal_pesanan DESC LIMIT 5");
+                        if(mysqli_num_rows($kueri_pesanan_terbaru) > 0):
+                            while($baris = mysqli_fetch_assoc($kueri_pesanan_terbaru)):
                         ?>
-                        <div class="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80 rounded-lg cursor-default">
+                        <div class="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80 rounded-xl cursor-default">
                             <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 bg-white dark:bg-slate-900 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 flex-shrink-0">
+                                <div class="w-8 h-8 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 flex-shrink-0">
                                     <i class="fa-solid fa-bag-shopping text-xs"></i>
                                 </div>
                                 <div>
-                                    <p class="text-xs font-bold text-slate-800 dark:text-slate-200"><?= $row['nama']; ?></p>
-                                    <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5"><i class="fa-regular fa-clock mr-1"></i><?= date('H:i, d M Y', strtotime($row['tanggal_pesanan'])); ?></p>
+                                    <p class="text-xs font-bold text-slate-800 dark:text-slate-200"><?= $baris['nama']; ?></p>
+                                    <p class="text-[10px] text-slate-400 dark:text-slate-550 mt-0.5"><i class="fa-regular fa-clock mr-1"></i><?= date('H:i, d M Y', strtotime($baris['tanggal_pesanan'])); ?></p>
                                 </div>
                             </div>
-                            <span class="text-xs font-extrabold text-slate-800 dark:text-slate-200">Rp <?= number_format($row['total_harga'], 0, ',', '.'); ?></span>
+                            <span class="text-xs font-extrabold text-slate-800 dark:text-slate-200">Rp <?= number_format($baris['total_harga'], 0, ',', '.'); ?></span>
                         </div>
                         <?php 
                             endwhile; 
@@ -172,38 +248,83 @@ $admin_first_name = explode(' ', trim($_SESSION['nama']))[0];
                             <div class="w-10 h-10 bg-slate-50 dark:bg-slate-950 rounded-full flex items-center justify-center mx-auto mb-2.5 text-slate-300 dark:text-slate-700">
                                 <i class="fa-solid fa-receipt text-base"></i>
                             </div>
-                            <p class="text-slate-400 dark:text-slate-500 text-xs">Belum ada pesanan terbaru masuk.</p>
+                            <p class="text-slate-400 dark:text-slate-550 text-xs">Belum ada pesanan terbaru masuk.</p>
                         </div>
                         <?php endif; ?>
                     </div>
                 </div>
             </div>
+
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col shadow-sm transition-colors duration-300">
+                <div class="p-3.5 border-b border-slate-100 dark:border-slate-800">
+                    <h3 class="text-base font-bold text-slate-800 dark:text-slate-100">Aktivitas Terbaru</h3>
+                </div>
+                <div class="p-3.5 flex-grow overflow-y-auto max-h-[340px] custom-scrollbar">
+                    <div class="divide-y divide-slate-100 dark:divide-slate-800/60">
+                        <?php
+                        $kueri_aktivitas = mysqli_query($koneksi, "SELECT * FROM log_aktivitas ORDER BY tanggal_dibuat DESC, id DESC LIMIT 8");
+                        if(mysqli_num_rows($kueri_aktivitas) > 0):
+                            while($aktivitas = mysqli_fetch_assoc($kueri_aktivitas)):
+                                $tipe = $aktivitas['tipe_aktivitas'];
+                                $ikon_aktivitas = 'fa-circle-dot';
+                                if ($tipe === 'produk') $ikon_aktivitas = 'fa-box-open';
+                                elseif ($tipe === 'pengguna') $ikon_aktivitas = 'fa-user';
+                                elseif ($tipe === 'testimoni') $ikon_aktivitas = 'fa-comment';
+                                elseif ($tipe === 'pesanan') $ikon_aktivitas = 'fa-receipt';
+                        ?>
+                        <div class="py-3 flex items-start gap-3 first:pt-0 last:pb-0 text-xs">
+                            <div class="w-7 h-7 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-100 dark:border-slate-850 flex items-center justify-center text-slate-400 dark:text-slate-500 flex-shrink-0">
+                                <i class="fa-solid <?= $ikon_aktivitas; ?> text-[10px]"></i>
+                            </div>
+                            <div class="flex-grow min-w-0">
+                                <p class="text-slate-600 dark:text-slate-400 leading-normal">
+                                    <span class="font-bold text-slate-800 dark:text-slate-200"><?= $aktivitas['nama_pengguna']; ?></span> 
+                                    <?= $aktivitas['keterangan']; ?>
+                                </p>
+                                <span class="text-[9px] text-slate-400 dark:text-slate-550 block mt-0.5"><i class="fa-regular fa-clock mr-1"></i><?= date('H:i, d M', strtotime($aktivitas['tanggal_dibuat'])); ?></span>
+                            </div>
+                        </div>
+                        <?php
+                            endwhile;
+                        else:
+                        ?>
+                        <div class="text-center py-6">
+                            <div class="w-10 h-10 bg-slate-50 dark:bg-slate-950 rounded-full flex items-center justify-center mx-auto mb-2.5 text-slate-300 dark:text-slate-700">
+                                <i class="fa-solid fa-list-check text-base"></i>
+                            </div>
+                            <p class="text-slate-400 dark:text-slate-550 text-xs">Belum ada riwayat aktivitas terbaru.</p>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const themeToggleIcon = document.getElementById('theme-toggle-icon');
+        const tombolTema = document.getElementById('tombol-tema');
+        const ikonTema = document.getElementById('ikon-tombol-tema');
 
-        function updateIcon() {
+        function perbaruiIkon() {
             if (document.documentElement.classList.contains('dark')) {
-                if (themeToggleIcon) {
-                    themeToggleIcon.classList.replace('fa-moon', 'fa-sun');
+                if (ikonTema) {
+                    ikonTema.classList.replace('fa-moon', 'fa-sun');
                 }
             } else {
-                if (themeToggleIcon) {
-                    themeToggleIcon.classList.replace('fa-sun', 'fa-moon');
+                if (ikonTema) {
+                    ikonTema.classList.replace('fa-sun', 'fa-moon');
                 }
             }
         }
 
-        updateIcon();
+        perbaruiIkon();
 
-        if (themeToggleBtn) {
-            themeToggleBtn.addEventListener('click', () => {
-                if (themeToggleIcon) {
-                    themeToggleIcon.style.transform = 'rotate(360deg)';
+        if (tombolTema) {
+            tombolTema.addEventListener('click', () => {
+                if (ikonTema) {
+                    ikonTema.style.transform = 'rotate(360deg)';
                 }
                 
                 setTimeout(() => {
@@ -214,9 +335,9 @@ $admin_first_name = explode(' ', trim($_SESSION['nama']))[0];
                         document.documentElement.classList.add('dark');
                         localStorage.setItem('theme', 'dark');
                     }
-                    updateIcon();
-                    if (themeToggleIcon) {
-                        themeToggleIcon.style.transform = '';
+                    perbaruiIkon();
+                    if (ikonTema) {
+                        ikonTema.style.transform = '';
                     }
                 }, 150);
             });

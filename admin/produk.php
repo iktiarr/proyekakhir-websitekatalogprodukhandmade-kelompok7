@@ -1,75 +1,84 @@
 <?php
 include '../koneksi.php';
 
-
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../masuk.php");
     exit();
 }
 
-$success = '';
-$error = '';
-
+$berhasil = '';
+$galat = '';
 
 if (isset($_POST['simpan'])) {
-    $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
-    $nama = mysqli_real_escape_string($conn, $_POST['nama']);
-    $deskripsi = mysqli_real_escape_string($conn, $_POST['deskripsi']);
+    $id_produk = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+    $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
+    $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
     $harga = (float)$_POST['harga'];
     $stok = (int)$_POST['stok'];
     $id_kategori = (int)$_POST['id_kategori'];
     $id_daerah = isset($_POST['id_daerah']) ? (int)$_POST['id_daerah'] : 0;
-    $id_daerah_val = $id_daerah > 0 ? $id_daerah : "NULL";
+    $nilai_id_daerah = $id_daerah > 0 ? $id_daerah : "NULL";
     
-    $gambar_raw = trim($_POST['gambar']);
+    $gambar_mentah = trim($_POST['gambar']);
     
-    if (stripos($gambar_raw, 'unsplash.com') !== false && stripos($gambar_raw, 'images.unsplash.com') === false) {
-        $path = parse_url($gambar_raw, PHP_URL_PATH);
-        if ($path) {
-            $segments = explode('/', trim($path, '/'));
-            $last_segment = end($segments);
-            if ($last_segment) {
-                $sub_segments = explode('-', $last_segment);
-                $unsplash_id = end($sub_segments);
-                if ($unsplash_id) {
-                    $gambar_raw = "https://unsplash.com/photos/" . $unsplash_id . "/download";
+    if (stripos($gambar_mentah, 'unsplash.com') !== false && stripos($gambar_mentah, 'images.unsplash.com') === false) {
+        $jalur = parse_url($gambar_mentah, PHP_URL_PATH);
+        if ($jalur) {
+            $segmen = explode('/', trim($jalur, '/'));
+            $segmen_terakhir = end($segmen);
+            if ($segmen_terakhir) {
+                $sub_segmen = explode('-', $segmen_terakhir);
+                $id_unsplash = end($sub_segmen);
+                if ($id_unsplash) {
+                    $gambar_mentah = "https://unsplash.com/photos/" . $id_unsplash . "/download";
                 }
             }
         }
     }
-    $gambar = mysqli_real_escape_string($conn, $gambar_raw);
+    $gambar = mysqli_real_escape_string($koneksi, $gambar_mentah);
 
     if ($harga < 0 || $stok < 0) {
-        $error = "Gagal menyimpan: Harga dan Stok tidak boleh bernilai negatif!";
+        $galat = "Gagal menyimpan: Harga dan Stok tidak boleh bernilai negatif!";
     } else {
-        if ($id > 0) {
-            $query = "UPDATE produk SET nama_produk='$nama', deskripsi='$deskripsi', harga=$harga, stok=$stok, gambar='$gambar', id_kategori=$id_kategori, id_daerah=$id_daerah_val WHERE id=$id";
+        if ($id_produk > 0) {
+            $kueri_simpan = "UPDATE produk SET nama_produk='$nama', deskripsi='$deskripsi', harga=$harga, stok=$stok, gambar='$gambar', id_kategori=$id_kategori, id_daerah=$nilai_id_daerah WHERE id=$id_produk";
         } else {
-            $query = "INSERT INTO produk (nama_produk, deskripsi, harga, stok, gambar, id_kategori, id_daerah) VALUES ('$nama', '$deskripsi', $harga, $stok, '$gambar', $id_kategori, $id_daerah_val)";
+            $kueri_simpan = "INSERT INTO produk (nama_produk, deskripsi, harga, stok, gambar, id_kategori, id_daerah) VALUES ('$nama', '$deskripsi', $harga, $stok, '$gambar', $id_kategori, $nilai_id_daerah)";
         }
 
-        if (mysqli_query($conn, $query)) {
-            $success = "Produk berhasil disimpan!";
+        if (mysqli_query($koneksi, $kueri_simpan)) {
+            $berhasil = "Produk berhasil disimpan!";
+            $nama_admin = mysqli_real_escape_string($koneksi, $_SESSION['nama']);
+            $id_admin = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NULL';
+            $aksi_log = $id_produk > 0 ? 'ubah' : 'tambah';
+            $ket_log = ($id_produk > 0 ? "Mengubah detail produk " : "Menambahkan produk baru ") . "'$nama'";
+            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_admin, '$nama_admin', 'produk', '$aksi_log', '$ket_log')");
         } else {
-            $error = "Gagal menyimpan: " . mysqli_error($conn);
+            $galat = "Gagal menyimpan: " . mysqli_error($koneksi);
         }
     }
 }
 
-
 if (isset($_GET['hapus'])) {
-    $id = (int)$_GET['hapus'];
-    mysqli_query($conn, "DELETE FROM produk WHERE id=$id");
+    $id_produk = (int)$_GET['hapus'];
+    $res_p = mysqli_query($koneksi, "SELECT nama_produk FROM produk WHERE id=$id_produk");
+    if ($row_p = mysqli_fetch_assoc($res_p)) {
+        $nama_p = mysqli_real_escape_string($koneksi, $row_p['nama_produk']);
+        if (mysqli_query($koneksi, "DELETE FROM produk WHERE id=$id_produk")) {
+            $nama_admin = mysqli_real_escape_string($koneksi, $_SESSION['nama']);
+            $id_admin = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NULL';
+            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_admin, '$nama_admin', 'produk', 'hapus', 'Menghapus produk \'$nama_p\'')");
+        }
+    }
     header("Location: produk.php");
     exit();
 }
 
-
-$query_produk = mysqli_query($conn, "SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id ORDER BY p.id DESC");
-$query_kategori = mysqli_query($conn, "SELECT * FROM kategori");
-$query_daerah = mysqli_query($conn, "SELECT * FROM daerah");
-$pendingPayments = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
-$pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
+$kueri_produk = mysqli_query($koneksi, "SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id ORDER BY p.id DESC");
+$kueri_kategori = mysqli_query($koneksi, "SELECT * FROM kategori");
+$kueri_daerah = mysqli_query($koneksi, "SELECT * FROM daerah");
+$pembayaran_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
+$testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
 ?>
 
 <!doctype html>
@@ -77,7 +86,7 @@ $pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kelola Produk - Handmade Admin</title>
+    <title>Kelola Produk - HandMadura Admin</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -98,45 +107,44 @@ $pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex selection:bg-lime-200 selection:text-lime-900 transition-colors duration-300 min-h-screen">
     
-    <!-- Sidebar Admin -->
-    <aside class="w-56 bg-white dark:bg-slate-900 min-h-screen border-r border-slate-200 dark:border-slate-800 flex flex-col sticky top-0 z-10 transition-colors duration-300">
+    <aside class="w-56 bg-white dark:bg-slate-900 h-screen border-r border-slate-200 dark:border-slate-800 flex flex-col sticky top-0 z-10 transition-colors duration-300 overflow-y-auto">
         <div class="p-5 pb-3">
             <a href="../index.php" class="text-xl font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block hover:scale-105 transition-transform">
-                Hand<span class="text-lime-600">made.</span>
+                Hand<span class="text-lime-600">Madura.</span>
             </a>
             <p class="text-[9px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold mt-0.5">Admin Panel</p>
         </div>
         
         <nav class="flex-1 px-3 space-y-1">
-            <a href="index.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+            <a href="index.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
                 <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Dasbor
             </a>
-            <a href="produk.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-lg font-bold text-sm transition-colors">
+            <a href="produk.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-xl font-bold text-sm transition-colors">
                 <i class="fa-solid fa-box-open mr-2.5 w-4 text-center"></i> Produk
             </a>
-            <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+            <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
                 <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pembayaran
-                <?php if ($pendingPayments > 0): ?>
-                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pendingPayments; ?></span>
+                <?php if ($pembayaran_tertunda > 0): ?>
+                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pembayaran_tertunda; ?></span>
                 <?php endif; ?>
             </a>
-            <a href="testimonial.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+            <a href="testimoni.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
                 <i class="fa-solid fa-comments mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Testimonial
-                <?php if ($pendingTestimonial > 0): ?>
-                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pendingTestimonial; ?></span>
+                <?php if ($testimoni_tertunda > 0): ?>
+                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $testimoni_tertunda; ?></span>
                 <?php endif; ?>
             </a>
-            <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+            <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
                 <i class="fa-solid fa-users mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pengguna
             </a>
         </nav>
         
         <div class="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
-            <a href="../logout.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg font-bold text-sm transition-colors group flex-grow">
+            <a href="../keluar.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl font-bold text-sm transition-colors group flex-grow">
                 <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center group-hover:-translate-x-0.5 transition-transform"></i> Keluar
             </a>
-            <button id="theme-toggle" class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Ubah Tema">
-                <i id="theme-toggle-icon" class="fa-solid fa-moon text-base"></i>
+            <button id="tombol-tema" class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Ubah Tema">
+                <i id="ikon-tombol-tema" class="fa-solid fa-moon text-base"></i>
             </button>
         </div>
     </aside>
@@ -148,24 +156,23 @@ $pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as
                 <h1 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100">Kelola Produk</h1>
                 <p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Tambah, edit, atau hapus produk di katalog Anda.</p>
             </div>
-            <button onclick="openModalTambah()" class="bg-lime-600 text-white px-4 py-2.5 rounded-lg font-bold hover:bg-lime-700 hover:-translate-y-0.5 transition-all duration-300 shadow-lg shadow-lime-200/50 dark:shadow-none flex items-center cursor-pointer text-xs sm:text-sm">
+            <button onclick="bukaModalTambah()" class="bg-lime-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-lime-700 hover:-translate-y-0.5 transition-all duration-300 shadow-lg shadow-lime-200/50 dark:shadow-none flex items-center cursor-pointer text-xs sm:text-sm">
                 <i class="fa-solid fa-plus mr-1.5"></i> Tambah Produk
             </button>
         </div>
 
-        <?php if ($success): ?>
-            <div class="bg-lime-50 dark:bg-lime-950/20 text-lime-700 dark:text-lime-400 p-3 rounded-lg mb-6 border border-lime-100 dark:border-lime-900/30 flex items-center shadow-sm text-xs">
-                <i class="fa-solid fa-circle-check mr-2"></i> <?= $success; ?>
+        <?php if ($berhasil): ?>
+            <div class="bg-lime-50 dark:bg-lime-950/20 text-lime-700 dark:text-lime-400 p-3 rounded-xl mb-6 border border-lime-100 dark:border-lime-900/30 flex items-center shadow-sm text-xs">
+                <i class="fa-solid fa-circle-check mr-2"></i> <?= $berhasil; ?>
             </div>
         <?php endif; ?>
 
-        <?php if ($error): ?>
-            <div class="bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 p-3 rounded-lg mb-6 border border-red-100 dark:border-red-900/30 flex items-center shadow-sm text-xs">
-                <i class="fa-solid fa-circle-exclamation mr-2"></i> <?= $error; ?>
+        <?php if ($galat): ?>
+            <div class="bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 p-3 rounded-xl mb-6 border border-red-100 dark:border-red-900/30 flex items-center shadow-sm text-xs">
+                <i class="fa-solid fa-circle-exclamation mr-2"></i> <?= $galat; ?>
             </div>
         <?php endif; ?>
 
-        <!-- Tabel Produk -->
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm transition-colors duration-300">
             <table class="w-full text-left">
                 <thead class="bg-slate-50 dark:bg-slate-900/50 text-slate-400 dark:text-slate-500 text-[10px] uppercase tracking-wider font-bold border-b border-slate-100 dark:border-slate-800">
@@ -180,43 +187,41 @@ $pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as
                 </thead>
                 <tbody class="divide-y divide-slate-50 dark:divide-slate-800/60">
                     <?php 
-                    if(mysqli_num_rows($query_produk) > 0):
-                        while($p = mysqli_fetch_assoc($query_produk)): 
+                    if(mysqli_num_rows($kueri_produk) > 0):
+                        while($produk = mysqli_fetch_assoc($kueri_produk)): 
                     ?>
                     <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors duration-200 text-xs sm:text-sm">
                         <td class="px-4 py-3 pl-6">
                             <div class="flex items-center space-x-3">
                                 <?php 
-                                    $img_src = $p['gambar'];
-                                    if (empty($img_src) || strpos($img_src, 'uploads/produk') !== false) {
-                                        $img_src = 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&q=80&w=200';
-                                    } elseif (strpos($img_src, 'http') !== 0) {
-                                        $img_src = '../' . $img_src;
+                                    $sumber_gambar = $produk['gambar'];
+                                    if (!empty($sumber_gambar) && strpos($sumber_gambar, 'http') !== 0) {
+                                        $sumber_gambar = '../' . $sumber_gambar;
                                     }
                                 ?>
-                                    <img src="<?= $img_src; ?>" alt="<?= $p['nama_produk']; ?>" class="w-10 h-10 rounded-lg object-cover border border-slate-100 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-950 flex-shrink-0" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&q=80&w=200';">
-                                <span class="font-bold text-slate-800 dark:text-slate-200 line-clamp-1"><?= $p['nama_produk']; ?></span>
+                                    <img src="<?= $sumber_gambar; ?>" alt="<?= $produk['nama_produk']; ?>" class="w-10 h-10 rounded-xl object-cover border border-slate-100 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-950 flex-shrink-0">
+                                <span class="font-bold text-slate-800 dark:text-slate-200 line-clamp-1"><?= $produk['nama_produk']; ?></span>
                             </div>
                         </td>
                         <td class="px-4 py-3 text-xs font-medium text-slate-500 dark:text-slate-400">
-                            <?= $p['nama_kategori'] ?: '<span class="text-slate-350 dark:text-slate-600 italic">Tanpa Kategori</span>'; ?>
+                            <?= $produk['nama_kategori'] ?: '<span class="text-slate-350 dark:text-slate-600 italic">Tanpa Kategori</span>'; ?>
                         </td>
                         <td class="px-4 py-3 text-xs font-medium text-slate-500 dark:text-slate-400">
-                            <?= $p['nama_daerah'] ?: '<span class="text-slate-350 dark:text-slate-600 italic">-</span>'; ?>
+                            <?= $produk['nama_daerah'] ?: '<span class="text-slate-350 dark:text-slate-600 italic">-</span>'; ?>
                         </td>
                         <td class="px-4 py-3 font-extrabold text-slate-800 dark:text-slate-200 whitespace-nowrap">
-                            Rp <?= number_format($p['harga'], 0, ',', '.'); ?>
+                            Rp <?= number_format($produk['harga'], 0, ',', '.'); ?>
                         </td>
                         <td class="px-4 py-3">
-                            <span class="inline-flex items-center px-2 py-0.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-md text-[10px] font-bold border border-lime-100 dark:border-lime-900/40 whitespace-nowrap">
-                                <?= $p['stok']; ?> unit
+                            <span class="inline-flex items-center px-2 py-0.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-xl text-[10px] font-bold border border-lime-100 dark:border-lime-900/40 whitespace-nowrap">
+                                <?= $produk['stok']; ?> unit
                             </span>
                         </td>
                         <td class="px-4 py-3 pr-6 text-right space-x-1 whitespace-nowrap">
-                            <button onclick='editProduk(<?= json_encode($p); ?>)' class="w-8 h-8 inline-flex items-center justify-center rounded-lg text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors cursor-pointer" title="Edit">
+                            <button onclick='ubahProduk(<?= json_encode($produk); ?>)' class="w-8 h-8 inline-flex items-center justify-center rounded-xl text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors cursor-pointer" title="Edit">
                                 <i class="fa-solid fa-pen-to-square text-sm"></i>
                             </button>
-                            <a href="produk.php?hapus=<?= $p['id']; ?>" onclick="return confirm('Hapus produk ini secara permanen?')" class="w-8 h-8 inline-flex items-center justify-center rounded-lg text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors" title="Hapus">
+                            <a href="produk.php?hapus=<?= $produk['id']; ?>" onclick="return confirm('Hapus produk ini secara permanen?')" class="w-8 h-8 inline-flex items-center justify-center rounded-xl text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors" title="Hapus">
                                 <i class="fa-solid fa-trash-can text-sm"></i>
                             </a>
                         </td>
@@ -239,56 +244,55 @@ $pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as
         </div>
     </main>
 
-    <!-- Modal Form (Tambah / Edit) -->
     <div id="modalProduk" class="fixed inset-0 bg-slate-900/80 dark:bg-slate-950/80 backdrop-blur-sm z-[60] flex items-center justify-center opacity-0 invisible transition-all duration-300 py-6 px-4">
-        <div id="modalContent" class="bg-white dark:bg-slate-900 w-full max-w-md rounded-xl p-4 sm:p-5 shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 transform scale-95 transition-transform duration-300 max-h-full overflow-y-auto custom-scrollbar">
+        <div id="kontenModal" class="bg-white dark:bg-slate-900 w-full max-w-md rounded-xl p-4 sm:p-5 shadow-2xl dark:shadow-none border border-slate-100 dark:border-slate-800 transform scale-95 transition-transform duration-300 max-h-full overflow-y-auto custom-scrollbar">
             
             <div class="flex justify-between items-center mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
-                <h2 id="modalTitle" class="text-lg font-extrabold text-slate-800 dark:text-slate-100">Tambah Produk Baru</h2>
-                <button onclick="closeModal()" class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                <h2 id="judulModal" class="text-lg font-extrabold text-slate-800 dark:text-slate-100">Tambah Produk Baru</h2>
+                <button onclick="tutupModal()" class="w-7 h-7 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
                     <i class="fa-solid fa-xmark text-base"></i>
                 </button>
             </div>
             
             <form action="" method="POST" class="space-y-3.5">
-                <input type="hidden" name="id" id="prod_id">
+                <input type="hidden" name="id" id="produk_id">
                 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Produk</label>
-                    <input type="text" name="nama" id="prod_nama" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-lg border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs" placeholder="Masukkan nama produk">
+                    <input type="text" name="nama" id="produk_nama" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs" placeholder="Masukkan nama produk">
                 </div>
                 
                 <div class="grid grid-cols-2 gap-3.5">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Harga (Rp)</label>
-                        <input type="number" name="harga" id="prod_harga" min="0" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-lg border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs">
+                        <input type="number" name="harga" id="produk_harga" min="0" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Stok (Unit)</label>
-                        <input type="number" name="stok" id="prod_stok" min="0" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-lg border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs">
+                        <input type="number" name="stok" id="produk_stok" min="0" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs">
                     </div>
                 </div>
  
                 <div class="grid grid-cols-2 gap-3.5">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Kategori</label>
-                        <select name="id_kategori" id="prod_kategori" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-lg border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs">
+                        <select name="id_kategori" id="produk_kategori" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs">
                             <option value="" disabled selected>-- Pilih Kategori --</option>
                             <?php 
-                            mysqli_data_seek($query_kategori, 0);
-                            while($k = mysqli_fetch_assoc($query_kategori)): ?>
-                            <option value="<?= $k['id']; ?>"><?= $k['nama_kategori']; ?></option>
+                            mysqli_data_seek($kueri_kategori, 0);
+                            while($kategori = mysqli_fetch_assoc($kueri_kategori)): ?>
+                            <option value="<?= $kategori['id']; ?>"><?= $kategori['nama_kategori']; ?></option>
                             <?php endwhile; ?>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Asal Daerah</label>
-                        <select name="id_daerah" id="prod_daerah" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-lg border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs">
+                        <select name="id_daerah" id="produk_daerah" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs">
                             <option value="" disabled selected>-- Pilih Daerah --</option>
                             <?php 
-                            mysqli_data_seek($query_daerah, 0);
-                            while($d = mysqli_fetch_assoc($query_daerah)): ?>
-                            <option value="<?= $d['id']; ?>"><?= $d['nama_daerah']; ?></option>
+                            mysqli_data_seek($kueri_daerah, 0);
+                            while($daerah = mysqli_fetch_assoc($kueri_daerah)): ?>
+                            <option value="<?= $daerah['id']; ?>"><?= $daerah['nama_daerah']; ?></option>
                             <?php endwhile; ?>
                         </select>
                     </div>
@@ -296,18 +300,18 @@ $pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as
  
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Link Foto Produk</label>
-                    <input type="url" name="gambar" id="prod_gambar" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-lg border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs" placeholder="https://example.com/foto.jpg">
-                    <p class="text-[9px] text-slate-400 dark:text-slate-500 mt-0.5 italic">*Gunakan link gambar online (misal dari Unsplash, Imgur, dsb.)</p>
+                    <input type="url" name="gambar" id="produk_gambar" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs" placeholder="https://example.com/foto.jpg">
+                    <p class="text-[9px] text-slate-400 dark:text-slate-550 mt-0.5 italic">*Gunakan link gambar online (misal dari Unsplash, Imgur, dsb.)</p>
                 </div>
  
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Deskripsi</label>
-                    <textarea name="deskripsi" id="prod_deskripsi" rows="2" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-lg border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs resize-none" placeholder="Tulis deskripsi produk..."></textarea>
+                    <textarea name="deskripsi" id="produk_deskripsi" rows="2" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs resize-none" placeholder="Tulis deskripsi produk..."></textarea>
                 </div>
  
                 <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex gap-2.5 justify-end">
-                    <button type="button" onclick="closeModal()" class="px-4 py-2 bg-white dark:bg-slate-900 text-slate-650 dark:text-slate-400 border border-slate-200 dark:border-slate-800 rounded-lg font-bold hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors cursor-pointer text-xs">Batal</button>
-                    <button type="submit" name="simpan" class="px-5 py-2 bg-lime-600 text-white rounded-lg font-bold hover:bg-lime-700 hover:shadow-lg hover:shadow-lime-200/40 dark:shadow-none transition-all cursor-pointer text-xs">Simpan Produk</button>
+                    <button type="button" onclick="tutupModal()" class="px-4 py-2 bg-white dark:bg-slate-900 text-slate-655 dark:text-slate-400 border border-slate-200 dark:border-slate-800 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors cursor-pointer text-xs">Batal</button>
+                    <button type="submit" name="simpan" class="px-5 py-2 bg-lime-600 text-white rounded-xl font-bold hover:bg-lime-700 hover:shadow-lg hover:shadow-lime-200/40 dark:shadow-none transition-all cursor-pointer text-xs">Simpan Produk</button>
                 </div>
             </form>
         </div>
@@ -324,68 +328,68 @@ $pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as
 
     <script>
         const modal = document.getElementById('modalProduk');
-        const modalContent = document.getElementById('modalContent');
+        const kontenModal = document.getElementById('kontenModal');
 
-        function openModalTambah() {
-            document.getElementById('modalTitle').innerText = "Tambah Produk Baru";
-            document.getElementById('prod_id').value = "";
-            document.getElementById('prod_nama').value = "";
-            document.getElementById('prod_harga').value = "";
-            document.getElementById('prod_stok').value = "";
-            document.getElementById('prod_kategori').value = "";
-            document.getElementById('prod_daerah').value = "";
-            document.getElementById('prod_deskripsi').value = "";
-            document.getElementById('prod_gambar').value = "";
+        function bukaModalTambah() {
+            document.getElementById('judulModal').innerText = "Tambah Produk Baru";
+            document.getElementById('produk_id').value = "";
+            document.getElementById('produk_nama').value = "";
+            document.getElementById('produk_harga').value = "";
+            document.getElementById('produk_stok').value = "";
+            document.getElementById('produk_kategori').value = "";
+            document.getElementById('produk_daerah').value = "";
+            document.getElementById('produk_deskripsi').value = "";
+            document.getElementById('produk_gambar').value = "";
             
-            showModal();
+            tampilkanModal();
         }
 
-        function editProduk(data) {
-            document.getElementById('modalTitle').innerText = "Edit Produk";
-            document.getElementById('prod_id').value = data.id;
-            document.getElementById('prod_nama').value = data.nama_produk;
-            document.getElementById('prod_harga').value = data.harga;
-            document.getElementById('prod_stok').value = data.stok;
-            document.getElementById('prod_kategori').value = data.id_kategori;
-            document.getElementById('prod_daerah').value = data.id_daerah;
-            document.getElementById('prod_deskripsi').value = data.deskripsi;
-            document.getElementById('prod_gambar').value = data.gambar;
+        function ubahProduk(data) {
+            document.getElementById('judulModal').innerText = "Edit Produk";
+            document.getElementById('produk_id').value = data.id;
+            document.getElementById('produk_nama').value = data.nama_produk;
+            document.getElementById('produk_harga').value = data.harga;
+            document.getElementById('produk_stok').value = data.stok;
+            document.getElementById('produk_kategori').value = data.id_kategori;
+            document.getElementById('produk_daerah').value = data.id_daerah;
+            document.getElementById('produk_deskripsi').value = data.deskripsi;
+            document.getElementById('produk_gambar').value = data.gambar;
             
-            showModal();
+            tampilkanModal();
         }
 
-        function showModal() {
+        function tampilkanModal() {
             modal.classList.remove('opacity-0', 'invisible');
-            modalContent.classList.remove('scale-95');
+            kontenModal.classList.remove('scale-95');
         }
 
-        function closeModal() {
-            modalContent.classList.add('scale-95');
+        function tutupModal() {
+            kontenModal.classList.add('scale-95');
             modal.classList.add('opacity-0', 'invisible');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const themeToggleBtn = document.getElementById('theme-toggle');
-            const themeToggleIcon = document.getElementById('theme-toggle-icon');
+            const tombolTema = document.getElementById('tombol-tema');
+            const ikonTema = document.getElementById('ikon-tombol-tema');
 
-            function updateIcon() {
+            function perbaruiIkon() {
                 if (document.documentElement.classList.contains('dark')) {
-                    if (themeToggleIcon) {
-                        themeToggleIcon.classList.replace('fa-moon', 'fa-sun');
+                    if (ikonTema) {
+                        ikonTema.classList.replace('fa-moon', 'fa-sun');
                     }
                 } else {
-                    if (themeToggleIcon) {
-                        themeToggleIcon.classList.replace('fa-sun', 'fa-moon');
+                    if (ikonTema) {
+                        ikonTema.classList.replace('fa-sun', 'fa-moon');
                     }
                 }
             }
 
-            updateIcon();
+            perbaruiIkon();
 
-            if (themeToggleBtn) {
-                themeToggleBtn.addEventListener('click', () => {
-                    if (themeToggleIcon) {
-                        themeToggleIcon.style.transform = 'rotate(360deg)';
+            if (tombolTema) {
+                tombolTema.addEventListener('click', () => {
+                    if (ikonTema) {
+                        ikonTema.style.transform = 'rotate(360deg)';
                     }
                     
                     setTimeout(() => {
@@ -396,9 +400,9 @@ $pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as
                             document.documentElement.classList.add('dark');
                             localStorage.setItem('theme', 'dark');
                         }
-                        updateIcon();
-                        if (themeToggleIcon) {
-                            themeToggleIcon.style.transform = '';
+                        perbaruiIkon();
+                        if (ikonTema) {
+                            ikonTema.style.transform = '';
                         }
                     }, 150);
                 });

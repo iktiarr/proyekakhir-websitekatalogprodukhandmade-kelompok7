@@ -6,24 +6,27 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// Aksi hapus akun khusus untuk role = 'user'
 if (isset($_GET['hapus'])) {
     $id_hapus = (int)$_GET['hapus'];
-    // Proteksi: Cek role akun sebelum menghapus
-    $check = mysqli_query($conn, "SELECT role FROM pengguna WHERE id = $id_hapus");
-    $user_data = mysqli_fetch_assoc($check);
+    $cek_pengguna = mysqli_query($koneksi, "SELECT nama, role FROM pengguna WHERE id = $id_hapus");
+    $data_pengguna = mysqli_fetch_assoc($cek_pengguna);
     
-    if ($user_data && $user_data['role'] === 'user') {
-        mysqli_query($conn, "DELETE FROM pengguna WHERE id = $id_hapus");
+    if ($data_pengguna && $data_pengguna['role'] === 'user') {
+        $nama_pengguna_hapus = mysqli_real_escape_string($koneksi, $data_pengguna['nama']);
+        if (mysqli_query($koneksi, "DELETE FROM pengguna WHERE id = $id_hapus")) {
+            $nama_admin = mysqli_real_escape_string($koneksi, $_SESSION['nama']);
+            $id_admin = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NULL';
+            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_admin, '$nama_admin', 'pengguna', 'hapus', 'Menghapus pengguna \'$nama_pengguna_hapus\'')");
+        }
     }
     
     header("Location: pengguna.php");
     exit();
 }
 
-$query = mysqli_query($conn, "SELECT * FROM pengguna ORDER BY role ASC, nama ASC");
-$pendingPayments = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
-$pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
+$kueri_pengguna = mysqli_query($koneksi, "SELECT * FROM pengguna ORDER BY role ASC, nama ASC");
+$pembayaran_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
+$testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
 ?>
 
 <!doctype html>
@@ -31,7 +34,7 @@ $pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kelola Pengguna - Handmade Admin</title>
+    <title>Kelola Pengguna - HandMadura Admin</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -52,44 +55,44 @@ $pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex selection:bg-lime-200 selection:text-lime-900 transition-colors duration-300 min-h-screen">
     
-    <aside class="w-56 bg-white dark:bg-slate-900 min-h-screen border-r border-slate-200 dark:border-slate-800 flex flex-col sticky top-0 z-10 transition-colors duration-300">
+    <aside class="w-56 bg-white dark:bg-slate-900 h-screen border-r border-slate-200 dark:border-slate-800 flex flex-col sticky top-0 z-10 transition-colors duration-300 overflow-y-auto">
         <div class="p-5 pb-3">
             <a href="../index.php" class="text-xl font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block hover:scale-105 transition-transform">
-                Hand<span class="text-lime-600">made.</span>
+                Hand<span class="text-lime-600">Madura.</span>
             </a>
             <p class="text-[9px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold mt-0.5">Admin Panel</p>
         </div>
         
         <nav class="flex-1 px-3 space-y-1">
-            <a href="index.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+            <a href="index.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
                 <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Dasbor
             </a>
-            <a href="produk.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+            <a href="produk.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
                 <i class="fa-solid fa-box-open mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Produk
             </a>
-            <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+            <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
                 <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pembayaran
-                <?php if ($pendingPayments > 0): ?>
-                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pendingPayments; ?></span>
+                <?php if ($pembayaran_tertunda > 0): ?>
+                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pembayaran_tertunda; ?></span>
                 <?php endif; ?>
             </a>
-            <a href="testimonial.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg font-medium text-sm transition-colors group">
+            <a href="testimoni.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
                 <i class="fa-solid fa-comments mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Testimonial
-                <?php if ($pendingTestimonial > 0): ?>
-                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pendingTestimonial; ?></span>
+                <?php if ($testimoni_tertunda > 0): ?>
+                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $testimoni_tertunda; ?></span>
                 <?php endif; ?>
             </a>
-            <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-lg font-bold text-sm transition-colors">
+            <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-xl font-bold text-sm transition-colors">
                 <i class="fa-solid fa-users mr-2.5 w-4 text-center"></i> Pengguna
             </a>
         </nav>
         
         <div class="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
-            <a href="../logout.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg font-bold text-sm transition-colors group flex-grow">
+            <a href="../keluar.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl font-bold text-sm transition-colors group flex-grow">
                 <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center group-hover:-translate-x-0.5 transition-transform"></i> Keluar
             </a>
-            <button id="theme-toggle" class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Ubah Tema">
-                <i id="theme-toggle-icon" class="fa-solid fa-moon text-base"></i>
+            <button id="tombol-tema" class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Ubah Tema">
+                <i id="ikon-tombol-tema" class="fa-solid fa-moon text-base"></i>
             </button>
         </div>
     </aside>
@@ -114,37 +117,37 @@ $pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as
                 </thead>
                 <tbody class="divide-y divide-slate-50 dark:divide-slate-800/60">
                     <?php 
-                    if(mysqli_num_rows($query) > 0):
-                        while($row = mysqli_fetch_assoc($query)): 
+                    if(mysqli_num_rows($kueri_pengguna) > 0):
+                        while($baris = mysqli_fetch_assoc($kueri_pengguna)): 
                     ?>
                     <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 text-xs sm:text-sm transition-colors duration-200">
                         <td class="px-4 py-3 pl-6">
                             <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 <?= $row['role'] === 'admin' ? 'bg-lime-100 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400' : 'bg-slate-100 dark:bg-slate-950 text-slate-500 dark:text-slate-400'; ?> rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0">
-                                    <?= strtoupper(substr($row['nama'], 0, 1)); ?>
+                                <div class="w-8 h-8 <?= $baris['role'] === 'admin' ? 'bg-lime-100 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400' : 'bg-slate-100 dark:bg-slate-950 text-slate-500 dark:text-slate-400'; ?> rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0">
+                                    <?= strtoupper(substr($baris['nama'], 0, 1)); ?>
                                 </div>
-                                <span class="font-bold text-slate-800 dark:text-slate-200"><?= $row['nama']; ?></span>
+                                <span class="font-bold text-slate-800 dark:text-slate-200"><?= $baris['nama']; ?></span>
                             </div>
                         </td>
                         <td class="px-4 py-3 text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                            <?= $row['email']; ?>
+                            <?= $baris['email']; ?>
                         </td>
                         <td class="px-4 py-3">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest border whitespace-nowrap <?= $row['role'] === 'admin' ? 'bg-lime-50 dark:bg-lime-950/20 text-lime-700 dark:text-lime-400 border-lime-200 dark:border-lime-900/30' : 'bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-850'; ?>">
-                                <?php if($row['role'] === 'admin'): ?>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-xl text-[9px] font-bold uppercase tracking-widest border whitespace-nowrap <?= $baris['role'] === 'admin' ? 'bg-lime-50 dark:bg-lime-950/20 text-lime-700 dark:text-lime-400 border-lime-200 dark:border-lime-900/30' : 'bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-850'; ?>">
+                                <?php if($baris['role'] === 'admin'): ?>
                                     <i class="fa-solid fa-user-shield mr-1"></i>
                                 <?php else: ?>
                                     <i class="fa-solid fa-user mr-1"></i>
                                 <?php endif; ?>
-                                <?= $row['role']; ?>
+                                <?= $baris['role']; ?>
                             </span>
                         </td>
                         <td class="px-4 py-3 text-xs font-medium text-slate-400 dark:text-slate-500 whitespace-nowrap">
-                            <i class="fa-regular fa-calendar-days mr-1.5 text-slate-400"></i><?= date('d M Y', strtotime($row['tanggal_dibuat'])); ?>
+                            <i class="fa-regular fa-calendar-days mr-1.5 text-slate-400"></i><?= date('d M Y', strtotime($baris['tanggal_dibuat'])); ?>
                         </td>
                         <td class="px-4 py-3 pr-6 text-right whitespace-nowrap">
-                            <?php if ($row['role'] === 'user'): ?>
-                                <a href="pengguna.php?hapus=<?= $row['id']; ?>" onclick="return confirm('Hapus akun pengguna ini secara permanen?')" class="w-8 h-8 inline-flex items-center justify-center rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors" title="Hapus Pengguna">
+                            <?php if ($baris['role'] === 'user'): ?>
+                                <a href="pengguna.php?hapus=<?= $baris['id']; ?>" onclick="return confirm('Hapus akun pengguna ini secara permanen?')" class="w-8 h-8 inline-flex items-center justify-center rounded-xl text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors" title="Hapus Pengguna">
                                     <i class="fa-solid fa-trash-can text-sm"></i>
                                 </a>
                             <?php else: ?>
@@ -172,27 +175,27 @@ $pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const themeToggleIcon = document.getElementById('theme-toggle-icon');
+        const tombolTema = document.getElementById('tombol-tema');
+        const ikonTema = document.getElementById('ikon-tombol-tema');
 
-        function updateIcon() {
+        function perbaruiIkon() {
             if (document.documentElement.classList.contains('dark')) {
-                if (themeToggleIcon) {
-                    themeToggleIcon.classList.replace('fa-moon', 'fa-sun');
+                if (ikonTema) {
+                    ikonTema.classList.replace('fa-moon', 'fa-sun');
                 }
             } else {
-                if (themeToggleIcon) {
-                    themeToggleIcon.classList.replace('fa-sun', 'fa-moon');
+                if (ikonTema) {
+                    ikonTema.classList.replace('fa-sun', 'fa-moon');
                 }
             }
         }
 
-        updateIcon();
+        perbaruiIkon();
 
-        if (themeToggleBtn) {
-            themeToggleBtn.addEventListener('click', () => {
-                if (themeToggleIcon) {
-                    themeToggleIcon.style.transform = 'rotate(360deg)';
+        if (tombolTema) {
+            tombolTema.addEventListener('click', () => {
+                if (ikonTema) {
+                    ikonTema.style.transform = 'rotate(360deg)';
                 }
                 
                 setTimeout(() => {
@@ -203,9 +206,9 @@ $pendingTestimonial = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as
                         document.documentElement.classList.add('dark');
                         localStorage.setItem('theme', 'dark');
                     }
-                    updateIcon();
-                    if (themeToggleIcon) {
-                        themeToggleIcon.style.transform = '';
+                    perbaruiIkon();
+                    if (ikonTema) {
+                        ikonTema.style.transform = '';
                     }
                 }, 150);
             });

@@ -1,55 +1,43 @@
 <?php
-// Get requested URI path
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$jalur = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-// Normalize path (remove leading and trailing slashes)
-$path = trim($path, '/');
+$jalur = trim($jalur, '/');
 
-// If empty path, default to index.php
-if ($path === '') {
-    $path = 'index.php';
+if ($jalur === '') {
+    $jalur = 'index.php';
 }
 
-// Security: Prevent directory traversal attacks
-if (strpos($path, '..') !== false || strpos($path, '\\') !== false) {
+if (strpos($jalur, '..') !== false || strpos($jalur, '\\') !== false) {
     http_response_code(403);
-    echo "Access denied.";
+    echo "Akses ditolak.";
     exit;
 }
 
-// Get absolute path to the target file/directory
-$baseDir = dirname(__DIR__);
-$fullPath = $baseDir . '/' . $path;
+$direktori_induk = dirname(__DIR__);
+$jalur_lengkap = $direktori_induk . '/' . $jalur;
 
-// If it's a directory (e.g. "admin"), append "index.php"
-if (is_dir($fullPath)) {
-    $path = rtrim($path, '/') . '/index.php';
-    $fullPath = $baseDir . '/' . $path;
+if (is_dir($jalur_lengkap)) {
+    $jalur = rtrim($jalur, '/') . '/index.php';
+    $jalur_lengkap = $direktori_induk . '/' . $jalur;
 }
 
-// If file doesn't exist, try appending .php (supporting extensionless URLs)
-if (!file_exists($fullPath) && file_exists($fullPath . '.php')) {
-    $path .= '.php';
-    $fullPath = $baseDir . '/' . $path;
+if (!file_exists($jalur_lengkap) && file_exists($jalur_lengkap . '.php')) {
+    $jalur .= '.php';
+    $jalur_lengkap = $direktori_induk . '/' . $jalur;
 }
 
-// Serve the file if it exists
-if (file_exists($fullPath) && !is_dir($fullPath)) {
-    // Only execute PHP files, serve others as static (fallback)
-    if (pathinfo($fullPath, PATHINFO_EXTENSION) === 'php') {
-        // Change working directory to the target file's directory so relative paths work
-        chdir(dirname($fullPath));
+if (file_exists($jalur_lengkap) && !is_dir($jalur_lengkap)) {
+    if (pathinfo($jalur_lengkap, PATHINFO_EXTENSION) === 'php') {
+        chdir(dirname($jalur_lengkap));
         
-        // Define SCRIPT_FILENAME and other standard variables so self-referencing scripts work
-        $_SERVER['SCRIPT_FILENAME'] = $fullPath;
-        $_SERVER['SCRIPT_NAME'] = '/' . $path;
-        $_SERVER['PHP_SELF'] = '/' . $path;
+        $_SERVER['SCRIPT_FILENAME'] = $jalur_lengkap;
+        $_SERVER['SCRIPT_NAME'] = '/' . $jalur;
+        $_SERVER['PHP_SELF'] = '/' . $jalur;
         
-        require $fullPath;
+        require $jalur_lengkap;
         exit;
     } else {
-        // Serve static file with correct content type
-        $mime_types = [
+        $tipe_mime = [
             'css' => 'text/css',
             'js' => 'application/javascript',
             'png' => 'image/png',
@@ -59,15 +47,14 @@ if (file_exists($fullPath) && !is_dir($fullPath)) {
             'svg' => 'image/svg+xml',
             'ico' => 'image/x-icon',
         ];
-        $ext = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
-        $content_type = isset($mime_types[$ext]) ? $mime_types[$ext] : 'application/octet-stream';
-        header("Content-Type: $content_type");
-        readfile($fullPath);
+        $ekstensi = strtolower(pathinfo($jalur_lengkap, PATHINFO_EXTENSION));
+        $tipe_konten = isset($tipe_mime[$ekstensi]) ? $tipe_mime[$ekstensi] : 'application/octet-stream';
+        header("Content-Type: $tipe_konten");
+        readfile($jalur_lengkap);
         exit;
     }
 }
 
-// 404 Not Found
 http_response_code(404);
-echo "404 Not Found";
+echo "404 Halaman Tidak Ditemukan";
 ?>
