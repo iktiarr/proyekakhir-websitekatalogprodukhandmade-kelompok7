@@ -20,11 +20,12 @@ if ($hasil_produk && mysqli_num_rows($hasil_produk) > 0) {
 
 $daerah_bawaan = 'Bangkalan';
 ?>
-<section id="galeri" class="py-16 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+<section id="galeri" class="py-16 bg-slate-50 dark:bg-slate-950">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     
+    <!-- Header -->
     <div class="text-center mb-10">
-      <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
+      <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100">
         Galeri <span class="text-lime-600">Madura</span>
       </h2>
       <p class="text-slate-500 dark:text-slate-400 mt-2 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
@@ -32,18 +33,20 @@ $daerah_bawaan = 'Bangkalan';
       </p>
     </div>
 
+    <!-- Filter Buttons -->
     <div class="flex flex-wrap items-center justify-center gap-2 mb-10 max-w-2xl mx-auto">
       <?php foreach ($daftar_daerah as $nama_daerah): ?>
-      <button onclick="saringDaerah('<?= $nama_daerah; ?>')" id="btn-<?= $nama_daerah; ?>" class="tombol-saring-daerah px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm border transition-colors duration-200 cursor-pointer shadow-sm <?= $nama_daerah === $daerah_bawaan ? 'bg-lime-600 text-white border-lime-600' : 'bg-white dark:bg-slate-900 text-slate-650 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-lime-50 dark:hover:bg-lime-950/30 hover:text-lime-700 dark:hover:text-lime-400 hover:border-lime-200'; ?>">
+      <button onclick="saringDaerah('<?= $nama_daerah; ?>')" id="btn-<?= $nama_daerah; ?>" class="tombol-saring-daerah px-4 py-2 rounded-xl font-bold text-xs sm:text-sm border cursor-pointer <?= $nama_daerah === $daerah_bawaan ? 'bg-lime-600 text-white border-lime-600' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800'; ?>">
         <?= $nama_daerah; ?>
       </button>
       <?php endforeach; ?>
     </div>
 
+    <!-- Gallery Grid -->
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto items-stretch" id="grid-galeri">
       
       <?php foreach ($daftar_galeri as $item): ?>
-      <div class="item-galeri relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200/50 dark:border-slate-800/80 shadow-sm" 
+      <div class="item-galeri relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-800" 
            data-daerah="<?= $item['daerah']; ?>">
         <img 
           src="<?= $item['gambar']; ?>" 
@@ -62,12 +65,12 @@ $daerah_bawaan = 'Bangkalan';
   function saringDaerah(daerah) {
       const tombol = document.querySelectorAll('.tombol-saring-daerah');
       tombol.forEach(btn => {
-          btn.className = "tombol-saring-daerah px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm border bg-white dark:bg-slate-900 text-slate-650 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-lime-50 dark:hover:bg-lime-950/30 hover:text-lime-700 dark:hover:text-lime-400 hover:border-lime-200 transition-colors duration-200 cursor-pointer shadow-sm";
+          btn.className = "tombol-saring-daerah px-4 py-2 rounded-xl font-bold text-xs sm:text-sm border cursor-pointer bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800";
       });
 
       const tombolAktif = document.getElementById(`btn-${daerah}`);
       if (tombolAktif) {
-          tombolAktif.className = "tombol-saring-daerah px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm border bg-lime-600 text-white border-lime-600 shadow-sm transition-colors duration-200 cursor-pointer";
+          tombolAktif.className = "tombol-saring-daerah px-4 py-2 rounded-xl font-bold text-xs sm:text-sm border cursor-pointer bg-lime-600 text-white border-lime-600";
       }
 
       const itemGaleri = document.querySelectorAll('.item-galeri');

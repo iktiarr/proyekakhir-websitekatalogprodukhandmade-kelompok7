@@ -1,4 +1,9 @@
 <?php
+/**
+ * Halaman Masuk (Login)
+ * Berfungsi untuk autentikasi kredensial email & kata sandi pengguna
+ * untuk mendapatkan akses ke fitur transaksi dan administrasi.
+ */
 $awalan = "";
 include 'koneksi.php';
 
@@ -13,15 +18,18 @@ if (isset($_POST['masuk'])) {
     $email = mysqli_real_escape_string($koneksi, $_POST['email']);
     $kata_sandi = $_POST['password'];
 
+    // Lakukan pencarian email pengguna di database
     $kueri = mysqli_query($koneksi, "SELECT * FROM pengguna WHERE email = '$email'");
     if (mysqli_num_rows($kueri) > 0) {
         $data_pengguna = mysqli_fetch_assoc($kueri);
         
+        // Verifikasi kesesuaian hash kata sandi
         if (password_verify($kata_sandi, $data_pengguna['password'])) {
             $_SESSION['user_id'] = $data_pengguna['id'];
             $_SESSION['nama'] = $data_pengguna['nama'];
             $_SESSION['role'] = $data_pengguna['role'];
 
+            // Alihkan berdasarkan peran pengguna
             if ($data_pengguna['role'] === 'admin') {
                 header("Location: admin/index.php");
             } else {
@@ -39,56 +47,62 @@ if (isset($_POST['masuk'])) {
 
 <?php include 'bagian/atas.php'; ?>
 
-<div class="min-h-[75vh] bg-slate-50 dark:bg-slate-950 flex items-center justify-center py-10 px-4 transition-colors duration-300">
-    <div class="max-w-md w-full bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200/60 dark:border-slate-800 shadow-sm">
+<!-- Panel Form Login Pengguna -->
+<div class="min-h-[75vh] bg-slate-50 dark:bg-slate-950 flex items-center justify-center py-10 px-4">
+    <div class="max-w-md w-full bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         
+        <!-- Header Panel Form -->
         <div class="text-center mb-6">
-            <h1 class="text-2xl font-extrabold text-slate-850 dark:text-slate-100 tracking-tight">Selamat Datang</h1>
+            <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Selamat Datang</h1>
             <p class="text-slate-500 dark:text-slate-400 mt-1 text-sm">Masuk untuk menjelajahi koleksi HandMadura</p>
         </div>
 
+        <!-- Notifikasi Galat/Error -->
         <?php if ($galat): ?>
-            <div class="bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl mb-4.5 text-xs border border-red-150 dark:border-red-900/30 flex items-center gap-2.5">
+            <div class="bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 px-4 py-3 rounded-xl mb-4.5 text-xs border border-red-200 dark:border-red-900/30 flex items-center gap-2.5">
                 <i class="fa-solid fa-circle-exclamation text-sm flex-shrink-0"></i> 
                 <span class="font-semibold"><?= $galat; ?></span>
             </div>
         <?php endif; ?>
 
+        <!-- Notifikasi Registrasi Sukses -->
         <?php if ($sukses): ?>
-            <div class="bg-lime-50 dark:bg-lime-950/20 text-lime-755 dark:text-lime-400 px-4 py-3 rounded-xl mb-4.5 text-xs border border-lime-200 dark:border-lime-900/30 flex items-center gap-2.5">
+            <div class="bg-lime-50 dark:bg-lime-950/20 text-lime-800 dark:text-lime-400 px-4 py-3 rounded-xl mb-4.5 text-xs border border-lime-200 dark:border-lime-900/30 flex items-center gap-2.5">
                 <i class="fa-solid fa-circle-check text-sm flex-shrink-0 text-lime-600"></i> 
                 <span class="font-semibold"><?= $sukses; ?></span>
             </div>
         <?php endif; ?>
 
+        <!-- Form Autentikasi -->
         <form action="" method="POST" class="space-y-4.5">
             <div>
-                <label class="block text-xs font-bold text-slate-600 dark:text-slate-405 mb-1.5 uppercase tracking-wider">Email</label>
-                <input type="email" name="email" required class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-250 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-sm text-slate-855 dark:text-slate-200 placeholder-slate-400" placeholder="nama@email.com">
+                <label class="block text-xs font-bold text-slate-650 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Email</label>
+                <input type="email" name="email" required class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 outline-none text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400" placeholder="nama@email.com">
             </div>
             
             <div>
                 <div class="flex justify-between items-center mb-1.5">
-                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-405 uppercase tracking-wider">Password</label>
-                    <a href="#" class="text-[11px] font-bold text-slate-400 dark:text-slate-550 hover:text-lime-600 dark:hover:text-lime-400 transition-colors">Lupa Password?</a>
+                    <label class="block text-xs font-bold text-slate-650 dark:text-slate-400 uppercase tracking-wider">Password</label>
+                    <a href="#" class="text-[11px] font-bold text-slate-400 dark:text-slate-500 hover:text-lime-600 dark:hover:text-lime-400">Lupa Password?</a>
                 </div>
                 <div class="relative">
-                    <input type="password" id="password" name="password" required class="w-full pl-4 pr-11 py-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-250 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-sm text-slate-855 dark:text-slate-200 placeholder-slate-400" placeholder="••••••••">
-                    <button type="button" onclick="tampilkanSandi('password', 'ikon-sandi')" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-lime-600 transition-colors cursor-pointer border-none bg-transparent">
+                    <input type="password" id="password" name="password" required class="w-full pl-4 pr-11 py-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 outline-none text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400" placeholder="••••••••">
+                    <button type="button" onclick="tampilkanSandi('password', 'ikon-sandi')" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-450 hover:text-lime-600 cursor-pointer border-none bg-transparent">
                         <i id="ikon-sandi" class="fa-solid fa-eye-slash text-sm"></i>
                     </button>
                 </div>
             </div>
             
-            <button type="submit" name="masuk" class="w-full bg-lime-600 text-white py-3 rounded-xl font-bold hover:bg-lime-700 hover:shadow-lg hover:shadow-lime-200/40 transition-all text-sm mt-2 cursor-pointer border-none">
+            <button type="submit" name="masuk" class="w-full bg-lime-600 text-white py-3 rounded-xl font-bold hover:bg-lime-700 text-sm mt-2 cursor-pointer border-none">
                 Masuk Ke Akun
             </button>
         </form>
 
-        <div class="mt-6 pt-4 border-t border-slate-150 dark:border-slate-800 text-center">
+        <!-- Tautan Navigasi ke Registrasi -->
+        <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 text-center">
             <p class="text-slate-500 dark:text-slate-400 text-xs">
                 Belum punya akun HandMadura? 
-                <a href="daftar.php" class="text-lime-600 dark:text-lime-400 font-bold hover:text-lime-700 dark:hover:text-lime-300 hover:underline transition-colors ml-1">
+                <a href="daftar.php" class="text-lime-600 dark:text-lime-400 font-bold hover:text-lime-700 dark:hover:text-lime-300 hover:underline ml-1">
                     Daftar Sekarang
                 </a>
             </p>
@@ -96,6 +110,7 @@ if (isset($_POST['masuk'])) {
     </div>
 </div>
 
+<!-- Script Pembantu Tampilkan/Sembunyikan Sandi -->
 <script>
     function tampilkanSandi(sandiId, ikonId) {
         const masukan = document.getElementById(sandiId);
@@ -110,4 +125,4 @@ if (isset($_POST['masuk'])) {
     }
 </script>
 
-<?php include 'bagian/bawah.php'; ?>
+<?php include 'bagian/bawah.php'; ?>n/bawah.php'; ?>

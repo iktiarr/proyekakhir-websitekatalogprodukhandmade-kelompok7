@@ -1,14 +1,18 @@
-<section class="py-16 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 transition-colors duration-300">
+<!-- Bagian Pertanyaan Umum (FAQ) -->
+<section class="py-16 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     
+    <!-- Header Bagian Pertanyaan Umum -->
     <div class="text-center mb-12">
-      <h2 class="text-3xl font-extrabold text-slate-800 dark:text-slate-100">Pertanyaan Umum</h2>
+      <h2 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Pertanyaan Umum</h2>
       <p class="text-slate-500 dark:text-slate-400 mt-2 text-sm sm:text-base">Temukan jawaban cepat seputar mahakarya autentik HandMadura.</p>
     </div>
 
+    <!-- Grid List Pertanyaan Tanya Jawab (Responsif 2 Kolom) -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
       
-      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200/60 dark:border-slate-850 transition-all hover:border-lime-200 dark:hover:border-lime-700 hover:shadow-md h-full flex flex-col justify-start">
+      <!-- Pertanyaan 1 -->
+      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
         <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-start gap-2.5">
           <i class="fa-solid fa-circle-question text-lime-600 mt-1 flex-shrink-0 text-base"></i>
           <span>Bagaimana cara membeli produk di HandMadura?</span>
@@ -18,7 +22,8 @@
         </p>
       </div>
 
-      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200/60 dark:border-slate-850 transition-all hover:border-lime-200 dark:hover:border-lime-700 hover:shadow-md h-full flex flex-col justify-start">
+      <!-- Pertanyaan 2 -->
+      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
         <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-start gap-2.5">
           <i class="fa-solid fa-circle-question text-lime-600 mt-1 flex-shrink-0 text-base"></i>
           <span>Apakah produk yang dijual 100% asli buatan tangan?</span>
@@ -28,7 +33,8 @@
         </p>
       </div>
 
-      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200/60 dark:border-slate-850 transition-all hover:border-lime-200 dark:hover:border-lime-700 hover:shadow-md h-full flex flex-col justify-start">
+      <!-- Pertanyaan 3 -->
+      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
         <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-start gap-2.5">
           <i class="fa-solid fa-circle-question text-lime-600 mt-1 flex-shrink-0 text-base"></i>
           <span>Berapa lama proses pengerjaan dan pengiriman?</span>
@@ -38,7 +44,8 @@
         </p>
       </div>
 
-      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200/60 dark:border-slate-850 transition-all hover:border-lime-200 dark:hover:border-lime-700 hover:shadow-md h-full flex flex-col justify-start">
+      <!-- Pertanyaan 4 -->
+      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
         <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-start gap-2.5">
           <i class="fa-solid fa-circle-question text-lime-600 mt-1 flex-shrink-0 text-base"></i>
           <span>Bagaimana jika produk yang diterima mengalami kerusakan?</span>
@@ -48,7 +55,8 @@
         </p>
       </div>
 
-      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200/60 dark:border-slate-850 transition-all hover:border-lime-200 dark:hover:border-lime-700 hover:shadow-md h-full flex flex-col justify-start">
+      <!-- Pertanyaan 5 -->
+      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
         <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-start gap-2.5">
           <i class="fa-solid fa-circle-question text-lime-600 mt-1 flex-shrink-0 text-base"></i>
           <span>Apakah bisa melakukan pemesanan kustom (custom order)?</span>
@@ -58,7 +66,8 @@
         </p>
       </div>
 
-      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200/60 dark:border-slate-850 transition-all hover:border-lime-200 dark:hover:border-lime-700 hover:shadow-md h-full flex flex-col justify-start">
+      <!-- Pertanyaan 6 -->
+      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
         <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-start gap-2.5">
           <i class="fa-solid fa-circle-question text-lime-600 mt-1 flex-shrink-0 text-base"></i>
           <span>Apakah HandMadura melayani pengiriman internasional?</span>
