@@ -1,0 +1,25 @@
+// Catatan pengguna
+
+@vercel.json adalah package dari node js yang digunakan untuk mendeploy aplikasi web menggunakan Vercel.
+
+// install vercel
+npm install -g vercel
+
+// deploy aplikasi web menggunakan Vercel
+vercel --prod
+
+file ini tidak penting dan boleh untuk tidak digunakan
+
+
+
+// Folder Api
+
+folder ini berisi file api.php yang digunakan untuk mengambil data dari database dan menampilkannya di halaman web.
+
+// Utilitas/inisialisasi_db.php
+
+file ini digunakan untuk menginisialisasi database dan membuat tabel yang diperlukan.
+
+// koneksi/koneksi.php
+
+file ini digunakan untuk koneksi ke database.   
