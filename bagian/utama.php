@@ -35,7 +35,7 @@
       <!-- Kolom Foto Banner Unggulan -->
       <div class="order-1 lg:order-2 relative w-full h-[280px] sm:h-[360px] lg:h-[450px] rounded-2xl overflow-hidden group">
         <img 
-          src="<?= $awalan; ?>uploads/hero.jpg" 
+          src="<?= $awalan; ?>uploads/foto2.webp" 
           alt="Batik Tulis Gentongan Madura" 
           class="w-full h-full object-cover"
         >
