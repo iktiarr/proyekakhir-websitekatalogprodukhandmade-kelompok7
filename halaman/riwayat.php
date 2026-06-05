@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $id_pengguna = $_SESSION['user_id'];
-$kueri_pesanan = mysqli_query($koneksi, "SELECT * FROM pesanan WHERE id_pengguna = $id_pengguna ORDER BY tanggal_pesanan DESC");
+$kueri_pesanan = kueri("SELECT * FROM pesanan WHERE id_pengguna = ? ORDER BY tanggal_pesanan DESC", [$id_pengguna]);
 ?>
 
 <?php include '../bagian/atas.php'; ?>
@@ -76,7 +76,7 @@ $kueri_pesanan = mysqli_query($koneksi, "SELECT * FROM pesanan WHERE id_pengguna
                     
                     <?php
                     $id_pesanan = $baris['id'];
-                    $kueri_rincian = mysqli_query($koneksi, "SELECT d.*, p.nama_produk FROM detail_pesanan d JOIN produk p ON d.id_produk = p.id WHERE d.id_pesanan = $id_pesanan");
+                    $kueri_rincian = kueri("SELECT d.*, p.nama_produk FROM detail_pesanan d JOIN produk p ON d.id_produk = p.id WHERE d.id_pesanan = ?", [$id_pesanan]);
                     ?>
                     <div class="bg-slate-50/60 dark:bg-slate-950/40 px-5 py-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap gap-2 items-center">
                         <span class="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider mr-1">Rincian Item:</span>

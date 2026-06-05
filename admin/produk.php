@@ -11,13 +11,13 @@ $galat = '';
 
 if (isset($_POST['simpan'])) {
     $id_produk = isset($_POST['id']) ? (int)$_POST['id'] : 0;
-    $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
-    $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
+    $nama = trim($_POST['nama']);
+    $deskripsi = trim($_POST['deskripsi']);
     $harga = (float)$_POST['harga'];
     $stok = (int)$_POST['stok'];
     $id_kategori = (int)$_POST['id_kategori'];
     $id_daerah = isset($_POST['id_daerah']) ? (int)$_POST['id_daerah'] : 0;
-    $nilai_id_daerah = $id_daerah > 0 ? $id_daerah : "NULL";
+    $val_daerah = $id_daerah > 0 ? $id_daerah : null;
     
     $gambar_mentah = trim($_POST['gambar']);
     
@@ -35,25 +35,22 @@ if (isset($_POST['simpan'])) {
             }
         }
     }
-    $gambar = mysqli_real_escape_string($koneksi, $gambar_mentah);
 
     if ($harga < 0 || $stok < 0) {
         $galat = "Gagal menyimpan: Harga dan Stok tidak boleh bernilai negatif!";
     } else {
         if ($id_produk > 0) {
-            $kueri_simpan = "UPDATE produk SET nama_produk='$nama', deskripsi='$deskripsi', harga=$harga, stok=$stok, gambar='$gambar', id_kategori=$id_kategori, id_daerah=$nilai_id_daerah WHERE id=$id_produk";
+            $sql = "UPDATE produk SET nama_produk=?, deskripsi=?, harga=?, stok=?, gambar=?, id_kategori=?, id_daerah=? WHERE id=?";
+            $params = [$nama, $deskripsi, $harga, $stok, $gambar_mentah, $id_kategori, $val_daerah, $id_produk];
         } else {
-            $kueri_simpan = "INSERT INTO produk (nama_produk, deskripsi, harga, stok, gambar, id_kategori, id_daerah) VALUES ('$nama', '$deskripsi', $harga, $stok, '$gambar', $id_kategori, $nilai_id_daerah)";
+            $sql = "INSERT INTO produk (nama_produk, deskripsi, harga, stok, gambar, id_kategori, id_daerah) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            $params = [$nama, $deskripsi, $harga, $stok, $gambar_mentah, $id_kategori, $val_daerah];
         }
 
-        if (mysqli_query($koneksi, $kueri_simpan)) {
+        if (kueri($sql, $params)) {
             $berhasil = "Produk berhasil disimpan!";
-            $nama_admin = mysqli_real_escape_string($koneksi, $_SESSION['nama']);
-            $id_admin = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NULL';
             $aksi_log = $id_produk > 0 ? 'ubah' : 'tambah';
-            $raw_nama = $_POST['nama'];
-            $ket_log = mysqli_real_escape_string($koneksi, ($id_produk > 0 ? "Mengubah detail produk " : "Menambahkan produk baru ") . "'$raw_nama'");
-            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_admin, '$nama_admin', 'produk', '$aksi_log', '$ket_log')");
+            catat_log('produk', $aksi_log, ($id_produk > 0 ? "Mengubah detail produk " : "Menambahkan produk baru ") . "'$nama'");
         } else {
             $galat = "Gagal menyimpan: " . mysqli_error($koneksi);
         }
@@ -62,24 +59,22 @@ if (isset($_POST['simpan'])) {
 
 if (isset($_GET['hapus'])) {
     $id_produk = (int)$_GET['hapus'];
-    $res_p = mysqli_query($koneksi, "SELECT nama_produk FROM produk WHERE id=$id_produk");
+    $res_p = kueri("SELECT nama_produk FROM produk WHERE id=?", [$id_produk]);
     if ($row_p = mysqli_fetch_assoc($res_p)) {
-        $nama_p = mysqli_real_escape_string($koneksi, $row_p['nama_produk']);
-        if (mysqli_query($koneksi, "DELETE FROM produk WHERE id=$id_produk")) {
-            $nama_admin = mysqli_real_escape_string($koneksi, $_SESSION['nama']);
-            $id_admin = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NULL';
-            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_admin, '$nama_admin', 'produk', 'hapus', 'Menghapus produk \'$nama_p\'')");
+        $nama_p = $row_p['nama_produk'];
+        if (kueri("DELETE FROM produk WHERE id=?", [$id_produk])) {
+            catat_log('produk', 'hapus', "Menghapus produk '$nama_p'");
         }
     }
     header("Location: produk.php");
     exit();
 }
 
-$kueri_produk = mysqli_query($koneksi, "SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id ORDER BY p.id DESC");
-$kueri_kategori = mysqli_query($koneksi, "SELECT * FROM kategori");
-$kueri_daerah = mysqli_query($koneksi, "SELECT * FROM daerah");
-$pembayaran_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
-$testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
+$kueri_produk = kueri("SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id ORDER BY p.id DESC");
+$kueri_kategori = kueri("SELECT * FROM kategori");
+$kueri_daerah = kueri("SELECT * FROM daerah");
+$pembayaran_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
+$testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
 ?>
 
 <!doctype html>
@@ -170,11 +165,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
 
     <main class="flex-grow p-4 sm:p-6 w-full max-w-7xl mx-auto overflow-x-hidden">
         
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
-            <div>
-                <h1 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100">Kelola Produk</h1>
-                <p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Tambah, edit, atau hapus produk di katalog Anda.</p>
-            </div>
+        <div class="flex justify-end mb-6">
             <button onclick="bukaModalTambah()" class="bg-lime-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-lime-700 transition-all duration-300 flex items-center cursor-pointer text-xs sm:text-sm">
                 <i class="fa-solid fa-plus mr-1.5"></i> Tambah Produk
             </button>
@@ -238,7 +229,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                             </span>
                         </td>
                         <td class="px-4 py-3 pr-6 text-right space-x-1 whitespace-nowrap">
-                            <button onclick='ubahProduk(<?= json_encode($produk); ?>)' class="w-8 h-8 inline-flex items-center justify-center rounded-xl text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors cursor-pointer" title="Edit">
+                            <button onclick="ubahProduk(<?= htmlspecialchars(json_encode($produk), ENT_QUOTES, 'UTF-8'); ?>)" class="w-8 h-8 inline-flex items-center justify-center rounded-xl text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors cursor-pointer" title="Edit">
                                 <i class="fa-solid fa-pen-to-square text-sm"></i>
                             </button>
                             <a href="produk.php?hapus=<?= $produk['id']; ?>" onclick="return confirm('Hapus produk ini secara permanen?')" class="w-8 h-8 inline-flex items-center justify-center rounded-xl text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors" title="Hapus">
@@ -371,8 +362,8 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
             document.getElementById('produk_nama').value = data.nama_produk;
             document.getElementById('produk_harga').value = data.harga;
             document.getElementById('produk_stok').value = data.stok;
-            document.getElementById('produk_kategori').value = data.id_kategori;
-            document.getElementById('produk_daerah').value = data.id_daerah;
+            document.getElementById('produk_kategori').value = data.id_kategori || "";
+            document.getElementById('produk_daerah').value = data.id_daerah || "";
             document.getElementById('produk_deskripsi').value = data.deskripsi;
             document.getElementById('produk_gambar').value = data.gambar;
             

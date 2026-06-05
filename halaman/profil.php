@@ -19,7 +19,7 @@ $galat = '';
 $sukses = '';
 
 // Ambil data profil pengguna terbaru dari database
-$kueri_pengguna = mysqli_query($koneksi, "SELECT * FROM pengguna WHERE id = $id_pengguna");
+$kueri_pengguna = kueri("SELECT * FROM pengguna WHERE id = ?", [$id_pengguna]);
 $data_pengguna = mysqli_fetch_assoc($kueri_pengguna);
 
 if (!$data_pengguna) {
@@ -29,10 +29,10 @@ if (!$data_pengguna) {
 
 // Proses pembaruan profil saat form dikirimkan
 if (isset($_POST['simpan_profil'])) {
-    $nama = mysqli_real_escape_string($koneksi, trim($_POST['nama']));
-    $email = mysqli_real_escape_string($koneksi, trim($_POST['email']));
-    $no_telp = mysqli_real_escape_string($koneksi, trim($_POST['no_telp']));
-    $alamat = mysqli_real_escape_string($koneksi, trim($_POST['alamat']));
+    $nama = trim($_POST['nama']);
+    $email = trim($_POST['email']);
+    $no_telp = trim($_POST['no_telp']);
+    $alamat = trim($_POST['alamat']);
     $kata_sandi_baru = $_POST['password_baru'];
     $konfirmasi_sandi = $_POST['konfirmasi_password'];
 
@@ -43,12 +43,12 @@ if (isset($_POST['simpan_profil'])) {
         $galat = "Format email tidak valid!";
     } else {
         // Periksa apakah email sudah digunakan oleh pengguna lain
-        $periksa_email = mysqli_query($koneksi, "SELECT id FROM pengguna WHERE email = '$email' AND id != $id_pengguna");
-        if (mysqli_num_rows($periksa_email) > 0) {
+        $periksa_email = kueri("SELECT id FROM pengguna WHERE email = ? AND id != ?", [$email, $id_pengguna]);
+        if ($periksa_email && mysqli_num_rows($periksa_email) > 0) {
             $galat = "Email ini sudah digunakan oleh akun lain!";
         } else {
             // Tangani pengubahan kata sandi baru (opsional)
-            $update_sandi_sql = "";
+            $sandi_hash = null;
             $ganti_sandi = false;
 
             if (!empty($kata_sandi_baru)) {
@@ -58,28 +58,30 @@ if (isset($_POST['simpan_profil'])) {
                     $galat = "Password baru minimal harus terdiri dari 6 karakter!";
                 } else {
                     $sandi_hash = password_hash($kata_sandi_baru, PASSWORD_DEFAULT);
-                    $update_sandi_sql = ", password = '$sandi_hash'";
                     $ganti_sandi = true;
                 }
             }
 
             // Jika tidak ada kesalahan validasi, jalankan proses penyimpanan ke database
             if (empty($galat)) {
-                $kueri_update = "UPDATE pengguna SET nama = '$nama', email = '$email', no_telp = '$no_telp', alamat = '$alamat' $update_sandi_sql WHERE id = $id_pengguna";
+                if ($ganti_sandi) {
+                    $kueri_update = kueri("UPDATE pengguna SET nama = ?, email = ?, no_telp = ?, alamat = ?, password = ? WHERE id = ?", [$nama, $email, $no_telp, $alamat, $sandi_hash, $id_pengguna]);
+                } else {
+                    $kueri_update = kueri("UPDATE pengguna SET nama = ?, email = ?, no_telp = ?, alamat = ? WHERE id = ?", [$nama, $email, $no_telp, $alamat, $id_pengguna]);
+                }
                 
-                if (mysqli_query($koneksi, $kueri_update)) {
+                if ($kueri_update) {
                     $sukses = "Profil Anda berhasil diperbarui!";
                     
                     // Perbarui sesi nama pengguna agar header langsung berubah
                     $_SESSION['nama'] = $nama;
                     
                     // Log aktivitas pengguna
-                    $nama_escaped = mysqli_real_escape_string($koneksi, $nama);
                     $keterangan_log = $ganti_sandi ? 'Memperbarui data profil dan kata sandi' : 'Memperbarui data profil diri';
-                    mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_pengguna, '$nama_escaped', 'pengguna', 'edit', '$keterangan_log')");
+                    kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES (?, ?, 'pengguna', 'edit', ?)", [$id_pengguna, $nama, $keterangan_log]);
                     
                     // Muat ulang data terbaru dari database
-                    $kueri_pengguna = mysqli_query($koneksi, "SELECT * FROM pengguna WHERE id = $id_pengguna");
+                    $kueri_pengguna = kueri("SELECT * FROM pengguna WHERE id = ?", [$id_pengguna]);
                     $data_pengguna = mysqli_fetch_assoc($kueri_pengguna);
                 } else {
                     $galat = "Terjadi kesalahan sistem saat memperbarui profil.";

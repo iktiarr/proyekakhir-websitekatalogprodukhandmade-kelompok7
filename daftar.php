@@ -10,32 +10,28 @@ include 'koneksi.php';
 $galat = '';
 
 if (isset($_POST['daftar'])) {
-    $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
-    $email = mysqli_real_escape_string($koneksi, $_POST['email']);
-    $alamat = mysqli_real_escape_string($koneksi, $_POST['alamat']);
-    $no_telp = mysqli_real_escape_string($koneksi, $_POST['no_telp']);
+    $nama = $_POST['nama'];
+    $email = $_POST['email'];
+    $alamat = $_POST['alamat'];
+    $no_telp = $_POST['no_telp'];
     $kata_sandi = $_POST['password'];
     $konfirmasi = $_POST['konfirmasi_password'];
 
-    // Validasi kesamaan konfirmasi kata sandi
     if ($kata_sandi !== $konfirmasi) {
         $galat = "Konfirmasi password tidak cocok!";
     } else {
-        // Periksa apakah email yang dimasukkan sudah pernah terdaftar
-        $periksa = mysqli_query($koneksi, "SELECT id FROM pengguna WHERE email = '$email'");
-        if (mysqli_num_rows($periksa) > 0) {
+        $periksa = kueri("SELECT id FROM pengguna WHERE email = ?", [$email]);
+        if ($periksa && mysqli_num_rows($periksa) > 0) {
             $galat = "Email sudah terdaftar!";
         } else {
-            // Lakukan enkripsi kata sandi
             $sandi_hash = password_hash($kata_sandi, PASSWORD_DEFAULT);
-            $kueri = "INSERT INTO pengguna (nama, email, password, role, alamat, no_telp) VALUES ('$nama', '$email', '$sandi_hash', 'user', '$alamat', '$no_telp')";
+            $berhasil = kueri("INSERT INTO pengguna (nama, email, password, role, alamat, no_telp) VALUES (?, ?, ?, 'user', ?, ?)", [$nama, $email, $sandi_hash, $alamat, $no_telp]);
             
-            if (mysqli_query($koneksi, $kueri)) {
+            if ($berhasil) {
+                global $koneksi;
                 $id_baru = mysqli_insert_id($koneksi);
-                $nama_escaped = mysqli_real_escape_string($koneksi, $nama);
-                mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_baru, '$nama_escaped', 'pengguna', 'daftar', 'Mendaftar sebagai pengguna baru')");
+                kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES (?, ?, 'pengguna', 'daftar', 'Mendaftar sebagai pengguna baru')", [$id_baru, $nama]);
                 
-                // Registrasi sukses, alihkan ke halaman masuk dengan parameter sukses
                 header("Location: masuk.php?registrasi=sukses");
                 exit();
             } else {

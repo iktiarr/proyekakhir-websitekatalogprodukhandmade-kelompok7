@@ -20,7 +20,7 @@ if (isset($_GET['id'])) {
     $id_pesanan = (int)$_GET['id'];
     
     // Tarik data pesanan yang bersangkutan dari database
-    $kueri_pesanan = mysqli_query($koneksi, "SELECT * FROM pesanan WHERE id = $id_pesanan AND id_pengguna = $id_pengguna");
+    $kueri_pesanan = kueri("SELECT * FROM pesanan WHERE id = ? AND id_pengguna = ?", [$id_pesanan, $id_pengguna]);
     $data_pesanan = mysqli_fetch_assoc($kueri_pesanan);
     
     if (!$data_pesanan) {
@@ -57,12 +57,12 @@ if (isset($_GET['id'])) {
     
     // Tangani aksi ketika tombol selesaikan pembayaran diklik oleh pengguna
     if (isset($_POST['selesaikan_pembayaran'])) {
-        $kueri_perbarui = "UPDATE pesanan SET bukti_pembayaran = '$kode_pembayaran', status = 'dibayar' WHERE id = $id_pesanan";
-        if (mysqli_query($koneksi, $kueri_perbarui)) {
+        $kueri_perbarui = kueri("UPDATE pesanan SET bukti_pembayaran = ?, status = 'dibayar' WHERE id = ?", [$kode_pembayaran, $id_pesanan]);
+        if ($kueri_perbarui) {
             $berhasil = "Pembayaran Berhasil! Pesanan Anda telah lunas dan siap dikirim.";
-            $nama_pembeli = mysqli_real_escape_string($koneksi, $_SESSION['nama']);
+            $nama_pembeli = $_SESSION['nama'];
             $tag = "#HM-" . str_pad($id_pesanan, 5, '0', STR_PAD_LEFT);
-            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_pengguna, '$nama_pembeli', 'pesanan', 'dibayar', 'Melakukan konfirmasi pembayaran untuk $tag')");
+            kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES (?, ?, 'pesanan', 'dibayar', ?)", [$id_pengguna, $nama_pembeli, "Melakukan konfirmasi pembayaran untuk $tag"]);
             header("Refresh: 2; url=riwayat.php");
         } else {
             $galat = "Terjadi kesalahan saat memproses pembayaran.";

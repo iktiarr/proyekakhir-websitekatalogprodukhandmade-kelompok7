@@ -6,20 +6,18 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-$testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
-$pembayaran_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
+$testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
+$pembayaran_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
 
 $aksi = isset($_GET['action']) ? $_GET['action'] : 'list';
 $id_testimoni = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if (isset($_GET['approve']) && $id_testimoni > 0) {
-    $res_t = mysqli_query($koneksi, "SELECT t.*, p.nama FROM testimonial t JOIN pengguna p ON t.id_pengguna = p.id WHERE t.id = $id_testimoni");
+    $res_t = kueri("SELECT t.*, p.nama FROM testimonial t JOIN pengguna p ON t.id_pengguna = p.id WHERE t.id = ?", [$id_testimoni]);
     if ($row_t = mysqli_fetch_assoc($res_t)) {
-        $nama_pengulas = mysqli_real_escape_string($koneksi, $row_t['nama']);
-        if (mysqli_query($koneksi, "UPDATE testimonial SET status = 'approved' WHERE id = $id_testimoni")) {
-            $nama_admin = mysqli_real_escape_string($koneksi, $_SESSION['nama']);
-            $id_admin = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NULL';
-            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_admin, '$nama_admin', 'testimoni', 'setujui', 'Menyetujui testimoni dari \'$nama_pengulas\'')");
+        $nama_pengulas = $row_t['nama'];
+        if (kueri("UPDATE testimonial SET status = 'approved' WHERE id = ?", [$id_testimoni])) {
+            catat_log('testimoni', 'setujui', "Menyetujui testimoni dari '$nama_pengulas'");
         }
     }
     header("Location: testimoni.php");
@@ -27,13 +25,11 @@ if (isset($_GET['approve']) && $id_testimoni > 0) {
 }
 
 if (isset($_GET['reject']) && $id_testimoni > 0) {
-    $res_t = mysqli_query($koneksi, "SELECT t.*, p.nama FROM testimonial t JOIN pengguna p ON t.id_pengguna = p.id WHERE t.id = $id_testimoni");
+    $res_t = kueri("SELECT t.*, p.nama FROM testimonial t JOIN pengguna p ON t.id_pengguna = p.id WHERE t.id = ?", [$id_testimoni]);
     if ($row_t = mysqli_fetch_assoc($res_t)) {
-        $nama_pengulas = mysqli_real_escape_string($koneksi, $row_t['nama']);
-        if (mysqli_query($koneksi, "UPDATE testimonial SET status = 'rejected' WHERE id = $id_testimoni")) {
-            $nama_admin = mysqli_real_escape_string($koneksi, $_SESSION['nama']);
-            $id_admin = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NULL';
-            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_admin, '$nama_admin', 'testimoni', 'tolak', 'Menolak testimoni dari \'$nama_pengulas\'')");
+        $nama_pengulas = $row_t['nama'];
+        if (kueri("UPDATE testimonial SET status = 'rejected' WHERE id = ?", [$id_testimoni])) {
+            catat_log('testimoni', 'tolak', "Menolak testimoni dari '$nama_pengulas'");
         }
     }
     header("Location: testimoni.php");
@@ -41,13 +37,11 @@ if (isset($_GET['reject']) && $id_testimoni > 0) {
 }
 
 if (isset($_GET['delete']) && $id_testimoni > 0) {
-    $res_t = mysqli_query($koneksi, "SELECT t.*, p.nama FROM testimonial t JOIN pengguna p ON t.id_pengguna = p.id WHERE t.id = $id_testimoni");
+    $res_t = kueri("SELECT t.*, p.nama FROM testimonial t JOIN pengguna p ON t.id_pengguna = p.id WHERE t.id = ?", [$id_testimoni]);
     if ($row_t = mysqli_fetch_assoc($res_t)) {
-        $nama_pengulas = mysqli_real_escape_string($koneksi, $row_t['nama']);
-        if (mysqli_query($koneksi, "DELETE FROM testimonial WHERE id = $id_testimoni")) {
-            $nama_admin = mysqli_real_escape_string($koneksi, $_SESSION['nama']);
-            $id_admin = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NULL';
-            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_admin, '$nama_admin', 'testimoni', 'hapus', 'Menghapus testimoni dari \'$nama_pengulas\'')");
+        $nama_pengulas = $row_t['nama'];
+        if (kueri("DELETE FROM testimonial WHERE id = ?", [$id_testimoni])) {
+            catat_log('testimoni', 'hapus', "Menghapus testimoni dari '$nama_pengulas'");
         }
     }
     header("Location: testimoni.php");
@@ -143,10 +137,7 @@ if (isset($_GET['delete']) && $id_testimoni > 0) {
 
     <main class="flex-grow p-4 sm:p-6 w-full max-w-7xl mx-auto overflow-x-hidden">
         
-        <div class="mb-5">
-            <h1 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100">Kelola Testimonial</h1>
-            <p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Tinjau, setujui, atau tolak ulasan yang dikirimkan oleh pelanggan.</p>
-        </div>
+
 
         <?php
         $status = isset($_GET['status']) ? $_GET['status'] : 'all';
@@ -172,20 +163,20 @@ if (isset($_GET['delete']) && $id_testimoni > 0) {
 
         <?php
         if ($status === 'all') {
-            $kueri_testimoni = mysqli_query($koneksi, "
+            $kueri_testimoni = kueri("
                 SELECT t.*, p.nama as pengguna_nama, p.email 
                 FROM testimonial t 
                 JOIN pengguna p ON t.id_pengguna = p.id 
                 ORDER BY t.tanggal_dibuat DESC
             ");
         } else {
-            $kueri_testimoni = mysqli_query($koneksi, "
+            $kueri_testimoni = kueri("
                 SELECT t.*, p.nama as pengguna_nama, p.email 
                 FROM testimonial t 
                 JOIN pengguna p ON t.id_pengguna = p.id 
-                WHERE t.status = '$status'
+                WHERE t.status = ?
                 ORDER BY t.tanggal_dibuat DESC
-            ");
+            ", [$status]);
         }
         ?>
 

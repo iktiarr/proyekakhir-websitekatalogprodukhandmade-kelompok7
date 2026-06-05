@@ -8,15 +8,13 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
 if (isset($_GET['hapus'])) {
     $id_hapus = (int)$_GET['hapus'];
-    $cek_pengguna = mysqli_query($koneksi, "SELECT nama, role FROM pengguna WHERE id = $id_hapus");
+    $cek_pengguna = kueri("SELECT nama, role FROM pengguna WHERE id = ?", [$id_hapus]);
     $data_pengguna = mysqli_fetch_assoc($cek_pengguna);
     
     if ($data_pengguna && $data_pengguna['role'] === 'user') {
-        $nama_pengguna_hapus = mysqli_real_escape_string($koneksi, $data_pengguna['nama']);
-        if (mysqli_query($koneksi, "DELETE FROM pengguna WHERE id = $id_hapus")) {
-            $nama_admin = mysqli_real_escape_string($koneksi, $_SESSION['nama']);
-            $id_admin = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NULL';
-            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_admin, '$nama_admin', 'pengguna', 'hapus', 'Menghapus pengguna \'$nama_pengguna_hapus\'')");
+        $nama_pengguna_hapus = $data_pengguna['nama'];
+        if (kueri("DELETE FROM pengguna WHERE id = ?", [$id_hapus])) {
+            catat_log('pengguna', 'hapus', "Menghapus pengguna '$nama_pengguna_hapus'");
         }
     }
     
@@ -24,9 +22,9 @@ if (isset($_GET['hapus'])) {
     exit();
 }
 
-$kueri_pengguna = mysqli_query($koneksi, "SELECT * FROM pengguna ORDER BY role ASC, nama ASC");
-$pembayaran_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
-$testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
+$kueri_pengguna = kueri("SELECT * FROM pengguna ORDER BY role ASC, nama ASC");
+$pembayaran_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
+$testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
 ?>
 
 <!doctype html>
@@ -117,10 +115,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
 
     <main class="flex-grow p-4 sm:p-6 w-full max-w-7xl mx-auto overflow-x-hidden">
         
-        <div class="mb-6">
-            <h1 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100">Kelola Pengguna</h1>
-            <p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Daftar semua pengguna terdaftar dan administrator sistem.</p>
-        </div>
+
 
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm transition-colors duration-300">
             <div class="overflow-x-auto">

@@ -8,7 +8,7 @@ if (!isset($_GET['id'])) {
 }
 
 $id_produk = (int)$_GET['id'];
-$kueri_produk = mysqli_query($koneksi, "SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id WHERE p.id = $id_produk");
+$kueri_produk = kueri("SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id WHERE p.id = ?", [$id_produk]);
 $data_produk = mysqli_fetch_assoc($kueri_produk);
 
 if (!$data_produk) {
@@ -25,11 +25,11 @@ if (isset($_POST['tambah_keranjang'])) {
     $id_pengguna = $_SESSION['user_id'];
     $jumlah = (int)$_POST['jumlah'];
     
-    $cek_keranjang = mysqli_query($koneksi, "SELECT * FROM keranjang WHERE id_pengguna = $id_pengguna AND id_produk = $id_produk");
-    if (mysqli_num_rows($cek_keranjang) > 0) {
-        mysqli_query($koneksi, "UPDATE keranjang SET jumlah = jumlah + $jumlah WHERE id_pengguna = $id_pengguna AND id_produk = $id_produk");
+    $cek_keranjang = kueri("SELECT * FROM keranjang WHERE id_pengguna = ? AND id_produk = ?", [$id_pengguna, $id_produk]);
+    if ($cek_keranjang && mysqli_num_rows($cek_keranjang) > 0) {
+        kueri("UPDATE keranjang SET jumlah = jumlah + ? WHERE id_pengguna = ? AND id_produk = ?", [$jumlah, $id_pengguna, $id_produk]);
     } else {
-        mysqli_query($koneksi, "INSERT INTO keranjang (id_pengguna, id_produk, jumlah) VALUES ($id_pengguna, $id_produk, $jumlah)");
+        kueri("INSERT INTO keranjang (id_pengguna, id_produk, jumlah) VALUES (?, ?, ?)", [$id_pengguna, $id_produk, $jumlah]);
     }
     header("Location: keranjang.php");
     exit();

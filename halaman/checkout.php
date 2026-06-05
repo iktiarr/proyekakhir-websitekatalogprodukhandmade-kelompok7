@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 $id_pengguna = $_SESSION['user_id'];
 $galat = '';
 
-$kueri_pengguna_info = mysqli_query($koneksi, "SELECT alamat, no_telp FROM pengguna WHERE id = $id_pengguna");
+$kueri_pengguna_info = kueri("SELECT alamat, no_telp FROM pengguna WHERE id = ?", [$id_pengguna]);
 $data_pengguna_info = mysqli_fetch_assoc($kueri_pengguna_info);
 $autofill_alamat = $data_pengguna_info['alamat'] ?? '';
 $autofill_no_telp = $data_pengguna_info['no_telp'] ?? '';
@@ -23,13 +23,14 @@ if (isset($_POST['cart_ids'])) {
 }
 
 if (!empty($daftar_id_keranjang)) {
-    $string_id = implode(',', array_map('intval', $daftar_id_keranjang));
-    $kueri_keranjang = mysqli_query($koneksi, "SELECT k.*, p.harga, p.stok, p.nama_produk FROM keranjang k JOIN produk p ON k.id_produk = p.id WHERE k.id_pengguna = $id_pengguna AND k.id IN ($string_id)");
+    $placeholders = implode(',', array_fill(0, count($daftar_id_keranjang), '?'));
+    $params = array_merge([$id_pengguna], array_map('intval', $daftar_id_keranjang));
+    $kueri_keranjang = kueri("SELECT k.*, p.harga, p.stok, p.nama_produk FROM keranjang k JOIN produk p ON k.id_produk = p.id WHERE k.id_pengguna = ? AND k.id IN ($placeholders)", $params);
 } else {
-    $kueri_keranjang = mysqli_query($koneksi, "SELECT k.*, p.harga, p.stok, p.nama_produk FROM keranjang k JOIN produk p ON k.id_produk = p.id WHERE k.id_pengguna = $id_pengguna");
+    $kueri_keranjang = kueri("SELECT k.*, p.harga, p.stok, p.nama_produk FROM keranjang k JOIN produk p ON k.id_produk = p.id WHERE k.id_pengguna = ?", [$id_pengguna]);
 }
 
-if (mysqli_num_rows($kueri_keranjang) == 0) {
+if (!$kueri_keranjang || mysqli_num_rows($kueri_keranjang) == 0) {
     header("Location: katalog.php");
     exit();
 }
@@ -42,34 +43,33 @@ while ($baris = mysqli_fetch_assoc($kueri_keranjang)) {
 }
 
 if (isset($_POST['buat_pesanan'])) {
-    $alamat_lengkap = mysqli_real_escape_string($koneksi, $_POST['alamat']);
-    $no_telepon = mysqli_real_escape_string($koneksi, $_POST['no_telp']);
+    $alamat_lengkap = $_POST['alamat'];
+    $no_telepon = $_POST['no_telp'];
     $alamat = $alamat_lengkap . " | Telp: " . $no_telepon;
-    $metode_pembayaran = mysqli_real_escape_string($koneksi, $_POST['metode_pembayaran']);
+    $metode_pembayaran = $_POST['metode_pembayaran'];
 
     mysqli_begin_transaction($koneksi);
 
     try {
-        $kueri_pesanan = "INSERT INTO pesanan (id_pengguna, total_harga, status, alamat, metode_pembayaran) VALUES ($id_pengguna, $total_harga, 'menunggu', '$alamat', '$metode_pembayaran')";
-        mysqli_query($koneksi, $kueri_pesanan);
+        $berhasil_pesan = kueri("INSERT INTO pesanan (id_pengguna, total_harga, status, alamat, metode_pembayaran) VALUES (?, ?, 'menunggu', ?, ?)", [$id_pengguna, $total_harga, $alamat, $metode_pembayaran]);
         $id_pesanan = mysqli_insert_id($koneksi);
         
-        $nama_pembeli = mysqli_real_escape_string($koneksi, $_SESSION['nama']);
+        $nama_pembeli = $_SESSION['nama'];
         $tag = "#HM-" . str_pad($id_pesanan, 5, '0', STR_PAD_LEFT);
-        mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_pengguna, '$nama_pembeli', 'pesanan', 'tambah', 'Membuat pesanan baru $tag')");
+        kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES (?, ?, 'pesanan', 'tambah', ?)", [$id_pengguna, $nama_pembeli, "Membuat pesanan baru $tag"]);
 
         foreach ($daftar_kerajinan as $kerajinan) {
             $id_produk = $kerajinan['id_produk'];
             $jumlah = $kerajinan['jumlah'];
             $harga = $kerajinan['harga'];
             
-            $hasil_produk = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT stok, nama_produk FROM produk WHERE id = $id_produk"));
+            $hasil_produk = mysqli_fetch_assoc(kueri("SELECT stok, nama_produk FROM produk WHERE id = ?", [$id_produk]));
             if ($hasil_produk['stok'] < $jumlah) {
                 throw new Exception("Stok untuk '" . $hasil_produk['nama_produk'] . "' tidak mencukupi! Tersisa: " . $hasil_produk['stok']);
             }
             
-            mysqli_query($koneksi, "INSERT INTO detail_pesanan (id_pesanan, id_produk, jumlah, harga) VALUES ($id_pesanan, $id_produk, $jumlah, $harga)");
-            mysqli_query($koneksi, "UPDATE produk SET stok = stok - $jumlah WHERE id = $id_produk");
+            kueri("INSERT INTO detail_pesanan (id_pesanan, id_produk, jumlah, harga) VALUES (?, ?, ?, ?)", [$id_pesanan, $id_produk, $jumlah, $harga]);
+            kueri("UPDATE produk SET stok = stok - ? WHERE id = ?", [$jumlah, $id_produk]);
         }
 
         $daftar_id_keranjang_dibayar = [];
@@ -77,8 +77,9 @@ if (isset($_POST['buat_pesanan'])) {
             $daftar_id_keranjang_dibayar[] = $kerajinan['id'];
         }
         if (!empty($daftar_id_keranjang_dibayar)) {
-            $string_id_dibayar = implode(',', array_map('intval', $daftar_id_keranjang_dibayar));
-            mysqli_query($koneksi, "DELETE FROM keranjang WHERE id_pengguna = $id_pengguna AND id IN ($string_id_dibayar)");
+            $placeholders_dibayar = implode(',', array_fill(0, count($daftar_id_keranjang_dibayar), '?'));
+            $params_dibayar = array_merge([$id_pengguna], array_map('intval', $daftar_id_keranjang_dibayar));
+            kueri("DELETE FROM keranjang WHERE id_pengguna = ? AND id IN ($placeholders_dibayar)", $params_dibayar);
         }
 
         mysqli_commit($koneksi);

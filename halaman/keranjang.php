@@ -11,27 +11,24 @@ $id_pengguna = $_SESSION['user_id'];
 
 if (isset($_GET['hapus'])) {
     $id_keranjang = (int)$_GET['hapus'];
-    mysqli_query($koneksi, "DELETE FROM keranjang WHERE id = $id_keranjang AND id_pengguna = $id_pengguna");
+    kueri("DELETE FROM keranjang WHERE id = ? AND id_pengguna = ?", [$id_keranjang, $id_pengguna]);
     header("Location: keranjang.php");
     exit();
 }
 
 if (isset($_POST['update_cart'])) {
     foreach ($_POST['jumlah'] as $id_keranjang => $jumlah) {
-        $jumlah = (int)$jumlah;
-        if ($jumlah < 1) {
-            $jumlah = 1;
-        }
-        mysqli_query($koneksi, "UPDATE keranjang SET jumlah = $jumlah WHERE id = $id_keranjang AND id_pengguna = $id_pengguna");
+        $jumlah = max(1, (int)$jumlah);
+        kueri("UPDATE keranjang SET jumlah = ? WHERE id = ? AND id_pengguna = ?", [$jumlah, (int)$id_keranjang, $id_pengguna]);
     }
     header("Location: keranjang.php");
     exit();
 }
 
-$kueri = mysqli_query($koneksi, "SELECT k.*, p.nama_produk, p.harga, p.gambar, p.stok FROM keranjang k JOIN produk p ON k.id_produk = p.id WHERE k.id_pengguna = $id_pengguna");
+$kueri = kueri("SELECT k.*, p.nama_produk, p.harga, p.gambar, p.stok FROM keranjang k JOIN produk p ON k.id_produk = p.id WHERE k.id_pengguna = ?", [$id_pengguna]);
 
-$kueri_jumlah = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT SUM(jumlah) as total_qty FROM keranjang WHERE id_pengguna = $id_pengguna"));
-$total_jumlah = (int)$kueri_jumlah['total_qty'];
+$kueri_jumlah = mysqli_fetch_assoc(kueri("SELECT SUM(jumlah) as total_qty FROM keranjang WHERE id_pengguna = ?", [$id_pengguna]));
+$total_jumlah = (int)($kueri_jumlah['total_qty'] ?? 0);
 ?>
 
 <?php include '../bagian/atas.php'; ?>

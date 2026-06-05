@@ -6,7 +6,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-mysqli_query($koneksi, "
+kueri("
     CREATE TABLE IF NOT EXISTS log_aktivitas (
         id INT AUTO_INCREMENT PRIMARY KEY,
         id_pengguna INT NULL,
@@ -18,52 +18,49 @@ mysqli_query($koneksi, "
     )
 ");
 
-$cek_log = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM log_aktivitas");
+$cek_log = kueri("SELECT COUNT(*) as total FROM log_aktivitas");
 $total_log = $cek_log ? mysqli_fetch_assoc($cek_log)['total'] : 0;
 if ($total_log == 0) {
-    $res_u = mysqli_query($koneksi, "SELECT * FROM pengguna ORDER BY tanggal_dibuat ASC LIMIT 10");
+    $res_u = kueri("SELECT * FROM pengguna ORDER BY tanggal_dibuat ASC LIMIT 10");
     while ($row = mysqli_fetch_assoc($res_u)) {
         $id = $row['id'];
-        $nama = mysqli_real_escape_string($koneksi, $row['nama']);
+        $nama = $row['nama'];
         $role = $row['role'];
         $tgl = $row['tanggal_dibuat'];
-        if ($role === 'admin') {
-            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES ($id, '$nama', 'pengguna', 'daftar', 'Menginisialisasi sebagai akun Administrator', '$tgl')");
-        } else {
-            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES ($id, '$nama', 'pengguna', 'daftar', 'Mendaftar sebagai pengguna baru', '$tgl')");
-        }
+        $msg = $role === 'admin' ? 'Menginisialisasi sebagai akun Administrator' : 'Mendaftar sebagai pengguna baru';
+        kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES (?, ?, 'pengguna', 'daftar', ?, ?)", [$id, $nama, $msg, $tgl]);
     }
 
-    $res_p = mysqli_query($koneksi, "SELECT * FROM produk LIMIT 5");
-    $res_admin = mysqli_query($koneksi, "SELECT id, nama FROM pengguna WHERE role='admin' LIMIT 1");
+    $res_p = kueri("SELECT * FROM produk LIMIT 5");
+    $res_admin = kueri("SELECT id, nama FROM pengguna WHERE role='admin' LIMIT 1");
     if ($admin_row = mysqli_fetch_assoc($res_admin)) {
         $admin_id = $admin_row['id'];
-        $admin_nama = mysqli_real_escape_string($koneksi, $admin_row['nama']);
+        $admin_nama = $admin_row['nama'];
         while ($row = mysqli_fetch_assoc($res_p)) {
-            $nama_p = mysqli_real_escape_string($koneksi, $row['nama_produk']);
-            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($admin_id, '$admin_nama', 'produk', 'tambah', 'Menambahkan produk baru \'$nama_p\'')");
+            $nama_p = $row['nama_produk'];
+            kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES (?, ?, 'produk', 'tambah', ?)", [$admin_id, $admin_nama, "Menambahkan produk baru '$nama_p'"]);
         }
     }
 
-    $res_t = mysqli_query($koneksi, "SELECT t.*, p.nama FROM testimonial t JOIN pengguna p ON t.id_pengguna = p.id LIMIT 5");
+    $res_t = kueri("SELECT t.*, p.nama FROM testimonial t JOIN pengguna p ON t.id_pengguna = p.id LIMIT 5");
     while ($row = mysqli_fetch_assoc($res_t)) {
-        $nama_pengulas = mysqli_real_escape_string($koneksi, $row['nama']);
+        $nama_pengulas = $row['nama'];
         $status_t = $row['status'];
         $tgl = $row['tanggal_dibuat'];
-        mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES ({$row['id_pengguna']}, '$nama_pengulas', 'testimoni', 'tambah', 'Menulis ulasan baru', '$tgl')");
+        kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES (?, ?, 'testimoni', 'tambah', 'Menulis ulasan baru', ?)", [$row['id_pengguna'], $nama_pengulas, $tgl]);
         if ($status_t === 'approved' && isset($admin_id)) {
-            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES ($admin_id, '$admin_nama', 'testimoni', 'setujui', 'Menyetujui testimoni dari \'$nama_pengulas\'', '$tgl')");
+            kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES (?, ?, 'testimoni', 'setujui', ?, ?)", [$admin_id, $admin_nama, "Menyetujui testimoni dari '$nama_pengulas'", $tgl]);
         }
     }
 
-    $res_o = mysqli_query($koneksi, "SELECT p.*, u.nama FROM pesanan p JOIN pengguna u ON p.id_pengguna = u.id LIMIT 5");
+    $res_o = kueri("SELECT p.*, u.nama FROM pesanan p JOIN pengguna u ON p.id_pengguna = u.id LIMIT 5");
     while ($row = mysqli_fetch_assoc($res_o)) {
-        $nama_pembeli = mysqli_real_escape_string($koneksi, $row['nama']);
+        $nama_pembeli = $row['nama'];
         $id_o = $row['id'];
         $tgl = $row['tanggal_pesanan'];
         $status_o = $row['status'];
         $tag = "#HM-" . str_pad($id_o, 5, '0', STR_PAD_LEFT);
-        mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES ({$row['id_pengguna']}, '$nama_pembeli', 'pesanan', 'tambah', 'Membuat pesanan baru $tag', '$tgl')");
+        kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES (?, ?, 'pesanan', 'tambah', ?, ?)", [$row['id_pengguna'], $nama_pembeli, "Membuat pesanan baru $tag", $tgl]);
         if ($status_o !== 'menunggu' && isset($admin_id)) {
             $status_keterangan = [
                 'dibayar' => 'Mengonfirmasi pembayaran pesanan',
@@ -72,48 +69,21 @@ if ($total_log == 0) {
                 'dibatalkan' => 'Membatalkan pesanan'
             ];
             $ket_aksi = isset($status_keterangan[$status_o]) ? $status_keterangan[$status_o] : "Mengubah status pesanan menjadi '$status_o'";
-            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES ($admin_id, '$admin_nama', 'pesanan', '$status_o', '$ket_aksi $tag dari \'$nama_pembeli\'', '$tgl')");
+            kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan, tanggal_dibuat) VALUES (?, ?, 'pesanan', ?, ?, ?)", [$admin_id, $admin_nama, $status_o, "$ket_aksi $tag dari '$nama_pembeli'", $tgl]);
         }
     }
 }
 
-$jumlah_pengguna = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pengguna WHERE role = 'user'"))['total'];
-$jumlah_admin = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pengguna WHERE role = 'admin'"))['total'];
-$jumlah_produk = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM produk"))['total'];
-$pembayaran_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
-$testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
+$jumlah_pengguna = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pengguna WHERE role = 'user'"))['total'];
+$jumlah_admin = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pengguna WHERE role = 'admin'"))['total'];
+$jumlah_produk = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM produk"))['total'];
+$pembayaran_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
+$testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
 
-// Metrik Pendapatan
-$res_hari_ini = mysqli_fetch_assoc(mysqli_query($koneksi, "
-    SELECT SUM(total_harga) AS total 
-    FROM pesanan 
-    WHERE status IN ('dibayar', 'dikirim', 'selesai') 
-      AND DATE(tanggal_pesanan) = CURDATE()
-"));
-$pendapatan_hari_ini = $res_hari_ini['total'] ?? 0;
-
-$res_seminggu = mysqli_fetch_assoc(mysqli_query($koneksi, "
-    SELECT SUM(total_harga) AS total 
-    FROM pesanan 
-    WHERE status IN ('dibayar', 'dikirim', 'selesai') 
-      AND tanggal_pesanan >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-"));
-$pendapatan_seminggu = $res_seminggu['total'] ?? 0;
-
-$res_sebulan = mysqli_fetch_assoc(mysqli_query($koneksi, "
-    SELECT SUM(total_harga) AS total 
-    FROM pesanan 
-    WHERE status IN ('dibayar', 'dikirim', 'selesai') 
-      AND tanggal_pesanan >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-"));
-$pendapatan_sebulan = $res_sebulan['total'] ?? 0;
-
-$res_total = mysqli_fetch_assoc(mysqli_query($koneksi, "
-    SELECT SUM(total_harga) AS total 
-    FROM pesanan 
-    WHERE status IN ('dibayar', 'dikirim', 'selesai')
-"));
-$pendapatan_total = $res_total['total'] ?? 0;
+$pendapatan_hari_ini = mysqli_fetch_assoc(kueri("SELECT SUM(total_harga) AS total FROM pesanan WHERE status IN ('dibayar', 'dikirim', 'selesai') AND DATE(tanggal_pesanan) = CURDATE()"))['total'] ?? 0;
+$pendapatan_seminggu = mysqli_fetch_assoc(kueri("SELECT SUM(total_harga) AS total FROM pesanan WHERE status IN ('dibayar', 'dikirim', 'selesai') AND tanggal_pesanan >= DATE_SUB(NOW(), INTERVAL 7 DAY)"))['total'] ?? 0;
+$pendapatan_sebulan = mysqli_fetch_assoc(kueri("SELECT SUM(total_harga) AS total FROM pesanan WHERE status IN ('dibayar', 'dikirim', 'selesai') AND tanggal_pesanan >= DATE_SUB(NOW(), INTERVAL 30 DAY)"))['total'] ?? 0;
+$pendapatan_total = mysqli_fetch_assoc(kueri("SELECT SUM(total_harga) AS total FROM pesanan WHERE status IN ('dibayar', 'dikirim', 'selesai')"))['total'] ?? 0;
 
 
 
@@ -209,20 +179,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
 
     <main class="flex-grow p-4 sm:p-6 w-full max-w-7xl mx-auto overflow-x-hidden">
         
-        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
-            <div>
-                <h1 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100">Dasbor Overview</h1>
-                <p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Selamat datang kembali, <span class="font-bold text-slate-700 dark:text-slate-350"><?= $nama_depan_admin; ?></span>.</p>
-            </div>
-            <div class="flex items-center space-x-3">
-                <div class="bg-white dark:bg-slate-900 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center space-x-2.5">
-                    <div class="w-7 h-7 bg-lime-100 dark:bg-lime-950/40 rounded-md flex items-center justify-center text-lime-600 dark:text-lime-400">
-                        <i class="fa-solid fa-user-shield text-xs"></i>
-                    </div>
-                    <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Administrator</span>
-                </div>
-            </div>
-        </header>
+
 
         <!-- Baris Metrik Umum -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -334,7 +291,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                 <div class="p-3.5 flex-grow">
                     <div class="space-y-3">
                         <?php
-                        $kueri_pesanan_terbaru = mysqli_query($koneksi, "SELECT p.*, u.nama FROM pesanan p JOIN pengguna u ON p.id_pengguna = u.id ORDER BY p.tanggal_pesanan DESC LIMIT 5");
+                        $kueri_pesanan_terbaru = kueri("SELECT p.*, u.nama FROM pesanan p JOIN pengguna u ON p.id_pengguna = u.id ORDER BY p.tanggal_pesanan DESC LIMIT 5");
                         if(mysqli_num_rows($kueri_pesanan_terbaru) > 0):
                             while($baris = mysqli_fetch_assoc($kueri_pesanan_terbaru)):
                         ?>
@@ -358,7 +315,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                             <div class="w-10 h-10 bg-slate-50 dark:bg-slate-950 rounded-full flex items-center justify-center mx-auto mb-2.5 text-slate-300 dark:text-slate-700">
                                 <i class="fa-solid fa-receipt text-base"></i>
                             </div>
-                            <p class="text-slate-400 dark:text-slate-500 text-xs">Belum ada pesanan terbaru masuk.</p>
+                            <p class="text-slate-400 dark:text-slate-550 text-xs">Belum ada pesanan terbaru masuk.</p>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -372,7 +329,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                 <div class="p-3.5 flex-grow overflow-y-auto max-h-[340px] custom-scrollbar">
                     <div class="divide-y divide-slate-100 dark:divide-slate-800/60">
                         <?php
-                        $kueri_aktivitas = mysqli_query($koneksi, "SELECT * FROM log_aktivitas ORDER BY tanggal_dibuat DESC, id DESC LIMIT 8");
+                        $kueri_aktivitas = kueri("SELECT * FROM log_aktivitas ORDER BY tanggal_dibuat DESC, id DESC LIMIT 8");
                         if(mysqli_num_rows($kueri_aktivitas) > 0):
                             while($aktivitas = mysqli_fetch_assoc($kueri_aktivitas)):
                                 $tipe = $aktivitas['tipe_aktivitas'];

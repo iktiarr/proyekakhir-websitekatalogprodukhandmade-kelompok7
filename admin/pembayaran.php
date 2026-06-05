@@ -8,15 +8,12 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
 if (isset($_GET['id']) && isset($_GET['status'])) {
     $id_pesanan = (int)$_GET['id'];
-    $status = mysqli_real_escape_string($koneksi, $_GET['status']);
+    $status = $_GET['status'];
     
-    $res_o = mysqli_query($koneksi, "SELECT p.*, u.nama FROM pesanan p JOIN pengguna u ON p.id_pengguna = u.id WHERE p.id = $id_pesanan");
+    $res_o = kueri("SELECT p.*, u.nama FROM pesanan p JOIN pengguna u ON p.id_pengguna = u.id WHERE p.id = ?", [$id_pesanan]);
     if ($row_o = mysqli_fetch_assoc($res_o)) {
         $nama_pembeli = $row_o['nama'];
-        if (mysqli_query($koneksi, "UPDATE pesanan SET status='$status' WHERE id=$id_pesanan")) {
-            $nama_admin = mysqli_real_escape_string($koneksi, $_SESSION['nama']);
-            $id_admin = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NULL';
-            
+        if (kueri("UPDATE pesanan SET status=? WHERE id=?", [$status, $id_pesanan])) {
             $status_keterangan = [
                 'dibayar' => 'Mengonfirmasi pembayaran pesanan',
                 'dikirim' => 'Mengirim produk untuk pesanan',
@@ -25,9 +22,7 @@ if (isset($_GET['id']) && isset($_GET['status'])) {
             ];
             $tag = "#HM-" . str_pad($id_pesanan, 5, '0', STR_PAD_LEFT);
             $ket_aksi = isset($status_keterangan[$status]) ? $status_keterangan[$status] : "Mengubah status pesanan menjadi '$status'";
-            $ket_log = mysqli_real_escape_string($koneksi, "$ket_aksi $tag dari '$nama_pembeli'");
-            
-            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_admin, '$nama_admin', 'pesanan', '$status', '$ket_log')");
+            catat_log('pesanan', $status, "$ket_aksi $tag dari '$nama_pembeli'");
         }
     }
     
@@ -35,9 +30,9 @@ if (isset($_GET['id']) && isset($_GET['status'])) {
     exit();
 }
 
-$kueri_pesanan = mysqli_query($koneksi, "SELECT p.*, u.nama, u.email FROM pesanan p JOIN pengguna u ON p.id_pengguna = u.id ORDER BY p.tanggal_pesanan DESC");
-$pembayaran_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
-$testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
+$kueri_pesanan = kueri("SELECT p.*, u.nama, u.email FROM pesanan p JOIN pengguna u ON p.id_pengguna = u.id ORDER BY p.tanggal_pesanan DESC");
+$pembayaran_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
+$testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
 ?>
 
 <!doctype html>
@@ -128,10 +123,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
 
     <main class="flex-grow p-4 sm:p-6 w-full max-w-7xl mx-auto overflow-x-hidden">
         
-        <div class="mb-6">
-            <h1 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100">Verifikasi Pembayaran</h1>
-            <p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Tinjau bukti konfirmasi dari pelanggan dan perbarui status pesanan.</p>
-        </div>
+
 
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm transition-colors duration-300">
             <div class="overflow-x-auto">
@@ -160,12 +152,12 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                             
                             // Ambil rincian produk pesanan
                             $id_pesanan_aktif = (int)$baris['id'];
-                            $kueri_detail_item = mysqli_query($koneksi, "
+                            $kueri_detail_item = kueri("
                                 SELECT dp.*, prod.nama_produk, prod.gambar 
                                 FROM detail_pesanan dp 
                                 JOIN produk prod ON dp.id_produk = prod.id 
-                                WHERE dp.id_pesanan = $id_pesanan_aktif
-                            ");
+                                WHERE dp.id_pesanan = ?
+                            ", [$id_pesanan_aktif]);
                             $item_pesanan = [];
                             while ($item = mysqli_fetch_assoc($kueri_detail_item)) {
                                 $item_pesanan[] = [

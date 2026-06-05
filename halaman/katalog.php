@@ -4,32 +4,28 @@ include '../koneksi.php';
 
 $id_kategori = isset($_GET['kategori']) ? (int)$_GET['kategori'] : 0;
 $id_daerah = isset($_GET['daerah']) ? (int)$_GET['daerah'] : 0;
-$pencarian = isset($_GET['cari']) ? mysqli_real_escape_string($koneksi, trim($_GET['cari'])) : '';
+$pencarian = isset($_GET['cari']) ? trim($_GET['cari']) : '';
 
-$kueri_kategori = "SELECT * FROM kategori";
-$hasil_kategori = mysqli_query($koneksi, $kueri_kategori);
-
-$kueri_daerah = "SELECT * FROM daerah";
-$hasil_daerah = mysqli_query($koneksi, $kueri_daerah);
+$hasil_kategori = kueri("SELECT * FROM kategori");
+$hasil_daerah = kueri("SELECT * FROM daerah");
 
 $kondisi = [];
+$params = [];
 if ($id_kategori > 0) {
-    $kondisi[] = "p.id_kategori = $id_kategori";
+    $kondisi[] = "p.id_kategori = ?";
+    $params[] = $id_kategori;
 }
 if ($id_daerah > 0) {
-    $kondisi[] = "p.id_daerah = $id_daerah";
+    $kondisi[] = "p.id_daerah = ?";
+    $params[] = $id_daerah;
 }
 if (!empty($pencarian)) {
-    $kondisi[] = "p.nama_produk LIKE '%$pencarian%'";
+    $kondisi[] = "p.nama_produk LIKE ?";
+    $params[] = "%" . $pencarian . "%";
 }
 
-$klausa_kondisi = "";
-if (count($kondisi) > 0) {
-    $klausa_kondisi = " WHERE " . implode(" AND ", $kondisi);
-}
-
-$kueri_produk = "SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id $klausa_kondisi ORDER BY p.id DESC";
-$hasil_produk = mysqli_query($koneksi, $kueri_produk);
+$klausa_kondisi = count($kondisi) > 0 ? " WHERE " . implode(" AND ", $kondisi) : "";
+$hasil_produk = kueri("SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id $klausa_kondisi ORDER BY p.id DESC", $params);
 ?>
 
 <?php include '../bagian/atas.php'; ?>

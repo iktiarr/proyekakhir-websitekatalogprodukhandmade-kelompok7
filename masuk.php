@@ -15,26 +15,19 @@ if (isset($_GET['registrasi']) && $_GET['registrasi'] === 'sukses') {
 }
 
 if (isset($_POST['masuk'])) {
-    $email = mysqli_real_escape_string($koneksi, $_POST['email']);
+    $email = $_POST['email'];
     $kata_sandi = $_POST['password'];
 
-    // Lakukan pencarian email pengguna di database
-    $kueri = mysqli_query($koneksi, "SELECT * FROM pengguna WHERE email = '$email'");
-    if (mysqli_num_rows($kueri) > 0) {
+    $kueri = kueri("SELECT * FROM pengguna WHERE email = ?", [$email]);
+    if ($kueri && mysqli_num_rows($kueri) > 0) {
         $data_pengguna = mysqli_fetch_assoc($kueri);
         
-        // Verifikasi kesesuaian hash kata sandi
         if (password_verify($kata_sandi, $data_pengguna['password'])) {
             $_SESSION['user_id'] = $data_pengguna['id'];
             $_SESSION['nama'] = $data_pengguna['nama'];
             $_SESSION['role'] = $data_pengguna['role'];
 
-            // Alihkan berdasarkan peran pengguna
-            if ($data_pengguna['role'] === 'admin') {
-                header("Location: admin/index.php");
-            } else {
-                header("Location: index.php");
-            }
+            header("Location: " . ($data_pengguna['role'] === 'admin' ? "admin/index.php" : "index.php"));
             exit();
         } else {
             $galat = "Password salah!";

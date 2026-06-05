@@ -12,9 +12,9 @@ $berhasil = '';
 
 if (isset($_POST['submit_testimonial'])) {
     $id_pengguna = $_SESSION['user_id'];
-    $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
-    $pekerjaan = mysqli_real_escape_string($koneksi, $_POST['pekerjaan']);
-    $isi_ulasan = mysqli_real_escape_string($koneksi, $_POST['isi_ulasan']);
+    $nama = $_POST['nama'];
+    $pekerjaan = $_POST['pekerjaan'];
+    $isi_ulasan = $_POST['isi_ulasan'];
     $rating = intval($_POST['rating']);
 
     if (empty($nama) || empty($isi_ulasan)) {
@@ -22,16 +22,14 @@ if (isset($_POST['submit_testimonial'])) {
     } elseif (strlen($isi_ulasan) > 500) {
         $galat = "Ulasan maksimal 500 karakter!";
     } else {
-        $kueri_tambah = "INSERT INTO testimonial (id_pengguna, nama, pekerjaan, isi_ulasan, rating) 
-                  VALUES ('$id_pengguna', '$nama', '$pekerjaan', '$isi_ulasan', '$rating')";
+        $berhasil_tambah = kueri("INSERT INTO testimonial (id_pengguna, nama, pekerjaan, isi_ulasan, rating) VALUES (?, ?, ?, ?, ?)", [$id_pengguna, $nama, $pekerjaan, $isi_ulasan, $rating]);
         
-        if (mysqli_query($koneksi, $kueri_tambah)) {
+        if ($berhasil_tambah) {
             $berhasil = "Testimoni Anda berhasil dikirim! Menunggu verifikasi admin.";
-            $nama_pengulas = mysqli_real_escape_string($koneksi, $nama);
-            mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_pengguna, '$nama_pengulas', 'testimoni', 'tambah', 'Menulis ulasan baru (menunggu persetujuan)')");
+            kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES (?, ?, 'testimoni', 'tambah', 'Menulis ulasan baru (menunggu persetujuan)')", [$id_pengguna, $nama]);
             header("Refresh: 2; url=../index.php");
         } else {
-            $galat = "Gagal mengirim testimoni. " . mysqli_error($koneksi);
+            $galat = "Gagal mengirim testimoni.";
         }
     }
 }
