@@ -33,7 +33,7 @@
         
         <div class="relative rounded-2xl overflow-hidden group">
           <img 
-            src="<?= $awalan; ?>uploads/about.jpg" 
+            src="<?= $awalan; ?>uploads/foto1.jpg" 
             alt="Proses Pembuatan Batik Tulis Gentongan Madura" 
             class="w-full h-[220px] sm:h-[300px] lg:h-[380px] object-cover"
           >
