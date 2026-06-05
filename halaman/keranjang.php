@@ -36,7 +36,7 @@ $total_jumlah = (int)$kueri_jumlah['total_qty'];
 
 <?php include '../bagian/atas.php'; ?>
 
-<<!-- Bagian Keranjang Belanja Utama -->
+<!-- Bagian Keranjang Belanja Utama -->
 <div class="py-12 sm:py-16 bg-slate-50 dark:bg-slate-950 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
@@ -53,7 +53,7 @@ $total_jumlah = (int)$kueri_jumlah['total_qty'];
                     <!-- Sektor Daftar Item Keranjang -->
                     <div class="lg:w-2/3 w-full mb-8 lg:mb-0">
                         <div class="bg-white dark:bg-slate-900 px-5 py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm mb-4 flex items-center">
-                            <input type="checkbox" id="pilihSemua" checked class="w-4 h-4 text-lime-600 border-slate-350 dark:border-slate-700 rounded focus:ring-lime-500 cursor-pointer mr-3">
+                            <input type="checkbox" id="pilihSemua" checked class="w-4 h-4 text-lime-600 border-slate-300 dark:text-slate-700 rounded cursor-pointer mr-3">
                             <label for="pilihSemua" class="text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">Pilih Semua Kerajinan</label>
                         </div>
                         
@@ -69,7 +69,7 @@ $total_jumlah = (int)$kueri_jumlah['total_qty'];
                                 
                                 <!-- Checkbox Item -->
                                 <div class="flex items-center flex-shrink-0">
-                                    <input type="checkbox" name="cart_ids[]" value="<?= $baris['id']; ?>" checked class="kotak-centang-keranjang w-4 h-4 text-lime-600 border-slate-350 dark:border-slate-700 rounded focus:ring-lime-500 cursor-pointer" data-price="<?= $baris['harga']; ?>" data-id="<?= $baris['id']; ?>">
+                                    <input type="checkbox" name="cart_ids[]" value="<?= $baris['id']; ?>" checked class="kotak-centang-keranjang w-4 h-4 text-lime-600 border-slate-300 dark:text-slate-700 rounded cursor-pointer" data-price="<?= $baris['harga']; ?>" data-id="<?= $baris['id']; ?>">
                                 </div>
                                 
                                 <!-- Tombol Hapus Item -->
@@ -78,7 +78,7 @@ $total_jumlah = (int)$kueri_jumlah['total_qty'];
                                 </a>
 
                                 <!-- Foto Thumbnail Produk -->
-                                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-950 flex-shrink-0 border border-slate-200 dark:border-slate-800">
+                                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-900 flex-shrink-0 border border-slate-200 dark:border-slate-800">
                                     <img src="<?= $baris['gambar']; ?>" alt="<?= $baris['nama_produk']; ?>" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -98,10 +98,10 @@ $total_jumlah = (int)$kueri_jumlah['total_qty'];
 
                                 <!-- Kontrol Jumlah Desktop -->
                                 <div class="hidden sm:flex flex-col items-end gap-2 flex-shrink-0">
-                                    <div class="flex items-center border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 overflow-hidden focus-within:border-lime-500">
-                                        <input type="number" name="jumlah[<?= $baris['id']; ?>]" value="<?= $baris['jumlah']; ?>" min="1" max="<?= $baris['stok']; ?>" class="w-12 text-center font-bold text-slate-850 dark:text-slate-200 bg-transparent border-none focus:ring-0 text-xs py-1 px-1.5 masukan-jumlah" data-id="<?= $baris['id']; ?>">
+                                    <div class="flex items-center border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 overflow-hidden">
+                                        <input type="number" name="jumlah[<?= $baris['id']; ?>]" value="<?= $baris['jumlah']; ?>" min="1" max="<?= $baris['stok']; ?>" class="w-12 text-center font-bold text-slate-800 dark:text-slate-200 bg-transparent border-none focus:ring-0 text-xs py-1 px-1.5 masukan-jumlah" data-id="<?= $baris['id']; ?>">
                                     </div>
-                                    <p class="text-slate-850 dark:text-slate-200 font-bold text-xs sm:text-sm nilai-total-sementara">Rp <?= number_format($total_sementara, 0, ',', '.'); ?></p>
+                                    <p class="text-slate-800 dark:text-slate-200 font-bold text-xs sm:text-sm nilai-total-sementara">Rp <?= number_format($total_sementara, 0, ',', '.'); ?></p>
                                 </div>
                                 
                              </div>
@@ -113,7 +113,7 @@ $total_jumlah = (int)$kueri_jumlah['total_qty'];
                             <a href="katalog.php" class="flex items-center text-slate-500 dark:text-slate-400 font-semibold hover:text-lime-600 dark:hover:text-lime-400 text-xs sm:text-sm">
                                 <i class="fa-solid fa-arrow-left mr-2"></i> Kembali ke Katalog
                             </a>
-                            <button type="submit" name="update_cart" formaction="keranjang.php" class="w-full sm:w-auto bg-slate-100 dark:bg-slate-800 text-slate-650 dark:text-slate-300 px-5 py-3 rounded-xl font-bold hover:bg-lime-50 dark:hover:bg-lime-950/30 hover:text-lime-750 dark:hover:text-lime-400 border border-transparent flex items-center justify-center text-xs sm:text-sm cursor-pointer shadow-sm">
+                            <button type="submit" name="update_cart" formaction="keranjang.php" class="w-full sm:w-auto bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-5 py-3 rounded-xl font-bold hover:bg-lime-50 dark:hover:bg-lime-900/30 hover:text-lime-700 dark:hover:text-lime-400 border border-transparent flex items-center justify-center text-xs sm:text-sm cursor-pointer shadow-sm">
                                 <i class="fa-solid fa-rotate mr-2"></i> Perbarui Keranjang
                             </button>
                         </div>
@@ -134,7 +134,7 @@ $total_jumlah = (int)$kueri_jumlah['total_qty'];
                                     <span class="text-lime-700 dark:text-lime-400 font-bold bg-lime-50 dark:bg-lime-950/40 px-2.5 py-0.5 rounded-lg text-[10px] sm:text-xs">Gratis Ongkir</span>
                                 </div>
                                 
-                                <div class="h-px bg-slate-150 dark:bg-slate-800 w-full my-4"></div>
+                                <div class="h-px bg-slate-200 dark:bg-slate-800 w-full my-4"></div>
                                 
                                 <div class="flex justify-between items-center">
                                     <span class="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-100">Total Harga</span>

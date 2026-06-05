@@ -1,5 +1,5 @@
 <!-- Bagian Pertanyaan Umum (FAQ) -->
-<section class="py-16 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+<section class="py-16 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     
     <!-- Header Bagian Pertanyaan Umum -->
@@ -12,7 +12,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
       
       <!-- Pertanyaan 1 -->
-      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
+      <div class="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
         <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-start gap-2.5">
           <i class="fa-solid fa-circle-question text-lime-600 mt-1 flex-shrink-0 text-base"></i>
           <span>Bagaimana cara membeli produk di HandMadura?</span>
@@ -23,7 +23,7 @@
       </div>
 
       <!-- Pertanyaan 2 -->
-      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
+      <div class="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
         <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-start gap-2.5">
           <i class="fa-solid fa-circle-question text-lime-600 mt-1 flex-shrink-0 text-base"></i>
           <span>Apakah produk yang dijual 100% asli buatan tangan?</span>
@@ -34,7 +34,7 @@
       </div>
 
       <!-- Pertanyaan 3 -->
-      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
+      <div class="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
         <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-start gap-2.5">
           <i class="fa-solid fa-circle-question text-lime-600 mt-1 flex-shrink-0 text-base"></i>
           <span>Berapa lama proses pengerjaan dan pengiriman?</span>
@@ -45,7 +45,7 @@
       </div>
 
       <!-- Pertanyaan 4 -->
-      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
+      <div class="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
         <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-start gap-2.5">
           <i class="fa-solid fa-circle-question text-lime-600 mt-1 flex-shrink-0 text-base"></i>
           <span>Bagaimana jika produk yang diterima mengalami kerusakan?</span>
@@ -56,7 +56,7 @@
       </div>
 
       <!-- Pertanyaan 5 -->
-      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
+      <div class="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
         <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-start gap-2.5">
           <i class="fa-solid fa-circle-question text-lime-600 mt-1 flex-shrink-0 text-base"></i>
           <span>Apakah bisa melakukan pemesanan kustom (custom order)?</span>
@@ -67,7 +67,7 @@
       </div>
 
       <!-- Pertanyaan 6 -->
-      <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
+      <div class="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 h-full flex flex-col justify-start">
         <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base flex items-start gap-2.5">
           <i class="fa-solid fa-circle-question text-lime-600 mt-1 flex-shrink-0 text-base"></i>
           <span>Apakah HandMadura melayani pengiriman internasional?</span>

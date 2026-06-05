@@ -12,7 +12,7 @@ if (isset($_GET['id']) && isset($_GET['status'])) {
     
     $res_o = mysqli_query($koneksi, "SELECT p.*, u.nama FROM pesanan p JOIN pengguna u ON p.id_pengguna = u.id WHERE p.id = $id_pesanan");
     if ($row_o = mysqli_fetch_assoc($res_o)) {
-        $nama_pembeli = mysqli_real_escape_string($koneksi, $row_o['nama']);
+        $nama_pembeli = $row_o['nama'];
         if (mysqli_query($koneksi, "UPDATE pesanan SET status='$status' WHERE id=$id_pesanan")) {
             $nama_admin = mysqli_real_escape_string($koneksi, $_SESSION['nama']);
             $id_admin = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NULL';
@@ -25,7 +25,7 @@ if (isset($_GET['id']) && isset($_GET['status'])) {
             ];
             $tag = "#HM-" . str_pad($id_pesanan, 5, '0', STR_PAD_LEFT);
             $ket_aksi = isset($status_keterangan[$status]) ? $status_keterangan[$status] : "Mengubah status pesanan menjadi '$status'";
-            $ket_log = "$ket_aksi $tag dari '$nama_pembeli'";
+            $ket_log = mysqli_real_escape_string($koneksi, "$ket_aksi $tag dari '$nama_pembeli'");
             
             mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_admin, '$nama_admin', 'pesanan', '$status', '$ket_log')");
         }
@@ -79,22 +79,22 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:sticky md:h-screen md:top-0 overflow-y-auto flex-shrink-0">
         <div class="p-5 pb-3 flex items-center justify-between">
             <div>
-                <a href="../index.php" class="text-xl font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block hover:scale-105 transition-transform">
+                <a href="../index.php" class="text-xl font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block transition-transform">
                     Hand<span class="text-lime-600">Madura.</span>
                 </a>
                 <p class="text-[9px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold mt-0.5">Admin Panel</p>
             </div>
-            <button id="tombol-tutup-sidebar" class="md:hidden p-2 rounded-xl text-slate-450 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Tutup Sidebar">
+            <button id="tombol-tutup-sidebar" class="md:hidden p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Tutup Sidebar">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
         
         <nav class="flex-1 px-3 space-y-1">
             <a href="index.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Dasbor
+                <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center"></i> Dasbor
             </a>
             <a href="produk.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-box-open mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Produk
+                <i class="fa-solid fa-box-open mr-2.5 w-4 text-center"></i> Produk
             </a>
             <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-xl font-bold text-sm transition-colors">
                 <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center"></i> Pembayaran
@@ -103,19 +103,19 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                 <?php endif; ?>
             </a>
             <a href="testimoni.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-comments mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Testimonial
+                <i class="fa-solid fa-comments mr-2.5 w-4 text-center"></i> Testimonial
                 <?php if ($testimoni_tertunda > 0): ?>
                     <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $testimoni_tertunda; ?></span>
                 <?php endif; ?>
             </a>
             <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-users mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pengguna
+                <i class="fa-solid fa-users mr-2.5 w-4 text-center"></i> Pengguna
             </a>
         </nav>
         
         <div class="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
-            <a href="../keluar.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl font-bold text-sm transition-colors group flex-grow">
-                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center group-hover:-translate-x-0.5 transition-transform"></i> Keluar
+            <a href="../keluar.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl font-bold text-sm transition-colors group flex-grow">
+                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center transition-transform"></i> Keluar
             </a>
             <button id="tombol-tema" class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Ubah Tema">
                 <i id="ikon-tombol-tema" class="fa-solid fa-moon text-base"></i>
@@ -141,7 +141,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                         <th class="px-4 py-3.5 pl-6">ID Pesanan</th>
                         <th class="px-4 py-3.5">Pelanggan</th>
                         <th class="px-4 py-3.5">Total Tagihan</th>
-                        <th class="px-4 py-3.5">Konfirmasi Akun/Rekening Pengirim</th>
+                        <th class="px-4 py-3.5">Bukti Pembayaran</th>
                         <th class="px-4 py-3.5 text-center">Status</th>
                         <th class="px-4 py-3.5 pr-6 text-right">Aksi</th>
                     </tr>
@@ -155,7 +155,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                                 'dibayar'    => 'bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-900/30',
                                 'dikirim'    => 'bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-900/30',
                                 'selesai'    => 'bg-lime-50 dark:bg-lime-950/20 text-lime-700 dark:text-lime-400 border-lime-200 dark:border-lime-900/30',
-                                'dibatalkan' => 'bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 border-red-200 dark:border-red-900/30'
+                                'dibatalkan' => 'bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/30'
                             ];
                             
                             // Ambil rincian produk pesanan
@@ -178,7 +178,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                             $item_pesanan_json = json_encode($item_pesanan, JSON_HEX_APOS | JSON_HEX_QUOT);
                     ?>
                     <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 text-xs sm:text-sm transition-colors duration-200">
-                        <td class="px-4 py-3 pl-6 font-mono text-[11px] font-bold text-slate-400 dark:text-slate-550">
+                        <td class="px-4 py-3 pl-6 font-mono text-[11px] font-bold text-slate-400 dark:text-slate-500">
                             #HM-<?= str_pad($baris['id'], 5, '0', STR_PAD_LEFT); ?>
                         </td>
                         <td class="px-4 py-3">
@@ -190,14 +190,14 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                         <td class="px-4 py-3">
                             <?php if ($baris['bukti_pembayaran']): ?>
                                 <span class="inline-flex items-center text-lime-700 dark:text-lime-400 font-bold text-[10px] bg-lime-50 dark:bg-lime-950/40 px-2 py-1 rounded-xl border border-lime-100 dark:border-lime-900/40 whitespace-nowrap">
-                                    <i class="fa-solid fa-file-invoice-dollar mr-1 text-lime-600 dark:text-lime-450"></i> <?= $baris['bukti_pembayaran']; ?>
+                                    <i class="fa-solid fa-file-invoice-dollar mr-1 text-lime-600 dark:text-lime-400"></i> <?= $baris['bukti_pembayaran']; ?>
                                 </span>
                             <?php else: ?>
-                                <span class="text-slate-350 dark:text-slate-600 italic text-[11px] whitespace-nowrap">Belum Konfirmasi</span>
+                                <span class="text-slate-300 dark:text-slate-600 italic text-[11px] whitespace-nowrap">Belum Konfirmasi</span>
                             <?php endif; ?>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <span class="inline-block px-2 py-0.5 rounded-xl text-[9px] font-bold uppercase tracking-wider border whitespace-nowrap <?= $warna_status[$baris['status']] ?? 'bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-550 border-slate-200 dark:border-slate-800'; ?>">
+                            <span class="inline-block px-2 py-0.5 rounded-xl text-[9px] font-bold uppercase tracking-wider border whitespace-nowrap <?= $warna_status[$baris['status']] ?? 'bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-800'; ?>">
                                 <?= $baris['status']; ?>
                             </span>
                         </td>
@@ -207,9 +207,9 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                                     <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
                                 </button>
                                 
-                                <div class="absolute right-0 w-44 mt-1 bg-white dark:bg-slate-900 rounded-xl shadow-lg dark:shadow-none border border-slate-100 dark:border-slate-850 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible group-hover/menu:-translate-y-1 transition-all duration-200 z-50 overflow-hidden transform origin-top-right">
+                                <div class="absolute right-0 w-44 mt-1 bg-white dark:bg-slate-900 rounded-xl shadow-lg dark:shadow-none border border-slate-100 dark:border-slate-800 hidden group-hover/menu:block z-50 overflow-hidden transform origin-top-right">
                                     <div class="py-1 text-left">
-                                        <p class="px-4 py-2 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest border-b border-slate-50 dark:border-slate-850">Aksi Pesanan</p>
+                                        <p class="px-4 py-2 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest border-b border-slate-50 dark:border-slate-800">Aksi Pesanan</p>
                                         <button type="button" 
                                             class="w-full text-left block px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer border-none bg-transparent tombol-lihat-detail"
                                             data-id="<?= $baris['id']; ?>"
@@ -226,17 +226,17 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                                             <i class="fa-solid fa-eye w-4 text-slate-400"></i> Lihat Detail
                                         </button>
                                         <div class="h-px bg-slate-100 dark:bg-slate-800 my-1"></div>
-                                        <a href="pembayaran.php?id=<?= $baris['id']; ?>&status=dibayar" class="block px-4 py-2 text-xs font-bold text-blue-650 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors">
+                                        <a href="pembayaran.php?id=<?= $baris['id']; ?>&status=dibayar" class="block px-4 py-2 text-xs font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors">
                                             <i class="fa-solid fa-check w-4"></i> Konfirmasi Bayar
                                         </a>
-                                        <a href="pembayaran.php?id=<?= $baris['id']; ?>&status=dikirim" class="block px-4 py-2 text-xs font-bold text-indigo-655 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors">
+                                        <a href="pembayaran.php?id=<?= $baris['id']; ?>&status=dikirim" class="block px-4 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors">
                                             <i class="fa-solid fa-truck-fast w-4"></i> Kirim Produk
                                         </a>
-                                        <a href="pembayaran.php?id=<?= $baris['id']; ?>&status=selesai" class="block px-4 py-2 text-xs font-bold text-lime-650 dark:text-lime-400 hover:bg-lime-50 dark:hover:bg-lime-950/30 transition-colors">
+                                        <a href="pembayaran.php?id=<?= $baris['id']; ?>&status=selesai" class="block px-4 py-2 text-xs font-bold text-lime-600 dark:text-lime-400 hover:bg-lime-50 dark:hover:bg-lime-950/30 transition-colors">
                                             <i class="fa-solid fa-flag-checkered w-4"></i> Selesaikan
                                         </a>
-                                        <div class="h-px bg-slate-55 dark:bg-slate-800 my-1"></div>
-                                        <a href="pembayaran.php?id=<?= $baris['id']; ?>&status=dibatalkan" class="block px-4 py-2 text-xs font-bold text-red-655 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
+                                        <div class="h-px bg-slate-100 dark:bg-slate-800 my-1"></div>
+                                        <a href="pembayaran.php?id=<?= $baris['id']; ?>&status=dibatalkan" class="block px-4 py-2 text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
                                             <i class="fa-solid fa-xmark w-4"></i> Batalkan
                                         </a>
                                     </div>
@@ -251,7 +251,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                     <tr>
                         <td colspan="6" class="px-4 py-10 text-center text-slate-400 dark:text-slate-500">
                             <div class="flex flex-col items-center justify-center">
-                                <i class="fa-solid fa-inbox text-2xl mb-2.5 text-slate-350 dark:text-slate-700"></i>
+                                <i class="fa-solid fa-inbox text-2xl mb-2.5 text-slate-300 dark:text-slate-700"></i>
                                 <p class="text-xs">Belum ada pesanan masuk.</p>
                             </div>
                         </td>
@@ -272,7 +272,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
             <!-- Modal Container -->
-            <div id="kontainer-modal" class="inline-block align-bottom bg-white dark:bg-slate-900 rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-slate-150 dark:border-slate-800 scale-95 opacity-0 duration-300 ease-out">
+            <div id="kontainer-modal" class="inline-block align-bottom bg-white dark:bg-slate-900 rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-slate-200 dark:border-slate-800 scale-95 opacity-0 duration-300 ease-out">
                 
                 <!-- Header Modal -->
                 <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
@@ -294,7 +294,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                     <!-- Status & Pelanggan Grid -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <!-- Pelanggan -->
-                        <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-850 flex items-start gap-3">
+                        <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-start gap-3">
                             <div class="w-9 h-9 bg-lime-100 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0">
                                 <i class="fa-solid fa-user"></i>
                             </div>
@@ -306,7 +306,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                         </div>
 
                         <!-- Status -->
-                        <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-850 flex items-start gap-3">
+                        <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-start gap-3">
                             <div id="md-status-icon-container" class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0">
                                 <i id="md-status-icon" class="fa-solid"></i>
                             </div>
@@ -319,7 +319,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
 
                     <!-- Rincian Item Belanja -->
                     <div>
-                        <h4 class="text-[11px] font-bold text-slate-400 dark:text-slate-550 uppercase tracking-widest mb-3.5 flex items-center gap-1.5">
+                        <h4 class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3.5 flex items-center gap-1.5">
                             <i class="fa-solid fa-boxes-stacked text-lime-600 dark:text-lime-400"></i> Daftar Produk Yang Dipesan
                         </h4>
                         
@@ -329,7 +329,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                     </div>
 
                     <!-- Alamat Pengiriman -->
-                    <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-850">
+                    <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
                         <h4 class="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
                             <i class="fa-solid fa-map-location-dot"></i> Alamat Pengiriman
                         </h4>
@@ -337,14 +337,14 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                     </div>
 
                     <!-- Metode & Kode Pembayaran -->
-                    <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-850 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <p class="text-[9px] text-slate-400 dark:text-slate-500 font-extrabold uppercase tracking-widest mb-1"><i class="fa-solid fa-credit-card mr-1 text-[10px]"></i> Metode Pembayaran</p>
                             <p class="text-xs font-bold text-slate-800 dark:text-slate-200" id="md-metode"></p>
                         </div>
                         <div>
                             <p class="text-[9px] text-slate-400 dark:text-slate-500 font-extrabold uppercase tracking-widest mb-1"><i class="fa-solid fa-file-invoice-dollar mr-1 text-[10px]"></i> Bukti / Kode Bayar</p>
-                            <p class="text-xs font-mono font-bold text-lime-600 dark:text-lime-450" id="md-bukti"></p>
+                            <p class="text-xs font-mono font-bold text-lime-600 dark:text-lime-400" id="md-bukti"></p>
                         </div>
                     </div>
 
@@ -458,15 +458,15 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                 const formattedSubtotal = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(subtotal);
 
                 const itemHtml = `
-                    <div class="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-850 rounded-2xl gap-3">
+                    <div class="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 rounded-2xl gap-3">
                         <div class="flex items-center gap-3.5 min-w-0">
-                            <img src="${imgSrc}" alt="${item.nama_produk}" class="w-12 h-12 rounded-xl object-cover border border-slate-250/60 dark:border-slate-800 flex-shrink-0 shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=150&q=80'">
+                            <img src="${imgSrc}" alt="${item.nama_produk}" class="w-12 h-12 rounded-xl object-cover border border-slate-200/60 dark:border-slate-800 flex-shrink-0 shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=150&q=80'">
                             <div class="min-w-0">
                                 <p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate leading-snug">${item.nama_produk}</p>
-                                <p class="text-[10px] text-slate-400 dark:text-slate-500 font-semibold mt-1 flex items-center gap-1">${formattedHarga} <span class="text-lime-600 dark:text-lime-400 font-black">x${item.jumlah}</span></p>
+                                <p class="text-[10px] text-slate-400 dark:text-slate-550 font-semibold mt-1 flex items-center gap-1">${formattedHarga} <span class="text-lime-600 dark:text-lime-400 font-black">x${item.jumlah}</span></p>
                             </div>
                         </div>
-                        <p class="text-xs font-extrabold text-slate-850 dark:text-slate-100 whitespace-nowrap">${formattedSubtotal}</p>
+                        <p class="text-xs font-extrabold text-slate-800 dark:text-slate-100 whitespace-nowrap">${formattedSubtotal}</p>
                     </div>
                 `;
                 mdItemList.insertAdjacentHTML('beforeend', itemHtml);
@@ -478,12 +478,12 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
             if (status === 'menunggu') {
                 actionHtml = `
                     <a href="pembayaran.php?id=${id}&status=dibayar" class="flex-1 sm:flex-initial bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl text-center shadow-md transition-colors"><i class="fa-solid fa-check mr-1 text-[10px]"></i> Konfirmasi Bayar</a>
-                    <a href="pembayaran.php?id=${id}&status=dibatalkan" class="flex-1 sm:flex-initial bg-red-50 hover:bg-red-105 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-xs font-bold px-4 py-2.5 rounded-xl text-center transition-colors"><i class="fa-solid fa-xmark mr-1 text-[10px]"></i> Batalkan</a>
+                    <a href="pembayaran.php?id=${id}&status=dibatalkan" class="flex-1 sm:flex-initial bg-red-50 hover:bg-red-100 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-xs font-bold px-4 py-2.5 rounded-xl text-center transition-colors"><i class="fa-solid fa-xmark mr-1 text-[10px]"></i> Batalkan</a>
                 `;
             } else if (status === 'dibayar') {
                 actionHtml = `
                     <a href="pembayaran.php?id=${id}&status=dikirim" class="flex-1 sm:flex-initial bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl text-center shadow-md transition-colors"><i class="fa-solid fa-truck-fast mr-1 text-[10px]"></i> Kirim Produk</a>
-                    <a href="pembayaran.php?id=${id}&status=dibatalkan" class="flex-1 sm:flex-initial bg-red-50 hover:bg-red-105 dark:bg-red-950/30 text-red-650 dark:text-red-400 text-xs font-bold px-4 py-2.5 rounded-xl text-center transition-colors"><i class="fa-solid fa-xmark mr-1 text-[10px]"></i> Batalkan</a>
+                    <a href="pembayaran.php?id=${id}&status=dibatalkan" class="flex-1 sm:flex-initial bg-red-50 hover:bg-red-100 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-xs font-bold px-4 py-2.5 rounded-xl text-center transition-colors"><i class="fa-solid fa-xmark mr-1 text-[10px]"></i> Batalkan</a>
                 `;
             } else if (status === 'dikirim') {
                 actionHtml = `
@@ -491,7 +491,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                 `;
             }
             
-            mdActionFooter.insertAdjacentHTML('beforeend', actionHtml + `<button type="button" onclick="tutupModalPesanan()" class="flex-1 sm:flex-initial bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl text-center transition-colors hover:bg-slate-50 dark:hover:bg-slate-750">Tutup</button>`);
+            mdActionFooter.insertAdjacentHTML('beforeend', actionHtml + `<button type="button" onclick="tutupModalPesanan()" class="flex-1 sm:flex-initial bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl text-center transition-colors hover:bg-slate-50 dark:hover:bg-slate-700">Tutup</button>`);
 
             // Show Modal with Animation
             modal.classList.remove('hidden');

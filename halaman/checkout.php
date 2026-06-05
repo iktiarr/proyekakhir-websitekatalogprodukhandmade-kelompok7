@@ -103,7 +103,7 @@ if (isset($_POST['buat_pesanan'])) {
         </div>
 
         <?php if ($galat): ?>
-            <div class="bg-red-50 dark:bg-red-950/30 text-red-655 dark:text-red-400 p-4 rounded-xl mb-6 text-sm border border-red-200 dark:border-red-900/50 flex items-start gap-3 shadow-sm">
+            <div class="bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 p-4 rounded-xl mb-6 text-sm border border-red-200 dark:border-red-900/50 flex items-start gap-3 shadow-sm">
                 <i class="fa-solid fa-circle-exclamation mt-0.5 text-base flex-shrink-0"></i> 
                 <span><?= $galat; ?></span>
             </div>
@@ -125,15 +125,15 @@ if (isset($_POST['buat_pesanan'])) {
                     <div class="space-y-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Nama Penerima</label>
-                            <input type="text" value="<?= $_SESSION['nama']; ?>" readonly class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 outline-none cursor-not-allowed text-sm">
+                            <input type="text" value="<?= $_SESSION['nama']; ?>" readonly class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-100 text-slate-500 outline-none cursor-not-allowed text-sm">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Nomor Telepon</label>
-                            <input type="tel" name="no_telp" value="<?= $autofill_no_telp; ?>" required class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-855 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all duration-300 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400" placeholder="Contoh: 08123456789">
+                            <input type="tel" name="no_telp" value="<?= $autofill_no_telp; ?>" required class="w-full px-4 py-3 bg-white rounded-xl border border-slate-200 outline-none text-sm text-slate-800 placeholder-slate-400">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Alamat Lengkap Tujuan</label>
-                            <textarea name="alamat" required rows="3" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-855 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all duration-300 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400" placeholder="Masukkan alamat lengkap tujuan pengiriman Anda..."><?= $autofill_alamat; ?></textarea>
+                            <textarea name="alamat" required rows="3" class="w-full px-4 py-3 bg-white rounded-xl border border-slate-200 outline-none text-sm text-slate-800 placeholder-slate-400 resize-none"><?= $autofill_alamat; ?></textarea>
                         </div>
                     </div>
                 </div>
@@ -146,33 +146,33 @@ if (isset($_POST['buat_pesanan'])) {
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                         <label class="relative flex items-center p-3.5 border border-slate-200 dark:border-slate-800 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-950/50 transition-colors has-[:checked]:border-lime-500 has-[:checked]:bg-lime-50/20 dark:has-[:checked]:bg-lime-950/20">
-                            <input type="radio" name="metode_pembayaran" value="BCA Virtual Account" checked class="w-4 h-4 text-lime-600 border-slate-350 focus:ring-lime-500 focus:ring-offset-0">
-                            <span class="ml-2.5 text-xs font-bold text-slate-750 dark:text-slate-300">BCA Virtual Account</span>
+                            <input type="radio" name="metode_pembayaran" value="BCA Virtual Account" checked class="w-4 h-4 text-lime-600 border-slate-300 cursor-pointer">
+                            <span class="ml-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">BCA Virtual Account</span>
                         </label>
                         
                         <label class="relative flex items-center p-3.5 border border-slate-200 dark:border-slate-800 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-950/50 transition-colors has-[:checked]:border-lime-500 has-[:checked]:bg-lime-50/20 dark:has-[:checked]:bg-lime-950/20">
-                            <input type="radio" name="metode_pembayaran" value="Mandiri Virtual Account" class="w-4 h-4 text-lime-600 border-slate-350 focus:ring-lime-500 focus:ring-offset-0">
-                            <span class="ml-2.5 text-xs font-bold text-slate-755 dark:text-slate-300">Mandiri VA</span>
+                            <input type="radio" name="metode_pembayaran" value="Mandiri Virtual Account" class="w-4 h-4 text-lime-600 border-slate-300 cursor-pointer">
+                            <span class="ml-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">Mandiri VA</span>
                         </label>
-
+ 
                         <label class="relative flex items-center p-3.5 border border-slate-200 dark:border-slate-800 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-950/50 transition-colors has-[:checked]:border-lime-500 has-[:checked]:bg-lime-50/20 dark:has-[:checked]:bg-lime-950/20">
-                            <input type="radio" name="metode_pembayaran" value="GoPay" class="w-4 h-4 text-lime-600 border-slate-350 focus:ring-lime-500 focus:ring-offset-0">
-                            <span class="ml-2.5 text-xs font-bold text-slate-755 dark:text-slate-300">GoPay</span>
+                            <input type="radio" name="metode_pembayaran" value="GoPay" class="w-4 h-4 text-lime-600 border-slate-300 cursor-pointer">
+                            <span class="ml-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">GoPay</span>
                         </label>
-
+ 
                         <label class="relative flex items-center p-3.5 border border-slate-200 dark:border-slate-800 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-950/50 transition-colors has-[:checked]:border-lime-500 has-[:checked]:bg-lime-50/20 dark:has-[:checked]:bg-lime-950/20">
-                            <input type="radio" name="metode_pembayaran" value="Dana" class="w-4 h-4 text-lime-600 border-slate-350 focus:ring-lime-500 focus:ring-offset-0">
-                            <span class="ml-2.5 text-xs font-bold text-slate-755 dark:text-slate-300">Dana</span>
+                            <input type="radio" name="metode_pembayaran" value="Dana" class="w-4 h-4 text-lime-600 border-slate-300 cursor-pointer">
+                            <span class="ml-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">Dana</span>
                         </label>
-
+ 
                         <label class="relative flex items-center p-3.5 border border-slate-200 dark:border-slate-800 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-950/50 transition-colors has-[:checked]:border-lime-500 has-[:checked]:bg-lime-50/20 dark:has-[:checked]:bg-lime-950/20">
-                            <input type="radio" name="metode_pembayaran" value="Alfamart" class="w-4 h-4 text-lime-600 border-slate-350 focus:ring-lime-500 focus:ring-offset-0">
-                            <span class="ml-2.5 text-xs font-bold text-slate-755 dark:text-slate-300">Alfamart</span>
+                            <input type="radio" name="metode_pembayaran" value="Alfamart" class="w-4 h-4 text-lime-600 border-slate-300 cursor-pointer">
+                            <span class="ml-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">Alfamart</span>
                         </label>
-
+ 
                         <label class="relative flex items-center p-3.5 border border-slate-200 dark:border-slate-800 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-950/50 transition-colors has-[:checked]:border-lime-500 has-[:checked]:bg-lime-50/20 dark:has-[:checked]:bg-lime-950/20">
-                            <input type="radio" name="metode_pembayaran" value="Indomaret" class="w-4 h-4 text-lime-600 border-slate-350 focus:ring-lime-500 focus:ring-offset-0">
-                            <span class="ml-2.5 text-xs font-bold text-slate-755 dark:text-slate-300">Indomaret</span>
+                            <input type="radio" name="metode_pembayaran" value="Indomaret" class="w-4 h-4 text-lime-600 border-slate-300 cursor-pointer">
+                            <span class="ml-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">Indomaret</span>
                         </label>
                     </div>
                 </div>
@@ -181,7 +181,7 @@ if (isset($_POST['buat_pesanan'])) {
 
             <div class="lg:w-1/3 w-full">
                 <div class="bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-xl border border-slate-200/60 dark:border-slate-800 shadow-sm sticky top-24">
-                    <h3 class="text-base sm:text-lg font-bold text-slate-850 dark:text-slate-100 mb-4">Ringkasan Pesanan</h3>
+                    <h3 class="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Ringkasan Pesanan</h3>
                     
                     <div class="space-y-2.5 mb-5 max-h-48 overflow-y-auto pr-1.5 custom-scrollbar">
                         <?php 
@@ -197,10 +197,10 @@ if (isset($_POST['buat_pesanan'])) {
                         <?php endwhile; ?>
                     </div>
                     
-                    <div class="h-px bg-slate-150 dark:bg-slate-800 w-full mb-4"></div>
+                    <div class="h-px bg-slate-200 dark:bg-slate-800 w-full mb-4"></div>
 
                     <div class="space-y-3 mb-6">
-                        <div class="flex justify-between items-center text-slate-550 dark:text-slate-455 text-xs">
+                        <div class="flex justify-between items-center text-slate-500 dark:text-slate-400 text-xs">
                             <span>Total Ongkos Kirim</span>
                             <span class="text-lime-700 dark:text-lime-400 font-extrabold">Gratis Ongkir</span>
                         </div>
@@ -210,7 +210,7 @@ if (isset($_POST['buat_pesanan'])) {
                         </div>
                     </div>
                     
-                    <button type="submit" name="buat_pesanan" class="w-full bg-lime-600 text-white py-3 rounded-xl font-bold text-center flex items-center justify-center hover:bg-lime-700 hover:shadow-lg hover:shadow-lime-200/40 hover:-translate-y-0.5 transition-all duration-300 text-sm cursor-pointer border-none shadow-sm">
+                    <button type="submit" name="buat_pesanan" class="w-full bg-lime-600 text-white py-3 rounded-xl font-bold text-center flex items-center justify-center hover:bg-lime-700 transition-all duration-300 text-sm cursor-pointer border-none shadow-sm">
                         Buat Pesanan & Bayar <i class="fa-solid fa-arrow-right ml-2"></i>
                     </button>
                 </div>

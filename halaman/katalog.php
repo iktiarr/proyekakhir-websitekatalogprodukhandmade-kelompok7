@@ -28,7 +28,7 @@ if (count($kondisi) > 0) {
     $klausa_kondisi = " WHERE " . implode(" AND ", $kondisi);
 }
 
-$kueri_produk = "SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id $klausa_kondisi";
+$kueri_produk = "SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id $klausa_kondisi ORDER BY p.id DESC";
 $hasil_produk = mysqli_query($koneksi, $kueri_produk);
 ?>
 
@@ -48,14 +48,14 @@ $hasil_produk = mysqli_query($koneksi, $kueri_produk);
                     <input type="hidden" name="daerah" value="<?= $id_daerah; ?>">
                 <?php endif; ?>
                 <div class="relative flex-grow">
-                    <input type="text" name="cari" value="<?= htmlspecialchars($pencarian); ?>" placeholder="Cari nama produk..." class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 outline-none text-sm">
+                    <input type="text" name="cari" value="<?= htmlspecialchars($pencarian); ?>" placeholder="Cari nama produk..." class="w-full pl-10 pr-4 py-2 bg-white text-slate-800 rounded-xl border border-slate-200 outline-none text-sm">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                 </div>
                 <button type="submit" class="bg-lime-600 hover:bg-lime-700 text-white px-5 rounded-xl text-sm font-bold cursor-pointer border-none">
                     Cari
                 </button>
                 <?php if (!empty($pencarian)): ?>
-                    <a href="katalog.php?<?= ($id_kategori > 0 ? 'kategori='.$id_kategori : '') . ($id_daerah > 0 ? ($id_kategori > 0 ? '&' : '').'daerah='.$id_daerah : ''); ?>#daftar-produk" class="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-450 hover:bg-slate-200/80 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center border border-slate-200/60 dark:border-slate-700">
+                    <a href="katalog.php?<?= ($id_kategori > 0 ? 'kategori='.$id_kategori : '') . ($id_daerah > 0 ? ($id_kategori > 0 ? '&' : '').'daerah='.$id_daerah : ''); ?>#daftar-produk" class="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center border border-slate-200/60 dark:border-slate-700">
                         Reset
                     </a>
                 <?php endif; ?>
@@ -125,7 +125,7 @@ $hasil_produk = mysqli_query($koneksi, $kueri_produk);
                                 <?= $baris['nama_kategori']; ?>
                             </span>
                             <?php if(!empty($baris['nama_daerah'])): ?>
-                                <span class="bg-lime-600/90 dark:bg-lime-650/80 backdrop-blur-sm px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-extrabold text-white uppercase tracking-widest shadow-sm flex items-center gap-0.5 truncate">
+                                <span class="bg-lime-600/90 dark:bg-lime-600/80 backdrop-blur-sm px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-extrabold text-white uppercase tracking-widest shadow-sm flex items-center gap-0.5 truncate">
                                     <i class="fa-solid fa-location-dot text-[7px] sm:text-[8px]"></i> <?= $baris['nama_daerah']; ?>
                                 </span>
                             <?php endif; ?>
@@ -157,7 +157,7 @@ $hasil_produk = mysqli_query($koneksi, $kueri_produk);
                 
             <?php else: ?>
                 
-                <div class="col-span-full py-16 text-center bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-250 dark:border-slate-800 shadow-sm">
+                <div class="col-span-full py-16 text-center bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 shadow-sm">
                     <div class="max-w-md mx-auto px-4">
                         <div class="w-12 h-12 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-350 dark:text-slate-600 text-xl">
                             <i class="fa-solid fa-box-open"></i>
@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!elemenKosong) {
                     elemenKosong = document.createElement('div');
                     elemenKosong.id = 'daftar-kosong-instan';
-                    elemenKosong.className = 'col-span-full py-16 text-center bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-250 dark:border-slate-800 shadow-sm';
+                    elemenKosong.className = 'col-span-full py-16 text-center bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 shadow-sm';
                     elemenKosong.innerHTML = `
                         <div class="max-w-md mx-auto px-4">
                             <div class="w-12 h-12 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-350 dark:text-slate-600 text-xl">

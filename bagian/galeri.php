@@ -20,7 +20,7 @@ if ($hasil_produk && mysqli_num_rows($hasil_produk) > 0) {
 
 $daerah_bawaan = 'Bangkalan';
 ?>
-<section id="galeri" class="py-16 bg-slate-50 dark:bg-slate-950">
+<section id="galeri" class="py-16 bg-white dark:bg-slate-900">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     
     <!-- Header -->

@@ -9,7 +9,7 @@
           <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 leading-tight mb-4">
             Mengapa Memilih <span class="text-lime-600">HandMadura?</span>
           </h2>
-          <p class="text-slate-650 dark:text-slate-350 text-sm sm:text-base leading-relaxed">
+          <p class="text-slate-600 dark:text-slate-350 text-sm sm:text-base leading-relaxed">
             Setiap jengkal anyaman, setiap tempaan bilah logam, dan setiap torehan malam panas batik tulis asal Pulau Madura menyimpan nilai seni yang mendalam. Pengrajin lokal kami mengandalkan tradisi leluhur untuk menjaga kualitas bahan baku alami serta keaslian motif yang penuh filosofi. Dengan membeli kerajinan ini, Anda turut melestarikan warisan budaya Nusantara sekaligus memajukan ekonomi sirkular para pengrajin di Sumenep, Pamekasan, Sampang, dan Bangkalan.
           </p>
         </div>

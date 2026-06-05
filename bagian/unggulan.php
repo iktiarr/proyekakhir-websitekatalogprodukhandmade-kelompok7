@@ -9,7 +9,7 @@
         <p class="text-slate-500 dark:text-slate-400 text-sm">Koleksi kerajinan terbaik Madura yang dikurasi khusus oleh tim ahli kami.</p>
       </div>
       
-      <a href="<?= $awalan; ?>halaman/katalog.php" class="flex items-center text-lime-650 dark:text-lime-400 font-bold text-xs whitespace-nowrap bg-lime-50 dark:bg-lime-950/40 hover:bg-lime-100 px-4 py-2.5 rounded-xl border border-lime-100 dark:border-lime-900/50">
+      <a href="<?= $awalan; ?>halaman/katalog.php" class="flex items-center text-lime-600 dark:text-lime-400 font-bold text-xs whitespace-nowrap bg-lime-50 dark:bg-lime-950/40 hover:bg-lime-100 px-4 py-2.5 rounded-xl border border-lime-100 dark:border-lime-900/50">
         Lihat Semua 
         <i class="fa-solid fa-arrow-right ml-1.5 text-[10px]"></i>
       </a>
@@ -32,11 +32,11 @@
             class="w-full h-full object-cover"
           >
           <div class="absolute top-2 left-2 flex flex-col gap-1 items-start max-w-[calc(100%-16px)]">
-            <span class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest shadow-sm border border-slate-100 dark:border-slate-850/80 truncate">
+            <span class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest shadow-sm border border-slate-100 dark:border-slate-800/80 truncate">
               <?= $baris['nama_kategori']; ?>
             </span>
             <?php if(!empty($baris['nama_daerah'])): ?>
-              <span class="bg-lime-600/90 dark:bg-lime-650/80 backdrop-blur-sm px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-bold text-white uppercase tracking-widest shadow-sm flex items-center gap-0.5 truncate">
+              <span class="bg-lime-600/90 dark:bg-lime-600/80 backdrop-blur-sm px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-bold text-white uppercase tracking-widest shadow-sm flex items-center gap-0.5 truncate">
                 <i class="fa-solid fa-location-dot text-[7px] sm:text-[8px]"></i> <?= $baris['nama_daerah']; ?>
               </span>
             <?php endif; ?>
@@ -49,7 +49,7 @@
             <?= $baris['nama_produk']; ?>
           </h3>
           
-          <p class="text-slate-555 dark:text-slate-400 text-[11px] sm:text-xs mt-1 sm:mt-1.5 line-clamp-2 flex-grow leading-relaxed">
+          <p class="text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs mt-1 sm:mt-1.5 line-clamp-2 flex-grow leading-relaxed">
             <?= $baris['deskripsi']; ?>
           </p>
           
@@ -58,7 +58,7 @@
               Rp <?= number_format($baris['harga'], 0, ',', '.'); ?>
             </span>
             
-            <a href="<?= $awalan; ?>halaman/detail_produk.php?id=<?= $baris['id']; ?>" class="w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-450 hover:bg-lime-600 hover:text-white rounded-full flex-shrink-0">
+            <a href="<?= $awalan; ?>halaman/detail_produk.php?id=<?= $baris['id']; ?>" class="w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-400 hover:bg-lime-600 hover:text-white rounded-full flex-shrink-0">
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </a>
           </div>

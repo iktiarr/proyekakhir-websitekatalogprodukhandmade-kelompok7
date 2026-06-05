@@ -69,40 +69,40 @@ if (isset($_POST['daftar'])) {
         <!-- Formulir Pendaftaran -->
         <form action="" method="POST" class="space-y-4">
             <div>
-                <label class="block text-xs font-bold text-slate-655 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Nama Lengkap</label>
-                <input type="text" name="nama" required class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 outline-none text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400" placeholder="Masukkan nama lengkap Anda">
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Nama Lengkap</label>
+                <input type="text" name="nama" required class="w-full px-4 py-3 bg-white rounded-xl border border-slate-200 outline-none text-sm text-slate-800 placeholder-slate-400" placeholder="Masukkan nama lengkap Anda">
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-655 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Email</label>
-                <input type="email" name="email" required class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 outline-none text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400" placeholder="nama@email.com">
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Email</label>
+                <input type="email" name="email" required class="w-full px-4 py-3 bg-white rounded-xl border border-slate-200 outline-none text-sm text-slate-800 placeholder-slate-400" placeholder="nama@email.com">
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-655 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Nomor Telepon</label>
-                <input type="tel" name="no_telp" required class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 outline-none text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400" placeholder="Contoh: 08123456789">
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Nomor Telepon</label>
+                <input type="tel" name="no_telp" required class="w-full px-4 py-3 bg-white rounded-xl border border-slate-200 outline-none text-sm text-slate-800 placeholder-slate-400" placeholder="Contoh: 08123456789">
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-655 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Alamat Lengkap</label>
-                <textarea name="alamat" required rows="3" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 outline-none text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 resize-none" placeholder="Masukkan alamat lengkap pengiriman Anda..."></textarea>
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Alamat Lengkap</label>
+                <textarea name="alamat" required rows="3" class="w-full px-4 py-3 bg-white rounded-xl border border-slate-200 outline-none text-sm text-slate-800 placeholder-slate-400 resize-none" placeholder="Masukkan alamat lengkap pengiriman Anda..."></textarea>
             </div>
             
             <div>
-                <label class="block text-xs font-bold text-slate-655 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Password</label>
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Password</label>
                 <div class="relative">
-                    <input type="password" id="password" name="password" required class="w-full pl-4 pr-11 py-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 outline-none text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400" placeholder="••••••••">
-                    <button type="button" onclick="tampilkanSandi('password', 'ikon-sandi')" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-450 hover:text-lime-600 cursor-pointer border-none bg-transparent">
+                    <input type="password" id="password" name="password" required class="w-full pl-4 pr-11 py-3 bg-white rounded-xl border border-slate-200 outline-none text-sm text-slate-800 placeholder-slate-400" placeholder="••••••••">
+                    <button type="button" onclick="tampilkanSandi('password', 'ikon-sandi')" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-lime-600 cursor-pointer border-none bg-transparent">
                         <i id="ikon-sandi" class="fa-solid fa-eye-slash text-sm"></i>
                     </button>
                 </div>
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-655 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Konfirmasi Password</label>
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Konfirmasi Password</label>
                 <div class="relative">
-                    <input type="password" id="konfirmasi_password" name="konfirmasi_password" required class="w-full pl-4 pr-11 py-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 outline-none text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400" placeholder="••••••••">
-                    <button type="button" onclick="tampilkanSandi('konfirmasi_password', 'ikon-konfirmasi-sandi')" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-455 hover:text-lime-600 cursor-pointer border-none bg-transparent">
+                    <input type="password" id="konfirmasi_password" name="konfirmasi_password" required class="w-full pl-4 pr-11 py-3 bg-white rounded-xl border border-slate-200 outline-none text-sm text-slate-800 placeholder-slate-400" placeholder="••••••••">
+                    <button type="button" onclick="tampilkanSandi('konfirmasi_password', 'ikon-konfirmasi-sandi')" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-lime-600 cursor-pointer border-none bg-transparent">
                         <i id="ikon-konfirmasi-sandi" class="fa-solid fa-eye-slash text-sm"></i>
                     </button>
                 </div>
@@ -140,4 +140,4 @@ if (isset($_POST['daftar'])) {
     }
 </script>
 
-<?php include 'bagian/bawah.php'; ?>p include 'bagian/bawah.php'; ?>
+<?php include 'bagian/bawah.php'; ?>

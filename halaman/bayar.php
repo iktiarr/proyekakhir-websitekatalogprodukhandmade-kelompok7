@@ -86,14 +86,14 @@ if (isset($_GET['id'])) {
                     <i class="fa-solid fa-circle-check text-2xl mr-3 flex-shrink-0 text-lime-600"></i>
                     <div>
                         <p class="font-bold text-sm"><?= $berhasil; ?></p>
-                        <p class="text-xs text-lime-650 dark:text-lime-500 mt-0.5 font-medium">Mengarahkan Anda ke Riwayat Transaksi...</p>
+                        <p class="text-xs text-lime-600 dark:text-lime-500 mt-0.5 font-medium">Mengarahkan Anda ke Riwayat Transaksi...</p>
                     </div>
                 </div>
             <?php endif; ?>
 
             <!-- Notifikasi Gagal -->
             <?php if ($galat): ?>
-                <div class="bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 p-4 rounded-xl mb-6 border border-red-200 dark:border-red-900/30 flex items-center">
+                <div class="bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 p-4 rounded-xl mb-6 border border-red-200 dark:border-red-900/30 flex items-center">
                     <i class="fa-solid fa-circle-exclamation mr-3 flex-shrink-0"></i> <?= $galat; ?>
                 </div>
             <?php endif; ?>

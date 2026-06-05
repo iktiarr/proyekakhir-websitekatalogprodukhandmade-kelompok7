@@ -80,9 +80,42 @@ if ($total_log == 0) {
 $jumlah_pengguna = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pengguna WHERE role = 'user'"))['total'];
 $jumlah_admin = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pengguna WHERE role = 'admin'"))['total'];
 $jumlah_produk = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM produk"))['total'];
-$total_penjualan = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT SUM(total_harga) as total FROM pesanan WHERE status != 'menunggu'"))['total'];
 $pembayaran_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
 $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
+
+// Metrik Pendapatan
+$res_hari_ini = mysqli_fetch_assoc(mysqli_query($koneksi, "
+    SELECT SUM(total_harga) AS total 
+    FROM pesanan 
+    WHERE status IN ('dibayar', 'dikirim', 'selesai') 
+      AND DATE(tanggal_pesanan) = CURDATE()
+"));
+$pendapatan_hari_ini = $res_hari_ini['total'] ?? 0;
+
+$res_seminggu = mysqli_fetch_assoc(mysqli_query($koneksi, "
+    SELECT SUM(total_harga) AS total 
+    FROM pesanan 
+    WHERE status IN ('dibayar', 'dikirim', 'selesai') 
+      AND tanggal_pesanan >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+"));
+$pendapatan_seminggu = $res_seminggu['total'] ?? 0;
+
+$res_sebulan = mysqli_fetch_assoc(mysqli_query($koneksi, "
+    SELECT SUM(total_harga) AS total 
+    FROM pesanan 
+    WHERE status IN ('dibayar', 'dikirim', 'selesai') 
+      AND tanggal_pesanan >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+"));
+$pendapatan_sebulan = $res_sebulan['total'] ?? 0;
+
+$res_total = mysqli_fetch_assoc(mysqli_query($koneksi, "
+    SELECT SUM(total_harga) AS total 
+    FROM pesanan 
+    WHERE status IN ('dibayar', 'dikirim', 'selesai')
+"));
+$pendapatan_total = $res_total['total'] ?? 0;
+
+
 
 $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
 ?>
@@ -127,12 +160,12 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:sticky md:h-screen md:top-0 overflow-y-auto flex-shrink-0">
         <div class="p-5 pb-3 flex items-center justify-between">
             <div>
-                <a href="../index.php" class="text-xl font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block hover:scale-105 transition-transform">
+                <a href="../index.php" class="text-xl font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block">
                     Hand<span class="text-lime-600">Madura.</span>
                 </a>
                 <p class="text-[9px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold mt-0.5">Admin Panel</p>
             </div>
-            <button id="tombol-tutup-sidebar" class="md:hidden p-2 rounded-xl text-slate-450 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Tutup Sidebar">
+            <button id="tombol-tutup-sidebar" class="md:hidden p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Tutup Sidebar">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
@@ -142,28 +175,28 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                 <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center"></i> Dasbor
             </a>
             <a href="produk.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-box-open mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Produk
+                <i class="fa-solid fa-box-open mr-2.5 w-4 text-center"></i> Produk
             </a>
             <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pembayaran
+                <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center"></i> Pembayaran
                 <?php if ($pembayaran_tertunda > 0): ?>
                     <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pembayaran_tertunda; ?></span>
                 <?php endif; ?>
             </a>
             <a href="testimoni.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-comments mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Testimonial
+                <i class="fa-solid fa-comments mr-2.5 w-4 text-center"></i> Testimonial
                 <?php if ($testimoni_tertunda > 0): ?>
                     <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $testimoni_tertunda; ?></span>
                 <?php endif; ?>
             </a>
             <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-users mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pengguna
+                <i class="fa-solid fa-users mr-2.5 w-4 text-center"></i> Pengguna
             </a>
         </nav>
         
         <div class="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
-            <a href="../keluar.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl font-bold text-sm transition-colors group flex-grow">
-                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center group-hover:-translate-x-0.5 transition-transform"></i> Keluar
+            <a href="../keluar.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl font-bold text-sm transition-colors group flex-grow">
+                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center"></i> Keluar
             </a>
             <button id="tombol-tema" class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Ubah Tema">
                 <i id="ikon-tombol-tema" class="fa-solid fa-moon text-base"></i>
@@ -191,47 +224,103 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
             </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- Baris Metrik Umum -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <!-- Total Pengguna -->
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
                 <div>
                     <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Pengguna</p>
                     <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100"><?= $jumlah_pengguna; ?></h2>
                 </div>
-                <div class="w-8 h-8 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-450 flex-shrink-0">
+                <div class="w-8 h-8 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-400 flex-shrink-0">
                     <i class="fa-solid fa-users text-sm"></i>
                 </div>
             </div>
             
+            <!-- Total Produk -->
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
                 <div>
                     <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Produk</p>
                     <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100"><?= $jumlah_produk; ?></h2>
                 </div>
-                <div class="w-8 h-8 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-455 flex-shrink-0">
+                <div class="w-8 h-8 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-400 flex-shrink-0">
                     <i class="fa-solid fa-box-open text-sm"></i>
                 </div>
             </div>
-            
-            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
-                <div>
-                    <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Pendapatan Bersih</p>
-                    <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100">Rp <?= number_format($total_penjualan ?: 0, 0, ',', '.'); ?></h2>
-                </div>
-                <div class="w-8 h-8 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-455 flex-shrink-0">
-                    <i class="fa-solid fa-wallet text-sm"></i>
-                </div>
-            </div>
-            
+
+            <!-- Total Admin -->
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
                 <div>
                     <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Admin</p>
                     <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100"><?= $jumlah_admin; ?></h2>
                 </div>
-                <div class="w-8 h-8 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-455 flex-shrink-0">
+                <div class="w-8 h-8 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-400 flex-shrink-0">
                     <i class="fa-solid fa-user-tie text-sm"></i>
                 </div>
             </div>
+
+            <!-- Ulasan Pending -->
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
+                <div>
+                    <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Ulasan Pending</p>
+                    <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100"><?= $testimoni_tertunda; ?></h2>
+                </div>
+                <div class="w-8 h-8 <?= $testimoni_tertunda > 0 ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400' : 'bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400'; ?> rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-comments text-sm"></i>
+                </div>
+            </div>
         </div>
+
+        <!-- Section Analisis Pendapatan -->
+        <div class="mb-6">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <!-- Hari Ini -->
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm">
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest">Hari Ini</p>
+                        <span class="w-7 h-7 bg-lime-50 dark:bg-lime-900/40 rounded-lg flex items-center justify-center text-lime-600 dark:text-lime-400 text-[11px] font-bold">1H</span>
+                    </div>
+                    <h2 class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100 mt-2.5">
+                        Rp <?= number_format($pendapatan_hari_ini, 0, ',', '.'); ?>
+                    </h2>
+                </div>
+ 
+                <!-- Seminggu -->
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm">
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest">Seminggu</p>
+                        <span class="w-7 h-7 bg-lime-50 dark:bg-lime-900/40 rounded-lg flex items-center justify-center text-lime-600 dark:text-lime-400 text-[11px] font-bold">7H</span>
+                    </div>
+                    <h2 class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100 mt-2.5">
+                        Rp <?= number_format($pendapatan_seminggu, 0, ',', '.'); ?>
+                    </h2>
+                </div>
+ 
+                <!-- Sebulan -->
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm">
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest">Sebulan</p>
+                        <span class="w-7 h-7 bg-lime-50 dark:bg-lime-900/40 rounded-lg flex items-center justify-center text-lime-600 dark:text-lime-400 text-[11px] font-bold">30H</span>
+                    </div>
+                    <h2 class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100 mt-2.5">
+                        Rp <?= number_format($pendapatan_sebulan, 0, ',', '.'); ?>
+                    </h2>
+                </div>
+ 
+                <!-- Total Semua -->
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm">
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest">Total Pendapatan</p>
+                        <span class="w-7 h-7 bg-lime-50 dark:bg-lime-900/40 rounded-lg flex items-center justify-center text-lime-600 dark:text-lime-400 text-[11px] font-bold">ALL</span>
+                    </div>
+                    <h2 class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100 mt-2.5">
+                        Rp <?= number_format($pendapatan_total, 0, ',', '.'); ?>
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+
         
 
 
@@ -249,14 +338,14 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                         if(mysqli_num_rows($kueri_pesanan_terbaru) > 0):
                             while($baris = mysqli_fetch_assoc($kueri_pesanan_terbaru)):
                         ?>
-                        <div class="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80 rounded-xl cursor-default">
+                        <div class="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl cursor-default">
                             <div class="flex items-center space-x-3">
                                 <div class="w-8 h-8 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 flex-shrink-0">
                                     <i class="fa-solid fa-bag-shopping text-xs"></i>
                                 </div>
                                 <div>
                                     <p class="text-xs font-bold text-slate-800 dark:text-slate-200"><?= $baris['nama']; ?></p>
-                                    <p class="text-[10px] text-slate-400 dark:text-slate-550 mt-0.5"><i class="fa-regular fa-clock mr-1"></i><?= date('H:i, d M Y', strtotime($baris['tanggal_pesanan'])); ?></p>
+                                    <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5"><i class="fa-regular fa-clock mr-1"></i><?= date('H:i, d M Y', strtotime($baris['tanggal_pesanan'])); ?></p>
                                 </div>
                             </div>
                             <span class="text-xs font-extrabold text-slate-800 dark:text-slate-200">Rp <?= number_format($baris['total_harga'], 0, ',', '.'); ?></span>
@@ -269,7 +358,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                             <div class="w-10 h-10 bg-slate-50 dark:bg-slate-950 rounded-full flex items-center justify-center mx-auto mb-2.5 text-slate-300 dark:text-slate-700">
                                 <i class="fa-solid fa-receipt text-base"></i>
                             </div>
-                            <p class="text-slate-400 dark:text-slate-550 text-xs">Belum ada pesanan terbaru masuk.</p>
+                            <p class="text-slate-400 dark:text-slate-500 text-xs">Belum ada pesanan terbaru masuk.</p>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -294,7 +383,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                                 elseif ($tipe === 'pesanan') $ikon_aktivitas = 'fa-receipt';
                         ?>
                         <div class="py-3 flex items-start gap-3 first:pt-0 last:pb-0 text-xs">
-                            <div class="w-7 h-7 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-100 dark:border-slate-850 flex items-center justify-center text-slate-400 dark:text-slate-500 flex-shrink-0">
+                            <div class="w-7 h-7 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 flex-shrink-0">
                                 <i class="fa-solid <?= $ikon_aktivitas; ?> text-[10px]"></i>
                             </div>
                             <div class="flex-grow min-w-0">
@@ -302,7 +391,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                                     <span class="font-bold text-slate-800 dark:text-slate-200"><?= $aktivitas['nama_pengguna']; ?></span> 
                                     <?= $aktivitas['keterangan']; ?>
                                 </p>
-                                <span class="text-[9px] text-slate-400 dark:text-slate-550 block mt-0.5"><i class="fa-regular fa-clock mr-1"></i><?= date('H:i, d M', strtotime($aktivitas['tanggal_dibuat'])); ?></span>
+                                <span class="text-[9px] text-slate-400 dark:text-slate-500 block mt-0.5"><i class="fa-regular fa-clock mr-1"></i><?= date('H:i, d M', strtotime($aktivitas['tanggal_dibuat'])); ?></span>
                             </div>
                         </div>
                         <?php
@@ -313,7 +402,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                             <div class="w-10 h-10 bg-slate-50 dark:bg-slate-950 rounded-full flex items-center justify-center mx-auto mb-2.5 text-slate-300 dark:text-slate-700">
                                 <i class="fa-solid fa-list-check text-base"></i>
                             </div>
-                            <p class="text-slate-400 dark:text-slate-550 text-xs">Belum ada riwayat aktivitas terbaru.</p>
+                            <p class="text-slate-400 dark:text-slate-500 text-xs">Belum ada riwayat aktivitas terbaru.</p>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -356,7 +445,9 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                         document.documentElement.classList.add('dark');
                         localStorage.setItem('theme', 'dark');
                     }
+                    
                     perbaruiIkon();
+                    
                     if (ikonTema) {
                         ikonTema.style.transform = '';
                     }
@@ -395,8 +486,6 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
         if (tombolMenuMobile) tombolMenuMobile.addEventListener('click', bukaSidebar);
         if (tombolTutupSidebar) tombolTutupSidebar.addEventListener('click', tutupSidebar);
         if (backdrop) backdrop.addEventListener('click', tutupSidebar);
-
-
     });
     </script>
 </body>

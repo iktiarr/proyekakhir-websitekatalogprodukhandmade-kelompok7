@@ -14,7 +14,7 @@
                 </a>
             <?php else: ?>
                 <!-- Tombol Login untuk Menulis Ulasan (Untuk Pengunjung) -->
-                <a href="<?= $awalan; ?>masuk.php" class="inline-flex items-center gap-1.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-750 hover:text-lime-600 dark:hover:text-lime-400">
+                <a href="<?= $awalan; ?>masuk.php" class="inline-flex items-center gap-1.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-lime-600 dark:hover:text-lime-400">
                     <i class="fa-solid fa-arrow-right-to-bracket"></i> Login untuk Mengulas
                 </a>
             <?php endif; ?>
@@ -47,7 +47,7 @@
                             </div>
                             
                             <!-- Isi Pesan Ulasan -->
-                            <p class="text-slate-650 dark:text-slate-350 italic mb-5 leading-relaxed text-xs sm:text-sm flex-grow">
+                            <p class="text-slate-600 dark:text-slate-350 italic mb-5 leading-relaxed text-xs sm:text-sm flex-grow">
                                 "<?= substr($data_testimoni['isi_ulasan'], 0, 120); ?><?= strlen($data_testimoni['isi_ulasan']) > 120 ? '...' : ''; ?>"
                             </p>
                             
@@ -87,7 +87,7 @@
                         <i class="fa-solid fa-pen"></i> Tulis Ulasan Pertama
                     </a>
                 <?php else: ?>
-                    <a href="<?= $awalan; ?>masuk.php" class="inline-flex items-center gap-1.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-750 hover:text-lime-650 dark:hover:text-lime-400">
+                    <a href="<?= $awalan; ?>masuk.php" class="inline-flex items-center gap-1.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-lime-600 dark:hover:text-lime-400">
                         <i class="fa-solid fa-arrow-right-to-bracket"></i> Login untuk Menulis Ulasan
                     </a>
                 <?php endif; ?>

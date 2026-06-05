@@ -51,7 +51,8 @@ if (isset($_POST['simpan'])) {
             $nama_admin = mysqli_real_escape_string($koneksi, $_SESSION['nama']);
             $id_admin = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NULL';
             $aksi_log = $id_produk > 0 ? 'ubah' : 'tambah';
-            $ket_log = ($id_produk > 0 ? "Mengubah detail produk " : "Menambahkan produk baru ") . "'$nama'";
+            $raw_nama = $_POST['nama'];
+            $ket_log = mysqli_real_escape_string($koneksi, ($id_produk > 0 ? "Mengubah detail produk " : "Menambahkan produk baru ") . "'$raw_nama'");
             mysqli_query($koneksi, "INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES ($id_admin, '$nama_admin', 'produk', '$aksi_log', '$ket_log')");
         } else {
             $galat = "Gagal menyimpan: " . mysqli_error($koneksi);
@@ -120,43 +121,43 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:sticky md:h-screen md:top-0 overflow-y-auto flex-shrink-0">
         <div class="p-5 pb-3 flex items-center justify-between">
             <div>
-                <a href="../index.php" class="text-xl font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block hover:scale-105 transition-transform">
+                <a href="../index.php" class="text-xl font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block">
                     Hand<span class="text-lime-600">Madura.</span>
                 </a>
                 <p class="text-[9px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold mt-0.5">Admin Panel</p>
             </div>
-            <button id="tombol-tutup-sidebar" class="md:hidden p-2 rounded-xl text-slate-450 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Tutup Sidebar">
+            <button id="tombol-tutup-sidebar" class="md:hidden p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Tutup Sidebar">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
         
         <nav class="flex-1 px-3 space-y-1">
             <a href="index.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Dasbor
+                <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center"></i> Dasbor
             </a>
             <a href="produk.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-xl font-bold text-sm transition-colors">
                 <i class="fa-solid fa-box-open mr-2.5 w-4 text-center"></i> Produk
             </a>
             <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pembayaran
+                <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center"></i> Pembayaran
                 <?php if ($pembayaran_tertunda > 0): ?>
                     <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pembayaran_tertunda; ?></span>
                 <?php endif; ?>
             </a>
             <a href="testimoni.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-comments mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Testimonial
+                <i class="fa-solid fa-comments mr-2.5 w-4 text-center"></i> Testimonial
                 <?php if ($testimoni_tertunda > 0): ?>
                     <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $testimoni_tertunda; ?></span>
                 <?php endif; ?>
             </a>
             <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-users mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pengguna
+                <i class="fa-solid fa-users mr-2.5 w-4 text-center"></i> Pengguna
             </a>
         </nav>
         
         <div class="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
-            <a href="../keluar.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl font-bold text-sm transition-colors group flex-grow">
-                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center group-hover:-translate-x-0.5 transition-transform"></i> Keluar
+            <a href="../keluar.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl font-bold text-sm transition-colors group flex-grow">
+                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center"></i> Keluar
             </a>
             <button id="tombol-tema" class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Ubah Tema">
                 <i id="ikon-tombol-tema" class="fa-solid fa-moon text-base"></i>
@@ -174,7 +175,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                 <h1 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100">Kelola Produk</h1>
                 <p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Tambah, edit, atau hapus produk di katalog Anda.</p>
             </div>
-            <button onclick="bukaModalTambah()" class="bg-lime-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-lime-700 hover:-translate-y-0.5 transition-all duration-300 shadow-lg shadow-lime-200/50 dark:shadow-none flex items-center cursor-pointer text-xs sm:text-sm">
+            <button onclick="bukaModalTambah()" class="bg-lime-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-lime-700 transition-all duration-300 flex items-center cursor-pointer text-xs sm:text-sm">
                 <i class="fa-solid fa-plus mr-1.5"></i> Tambah Produk
             </button>
         </div>
@@ -186,7 +187,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
         <?php endif; ?>
 
         <?php if ($galat): ?>
-            <div class="bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 p-3 rounded-xl mb-6 border border-red-100 dark:border-red-900/30 flex items-center shadow-sm text-xs">
+            <div class="bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 p-3 rounded-xl mb-6 border border-red-100 dark:border-red-900/30 flex items-center shadow-sm text-xs">
                 <i class="fa-solid fa-circle-exclamation mr-2"></i> <?= $galat; ?>
             </div>
         <?php endif; ?>
@@ -223,10 +224,10 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                             </div>
                         </td>
                         <td class="px-4 py-3 text-xs font-medium text-slate-500 dark:text-slate-400">
-                            <?= $produk['nama_kategori'] ?: '<span class="text-slate-350 dark:text-slate-600 italic">Tanpa Kategori</span>'; ?>
+                            <?= $produk['nama_kategori'] ?: '<span class="text-slate-300 dark:text-slate-600 italic">Tanpa Kategori</span>'; ?>
                         </td>
                         <td class="px-4 py-3 text-xs font-medium text-slate-500 dark:text-slate-400">
-                            <?= $produk['nama_daerah'] ?: '<span class="text-slate-350 dark:text-slate-600 italic">-</span>'; ?>
+                            <?= $produk['nama_daerah'] ?: '<span class="text-slate-300 dark:text-slate-600 italic">-</span>'; ?>
                         </td>
                         <td class="px-4 py-3 font-extrabold text-slate-800 dark:text-slate-200 whitespace-nowrap">
                             Rp <?= number_format($produk['harga'], 0, ',', '.'); ?>
@@ -252,7 +253,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                     <tr>
                         <td colspan="6" class="px-4 py-10 text-center text-slate-400 dark:text-slate-500">
                             <div class="flex flex-col items-center justify-center">
-                                <i class="fa-solid fa-box-open text-2xl mb-2.5 text-slate-350 dark:text-slate-700"></i>
+                                <i class="fa-solid fa-box-open text-2xl mb-2.5 text-slate-300 dark:text-slate-700"></i>
                                 <p class="text-xs">Belum ada produk di katalog.</p>
                             </div>
                         </td>
@@ -279,24 +280,24 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Produk</label>
-                    <input type="text" name="nama" id="produk_nama" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs" placeholder="Masukkan nama produk">
+                    <input type="text" name="nama" id="produk_nama" required class="w-full px-3 py-2 bg-white text-slate-800 rounded-xl border border-slate-200 outline-none transition-all text-xs" placeholder="Masukkan nama produk">
                 </div>
                 
                 <div class="grid grid-cols-2 gap-3.5">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Harga (Rp)</label>
-                        <input type="number" name="harga" id="produk_harga" min="0" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs">
+                        <input type="number" name="harga" id="produk_harga" min="0" required class="w-full px-3 py-2 bg-white text-slate-800 rounded-xl border border-slate-200 outline-none transition-all text-xs">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Stok (Unit)</label>
-                        <input type="number" name="stok" id="produk_stok" min="0" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs">
+                        <input type="number" name="stok" id="produk_stok" min="0" required class="w-full px-3 py-2 bg-white text-slate-800 rounded-xl border border-slate-200 outline-none transition-all text-xs">
                     </div>
                 </div>
  
                 <div class="grid grid-cols-2 gap-3.5">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Kategori</label>
-                        <select name="id_kategori" id="produk_kategori" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs">
+                        <select name="id_kategori" id="produk_kategori" required class="w-full px-3 py-2 bg-white text-slate-800 rounded-xl border border-slate-200 outline-none transition-all text-xs">
                             <option value="" disabled selected>-- Pilih Kategori --</option>
                             <?php 
                             mysqli_data_seek($kueri_kategori, 0);
@@ -307,7 +308,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Asal Daerah</label>
-                        <select name="id_daerah" id="produk_daerah" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs">
+                        <select name="id_daerah" id="produk_daerah" required class="w-full px-3 py-2 bg-white text-slate-800 rounded-xl border border-slate-200 outline-none transition-all text-xs">
                             <option value="" disabled selected>-- Pilih Daerah --</option>
                             <?php 
                             mysqli_data_seek($kueri_daerah, 0);
@@ -320,18 +321,18 @@ $testimoni_tertunda = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*)
  
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Link Foto Produk</label>
-                    <input type="url" name="gambar" id="produk_gambar" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs" placeholder="https://example.com/foto.jpg">
-                    <p class="text-[9px] text-slate-400 dark:text-slate-550 mt-0.5 italic">*Gunakan link gambar online (misal dari Unsplash, Imgur, dsb.)</p>
+                    <input type="url" name="gambar" id="produk_gambar" required class="w-full px-3 py-2 bg-white text-slate-800 rounded-xl border border-slate-200 outline-none transition-all text-xs" placeholder="https://example.com/foto.jpg">
+                    <p class="text-[9px] text-slate-400 dark:text-slate-500 mt-0.5 italic">*Gunakan link gambar online (misal dari Unsplash, Imgur, dsb.)</p>
                 </div>
  
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Deskripsi</label>
-                    <textarea name="deskripsi" id="produk_deskripsi" rows="2" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none transition-all text-xs resize-none" placeholder="Tulis deskripsi produk..."></textarea>
+                    <textarea name="deskripsi" id="produk_deskripsi" rows="2" required class="w-full px-3 py-2 bg-white text-slate-800 rounded-xl border border-slate-200 outline-none transition-all text-xs resize-none" placeholder="Tulis deskripsi produk..."></textarea>
                 </div>
  
                 <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex gap-2.5 justify-end">
-                    <button type="button" onclick="tutupModal()" class="px-4 py-2 bg-white dark:bg-slate-900 text-slate-655 dark:text-slate-400 border border-slate-200 dark:border-slate-800 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors cursor-pointer text-xs">Batal</button>
-                    <button type="submit" name="simpan" class="px-5 py-2 bg-lime-600 text-white rounded-xl font-bold hover:bg-lime-700 hover:shadow-lg hover:shadow-lime-200/40 dark:shadow-none transition-all cursor-pointer text-xs">Simpan Produk</button>
+                    <button type="button" onclick="tutupModal()" class="px-4 py-2 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors cursor-pointer text-xs">Batal</button>
+                    <button type="submit" name="simpan" class="px-5 py-2 bg-lime-600 text-white rounded-xl font-bold hover:bg-lime-700 transition-all cursor-pointer text-xs">Simpan Produk</button>
                 </div>
             </form>
         </div>

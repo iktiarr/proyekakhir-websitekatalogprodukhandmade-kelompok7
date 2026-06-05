@@ -25,16 +25,16 @@ $kueri_pesanan = mysqli_query($koneksi, "SELECT * FROM pesanan WHERE id_pengguna
             <div class="space-y-5">
                 <?php while($baris = mysqli_fetch_assoc($kueri_pesanan)): 
                     $warna_status = [
-                        'menunggu'   => 'bg-amber-50 text-amber-600 border-amber-250 dark:bg-amber-955/20 dark:text-amber-400 dark:border-amber-900/40',
-                        'dibayar'    => 'bg-blue-50 text-blue-600 border-blue-250 dark:bg-blue-955/20 dark:text-blue-400 dark:border-blue-900/40',
-                        'dikirim'    => 'bg-indigo-50 text-indigo-650 border-indigo-250 dark:bg-indigo-955/20 dark:text-indigo-400 dark:border-indigo-900/40',
-                        'selesai'    => 'bg-lime-50 text-lime-700 border-lime-250 dark:bg-lime-955/20 dark:text-lime-400 dark:border-lime-900/40',
-                        'dibatalkan' => 'bg-red-50 text-red-650 border-red-250 dark:bg-red-955/20 dark:text-red-400 dark:border-red-900/40'
+                        'menunggu'   => 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-900/40',
+                        'dibayar'    => 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-900/40',
+                        'dikirim'    => 'bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-900/40',
+                        'selesai'    => 'bg-lime-50 text-lime-700 border-lime-200 dark:bg-lime-900/20 dark:text-lime-400 dark:border-lime-900/40',
+                        'dibatalkan' => 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-900/40'
                     ];
                     $warna_status_pilihan = $warna_status[$baris['status']] ?? 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
                 ?>
                 
-                <div class="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-800 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+                <div class="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-800 shadow-sm overflow-hidden transition-all duration-300">
                     <div class="p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-5">
                         
                         <div class="flex items-center space-x-4">
@@ -42,9 +42,9 @@ $kueri_pesanan = mysqli_query($koneksi, "SELECT * FROM pesanan WHERE id_pengguna
                                 <i class="fa-solid fa-box text-base"></i>
                             </div>
                             <div>
-                                <p class="text-[9px] text-slate-400 dark:text-slate-500 font-extrabold uppercase tracking-widest">ID Pesanan</p>
-                                <p class="text-sm sm:text-base font-bold text-slate-850 dark:text-slate-200">#KM-<?= str_pad($baris['id'], 5, '0', STR_PAD_LEFT); ?></p>
-                                <p class="text-[11px] text-slate-400 dark:text-slate-550 mt-0.5"><i class="fa-regular fa-clock mr-1"></i> <?= date('d M Y, H:i', strtotime($baris['tanggal_pesanan'])); ?> WIB</p>
+                                <p class="text-[9px] text-slate-400 dark:text-slate-550 font-extrabold uppercase tracking-widest mb-0.5">ID Pesanan</p>
+                                <p class="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-200">#KM-<?= str_pad($baris['id'], 5, '0', STR_PAD_LEFT); ?></p>
+                                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5"><i class="fa-regular fa-clock mr-1"></i> <?= date('d M Y, H:i', strtotime($baris['tanggal_pesanan'])); ?> WIB</p>
                             </div>
                         </div>
                         
@@ -61,11 +61,11 @@ $kueri_pesanan = mysqli_query($koneksi, "SELECT * FROM pesanan WHERE id_pengguna
                                 </span>
                                 
                                 <?php if ($baris['status'] === 'menunggu'): ?>
-                                    <a href="bayar.php?id=<?= $baris['id']; ?>" class="inline-flex items-center justify-center bg-lime-600 hover:bg-lime-700 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-lime-200/30 border-none cursor-pointer">
+                                    <a href="bayar.php?id=<?= $baris['id']; ?>" class="inline-flex items-center justify-center bg-lime-600 hover:bg-lime-700 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition-all duration-200 border-none cursor-pointer">
                                         <i class="fa-solid fa-credit-card mr-1 text-[10px]"></i> Bayar Sekarang
                                     </a>
                                 <?php elseif ($baris['status'] === 'selesai'): ?>
-                                    <a href="tambah_ulasan.php" class="inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-amber-200/30 border-none cursor-pointer">
+                                    <a href="tambah_ulasan.php" class="inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition-all duration-200 border-none cursor-pointer">
                                         <i class="fa-solid fa-pen-to-square mr-1 text-[10px]"></i> Beri Ulasan
                                     </a>
                                 <?php endif; ?>
@@ -78,11 +78,11 @@ $kueri_pesanan = mysqli_query($koneksi, "SELECT * FROM pesanan WHERE id_pengguna
                     $id_pesanan = $baris['id'];
                     $kueri_rincian = mysqli_query($koneksi, "SELECT d.*, p.nama_produk FROM detail_pesanan d JOIN produk p ON d.id_produk = p.id WHERE d.id_pesanan = $id_pesanan");
                     ?>
-                    <div class="bg-slate-50/60 dark:bg-slate-950/40 px-5 py-3 border-t border-slate-150 dark:border-slate-800 flex flex-wrap gap-2 items-center">
+                    <div class="bg-slate-50/60 dark:bg-slate-950/40 px-5 py-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap gap-2 items-center">
                         <span class="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider mr-1">Rincian Item:</span>
                         <?php while($data_rincian = mysqli_fetch_assoc($kueri_rincian)): ?>
-                            <span class="text-[11px] sm:text-xs font-semibold text-slate-650 dark:text-slate-300 bg-white dark:bg-slate-900 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
-                                <?= $data_rincian['nama_produk']; ?> <span class="text-lime-650 dark:text-lime-400 font-bold ml-1">x<?= $data_rincian['jumlah']; ?></span>
+                            <span class="text-[11px] sm:text-xs font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-900 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <?= $data_rincian['nama_produk']; ?> <span class="text-lime-600 dark:text-lime-400 font-bold ml-1">x<?= $data_rincian['jumlah']; ?></span>
                             </span>
                         <?php endwhile; ?>
                     </div>
@@ -94,11 +94,11 @@ $kueri_pesanan = mysqli_query($koneksi, "SELECT * FROM pesanan WHERE id_pengguna
             
             <div class="py-20 sm:py-28 text-center bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 shadow-sm">
                 <div class="max-w-sm mx-auto px-4">
-                    <div class="w-16 h-16 bg-slate-50 dark:bg-slate-950 rounded-full flex items-center justify-center mx-auto mb-5 text-slate-350 dark:text-slate-700 text-3xl">
+                    <div class="w-16 h-16 bg-slate-50 dark:bg-slate-950 rounded-full flex items-center justify-center mx-auto mb-5 text-slate-300 dark:text-slate-700 text-3xl">
                         <i class="fa-solid fa-receipt"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Belum Ada Transaksi</h3>
-                    <p class="text-slate-500 dark:text-slate-450 mb-6 text-xs sm:text-sm leading-relaxed">Anda belum pernah melakukan pesanan di HandMadura. Yuk, mulai koleksi pertamamu hari ini!</p>
+                    <h3 class="text-xl font-bold text-slate-800 dark:bg-slate-900 dark:text-slate-200 mb-2">Belum Ada Transaksi</h3>
+                    <p class="text-slate-500 dark:text-slate-400 mb-6 text-xs sm:text-sm leading-relaxed">Anda belum pernah melakukan pesanan di HandMadura. Yuk, mulai koleksi pertamamu hari ini!</p>
                 </div>
             </div>
             

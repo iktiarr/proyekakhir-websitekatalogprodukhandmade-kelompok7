@@ -94,25 +94,25 @@ if (isset($_GET['delete']) && $id_testimoni > 0) {
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:sticky md:h-screen md:top-0 overflow-y-auto flex-shrink-0">
         <div class="p-5 pb-3 flex items-center justify-between">
             <div>
-                <a href="../index.php" class="text-xl font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block hover:scale-105 transition-transform">
+                <a href="../index.php" class="text-xl font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block transition-transform">
                     Hand<span class="text-lime-600">Madura.</span>
                 </a>
                 <p class="text-[9px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold mt-0.5">Admin Panel</p>
             </div>
-            <button id="tombol-tutup-sidebar" class="md:hidden p-2 rounded-xl text-slate-450 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Tutup Sidebar">
+            <button id="tombol-tutup-sidebar" class="md:hidden p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Tutup Sidebar">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
         
         <nav class="flex-1 px-3 space-y-1">
             <a href="index.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Dasbor
+                <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center"></i> Dasbor
             </a>
             <a href="produk.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-box-open mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Produk
+                <i class="fa-solid fa-box-open mr-2.5 w-4 text-center"></i> Produk
             </a>
             <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pembayaran
+                <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center"></i> Pembayaran
                 <?php if ($pembayaran_tertunda > 0): ?>
                     <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pembayaran_tertunda; ?></span>
                 <?php endif; ?>
@@ -124,13 +124,13 @@ if (isset($_GET['delete']) && $id_testimoni > 0) {
                 <?php endif; ?>
             </a>
             <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-users mr-2.5 w-4 text-center group-hover:scale-110 transition-transform"></i> Pengguna
+                <i class="fa-solid fa-users mr-2.5 w-4 text-center"></i> Pengguna
             </a>
         </nav>
         
         <div class="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
-            <a href="../keluar.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl font-bold text-sm transition-colors group flex-grow">
-                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center group-hover:-translate-x-0.5 transition-transform"></i> Keluar
+            <a href="../keluar.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl font-bold text-sm transition-colors group flex-grow">
+                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center transition-transform"></i> Keluar
             </a>
             <button id="tombol-tema" class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Ubah Tema">
                 <i id="ikon-tombol-tema" class="fa-solid fa-moon text-base"></i>
@@ -159,7 +159,7 @@ if (isset($_GET['delete']) && $id_testimoni > 0) {
             <a href="?status=pending" class="px-3.5 py-1.5 rounded-md text-xs font-bold transition-all duration-200 flex items-center <?= $status === 'pending' ? 'bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-350 hover:bg-slate-200/50 dark:hover:bg-slate-800/40'; ?>">
                 Pending
                 <?php if ($testimoni_tertunda > 0): ?>
-                    <span class="ml-1.5 bg-amber-100 dark:bg-amber-955 text-amber-700 dark:text-amber-400 text-[9px] px-1 py-0.5 rounded-md"><?= $testimoni_tertunda; ?></span>
+                    <span class="ml-1.5 bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-400 text-[9px] px-1 py-0.5 rounded-md"><?= $testimoni_tertunda; ?></span>
                 <?php endif; ?>
             </a>
             <a href="?status=approved" class="px-3.5 py-1.5 rounded-md text-xs font-bold transition-all duration-200 <?= $status === 'approved' ? 'bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-350 hover:bg-slate-200/50 dark:hover:bg-slate-800/40'; ?>">
@@ -196,17 +196,17 @@ if (isset($_GET['delete']) && $id_testimoni > 0) {
                     $kelas_lencana = '';
                     $kelas_ikon = '';
                     if ($testimoni['status'] === 'approved') {
-                        $kelas_lencana = 'bg-lime-50 dark:bg-lime-955/20 text-lime-700 dark:text-lime-400 border-lime-200 dark:border-lime-900/30';
+                        $kelas_lencana = 'bg-lime-50 dark:bg-lime-900/20 text-lime-700 dark:text-lime-400 border-lime-200 dark:border-lime-900/30';
                         $kelas_ikon = 'fa-check';
                     } elseif ($testimoni['status'] === 'rejected') {
-                        $kelas_lencana = 'bg-red-50 dark:bg-red-955/20 text-red-655 dark:text-red-400 border-red-200 dark:border-red-900/30';
+                        $kelas_lencana = 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/30';
                         $kelas_ikon = 'fa-xmark';
                     } else {
-                        $kelas_lencana = 'bg-amber-50 dark:bg-amber-955/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/30';
+                        $kelas_lencana = 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/30';
                         $kelas_ikon = 'fa-clock';
                     }
                 ?>
-                    <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col group">
+                    <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300 flex flex-col group">
                         
                         <div class="flex justify-between items-start mb-3.5">
                             <div class="flex items-center gap-2.5">
@@ -234,21 +234,21 @@ if (isset($_GET['delete']) && $id_testimoni > 0) {
                         </p>
 
                         <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mt-auto">
-                            <span class="text-[10px] font-medium text-slate-400 dark:text-slate-550">
+                            <span class="text-[10px] font-medium text-slate-400 dark:text-slate-500">
                                 <i class="fa-regular fa-calendar mr-1"></i> <?= date('d M Y, H:i', strtotime($testimoni['tanggal_dibuat'])); ?>
                             </span>
                             
                             <div class="flex flex-wrap gap-1.5">
                                 <?php if ($testimoni['status'] === 'pending'): ?>
-                                    <a href="?approve&id=<?= $testimoni['id']; ?>" class="w-7 h-7 flex items-center justify-center bg-lime-50 dark:bg-lime-955/40 text-lime-600 dark:text-lime-400 rounded-xl hover:bg-lime-600 hover:text-white transition-colors border border-transparent hover:border-lime-700" title="Setujui">
+                                    <a href="?approve&id=<?= $testimoni['id']; ?>" class="w-7 h-7 flex items-center justify-center bg-lime-50 dark:bg-lime-900/40 text-lime-600 dark:text-lime-400 rounded-xl hover:bg-lime-600 hover:text-white transition-colors border border-transparent hover:border-lime-700" title="Setujui">
                                         <i class="fa-solid fa-check text-xs"></i>
                                     </a>
-                                    <a href="?reject&id=<?= $testimoni['id']; ?>" class="w-7 h-7 flex items-center justify-center bg-red-50 dark:bg-red-955/40 text-red-550 dark:text-red-400 rounded-xl hover:bg-red-500 hover:text-white transition-colors border border-transparent hover:border-red-600" title="Tolak">
+                                    <a href="?reject&id=<?= $testimoni['id']; ?>" class="w-7 h-7 flex items-center justify-center bg-red-50 dark:bg-red-900/40 text-red-500 dark:text-red-400 rounded-xl hover:bg-red-500 hover:text-white transition-colors border border-transparent hover:border-red-600" title="Tolak">
                                         <i class="fa-solid fa-xmark text-xs"></i>
                                     </a>
                                 <?php endif; ?>
                                 
-                                <a href="?delete&id=<?= $testimoni['id']; ?>" onclick="return confirm('Yakin ingin menghapus testimonial ini permanen?')" class="w-7 h-7 flex items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-450 dark:text-slate-500 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300 transition-colors border border-transparent" title="Hapus Permanen">
+                                <a href="?delete&id=<?= $testimoni['id']; ?>" onclick="return confirm('Yakin ingin menghapus testimonial ini permanen?')" class="w-7 h-7 flex items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-400 dark:text-slate-500 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300 transition-colors border border-transparent" title="Hapus Permanen">
                                     <i class="fa-solid fa-trash-can text-xs"></i>
                                 </a>
                             </div>

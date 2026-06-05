@@ -16,7 +16,7 @@
           </h1>
         </div>
         
-        <p class="text-sm sm:text-base text-slate-650 dark:text-slate-400 leading-relaxed max-w-lg mx-auto lg:mx-0">
+        <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-lg mx-auto lg:mx-0">
           Jelajahi keindahan Batik Tulis Gentongan yang legendaris, ukiran Karduluk yang presisi, hingga anyaman pandan serat alam karya maestro pengrajin terbaik di empat kabupaten Madura.
         </p>
         
@@ -26,7 +26,7 @@
             Lihat Katalog Madura
             <i class="fa-solid fa-arrow-right ml-1.5"></i>
           </a>
-          <a href="#tentang" class="inline-flex items-center justify-center bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-7 py-3 rounded-xl font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-750 hover:text-lime-600 dark:hover:text-lime-400">
+          <a href="#tentang" class="inline-flex items-center justify-center bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-7 py-3 rounded-xl font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-lime-600 dark:hover:text-lime-400">
             Kisah Pengrajin
           </a>
         </div>

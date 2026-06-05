@@ -113,7 +113,7 @@ if (!isset($awalan)) {
                     <?php else: ?>
                         
                         <!-- Menu Pengunjung Non-Login -->
-                        <a href="<?= $awalan; ?>masuk.php" class="hidden sm:inline-block text-slate-655 dark:text-slate-300 hover:text-lime-600 dark:hover:text-lime-400 font-bold text-sm">Masuk</a>
+                        <a href="<?= $awalan; ?>masuk.php" class="hidden sm:inline-block text-slate-600 dark:text-slate-350 hover:text-lime-600 dark:hover:text-lime-400 font-bold text-sm">Masuk</a>
                         <a href="<?= $awalan; ?>daftar.php" class="hidden sm:inline-block bg-lime-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-lime-700">Daftar</a>
                         
                     <?php endif; ?>
@@ -135,18 +135,18 @@ if (!isset($awalan)) {
                         <i class="fa-solid fa-user-shield"></i> Dasbor Admin
                     </a>
                 <?php else: ?>
-                    <a href="<?= $awalan; ?>index.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-55 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Beranda</a>
-                    <a href="<?= $awalan; ?>halaman/katalog.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-55 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Katalog</a>
+                    <a href="<?= $awalan; ?>index.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Beranda</a>
+                    <a href="<?= $awalan; ?>halaman/katalog.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Katalog</a>
                     <?php if ($sudah_masuk): ?>
-                        <a href="<?= $awalan; ?>halaman/riwayat.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-55 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Riwayat Transaksi</a>
-                        <a href="<?= $awalan; ?>halaman/profil.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-55 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Profil Saya</a>
+                        <a href="<?= $awalan; ?>halaman/riwayat.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Riwayat Transaksi</a>
+                        <a href="<?= $awalan; ?>halaman/profil.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Profil Saya</a>
                     <?php endif; ?>
                 <?php endif; ?>
                 
                 <?php if ($sudah_masuk): ?>
                     <!-- Profil Pengguna Seluler -->
                     <div class="pt-4 mt-2 border-t border-slate-200 dark:border-slate-800 sm:hidden">
-                        <a href="<?= $awalan; ?>halaman/profil.php" class="flex items-center px-3 py-2 hover:bg-slate-55 dark:hover:bg-slate-800/50 rounded-xl">
+                        <a href="<?= $awalan; ?>halaman/profil.php" class="flex items-center px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl">
                             <div class="flex-shrink-0 bg-lime-100 dark:bg-lime-950 text-lime-600 dark:text-lime-400 w-10 h-10 rounded-full flex items-center justify-center font-bold">
                                 <?= strtoupper(substr($nama_depan_pengguna, 0, 1)); ?>
                             </div>
@@ -159,7 +159,7 @@ if (!isset($awalan)) {
                 <?php else: ?>
                     <!-- Tombol Masuk/Daftar Seluler -->
                     <div class="pt-4 mt-2 border-t border-slate-200 dark:border-slate-800 flex flex-col space-y-2 sm:hidden">
-                        <a href="<?= $awalan; ?>masuk.php" class="w-full text-center py-2.5 rounded-xl text-base font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-55 dark:hover:bg-slate-800/50">Masuk</a>
+                        <a href="<?= $awalan; ?>masuk.php" class="w-full text-center py-2.5 rounded-xl text-base font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/50">Masuk</a>
                         <a href="<?= $awalan; ?>daftar.php" class="w-full text-center bg-lime-600 hover:bg-lime-700 text-white py-2.5 rounded-xl text-base font-bold">Daftar</a>
                     </div>
                 <?php endif; ?>

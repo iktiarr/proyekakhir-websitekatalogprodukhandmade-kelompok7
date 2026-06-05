@@ -1,4 +1,4 @@
-<section id="pricing" class="py-16 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+<section id="pricing" class="py-16 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     
     <!-- Header -->
@@ -15,11 +15,11 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch">
       
       <!-- Custom Basic -->
-      <div class="bg-slate-50 dark:bg-slate-950 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+      <div class="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
         <div>
           <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Custom Basic</h3>
-            <span class="p-2 bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-555 rounded-xl text-base">
+            <span class="p-2 bg-slate-50 dark:bg-slate-950 text-slate-400 dark:text-slate-400 rounded-xl text-base">
               <i class="fa-solid fa-seedling text-lime-600"></i>
             </span>
           </div>
@@ -58,14 +58,14 @@
         </div>
         
         <div class="mt-8">
-          <a href="https://wa.me/6285755064321?text=Halo%20HandMadura%2C%20saya%20ingin%20memesan%20layanan%20Custom%20Basic%20(Rp%2050.000)%2520untuk%20kebutuhan%20kerajinan%20saya." target="_blank" class="block w-full text-center bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-lime-600 hover:text-white hover:border-lime-600">
+          <a href="https://wa.me/6285143875550?text=Halo%20HandMadura%2C%20saya%20ingin%20memesan%20layanan%20Custom%20Basic%20(Rp%2050.000)%2520untuk%20kebutuhan%20kerajinan%20saya." target="_blank" class="block w-full text-center bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-slate-600 hover:text-white hover:border-lime-600">
             Pesan Custom Basic
           </a>
         </div>
       </div>
 
       <!-- Custom Standard -->
-      <div class="bg-slate-50 dark:bg-slate-950 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between relative">
+      <div class="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between relative">
         <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-lime-600 text-white text-[9px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
           PALING POPULER
         </div>
@@ -73,7 +73,7 @@
         <div>
           <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Custom Standard</h3>
-            <span class="p-2 bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-555 rounded-xl text-base">
+            <span class="p-2 bg-slate-50 dark:bg-slate-950 text-slate-400 dark:text-slate-400 rounded-xl text-base">
               <i class="fa-solid fa-basket-shopping text-lime-600"></i>
             </span>
           </div>
@@ -116,18 +116,18 @@
         </div>
         
         <div class="mt-8">
-          <a href="https://wa.me/6285755064321?text=Halo%20HandMadura%2C%20saya%20ingin%20memesan%20layanan%20Custom%20Standard%20(Rp%20100.000)%2520untuk%20kebutuhan%20kerajinan%20saya." target="_blank" class="block w-full text-center bg-lime-600 text-white py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-lime-700">
+          <a href="https://wa.me/6285143875550?text=Halo%20HandMadura%2C%20saya%20ingin%20memesan%20layanan%20Custom%20Standard%20(Rp%20100.000)%2520untuk%20kebutuhan%20kerajinan%20saya." target="_blank" class="block w-full text-center bg-lime-600 text-white py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-lime-700">
             Pesan Custom Standard
           </a>
         </div>
       </div>
 
       <!-- Custom Premium -->
-      <div class="bg-slate-50 dark:bg-slate-950 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+      <div class="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
         <div>
           <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Custom Premium</h3>
-            <span class="p-2 bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-555 rounded-xl text-base">
+            <span class="p-2 bg-slate-50 dark:bg-slate-950 text-slate-400 dark:text-slate-400 rounded-xl text-base">
               <i class="fa-solid fa-crown text-lime-600"></i>
             </span>
           </div>
@@ -145,7 +145,7 @@
           
           <div class="h-px bg-slate-200 dark:bg-slate-800 w-full mb-6"></div>
           
-          <ul class="space-y-3.5 text-xs sm:text-sm text-slate-650 dark:text-slate-400">
+          <ul class="space-y-3.5 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
             <li class="flex items-center gap-2.5">
               <i class="fa-solid fa-circle-check text-lime-600 text-sm"></i>
               <span>Kustom relief kayu jati mini atau kustom pola batik tulis eksklusif</span>
@@ -170,7 +170,7 @@
         </div>
         
         <div class="mt-8">
-          <a href="https://wa.me/6285755064321?text=Halo%20HandMadura%2C%20saya%20ingin%20memesan%20layanan%20Custom%20Premium%20(Rp%20200.000)%2520untuk%20kebutuhan%20kerajinan%20saya." target="_blank" class="block w-full text-center bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-lime-600 hover:text-white hover:border-lime-600">
+          <a href="https://wa.me/6285143875550?text=Halo%20HandMadura%2C%20saya%20ingin%20memesan%20layanan%20Custom%20Premium%20(Rp%20200.000)%2520untuk%20kebutuhan%20kerajinan%20saya." target="_blank" class="block w-full text-center bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-amber-600 hover:text-white hover:border-lime-600">
             Pesan Custom Premium
           </a>
         </div>

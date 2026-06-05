@@ -27,7 +27,7 @@
             <ul class="space-y-3.5 text-slate-500 dark:text-slate-400 text-sm">
               <li>
                 <a href="mailto:info@handmadura.com" target="_blank" class="flex items-center hover:text-lime-600 dark:hover:text-lime-400 w-fit cursor-pointer group">
-                  <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-3 text-slate-450 dark:text-slate-500 group-hover:bg-lime-50 dark:group-hover:bg-lime-950/30 group-hover:text-lime-600 dark:group-hover:text-lime-400">
+                  <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-3 text-slate-400 dark:text-slate-500 group-hover:bg-lime-50 dark:group-hover:bg-lime-950/30 group-hover:text-lime-600 dark:group-hover:text-lime-400">
                     <i class="fa-solid fa-envelope"></i>
                   </div>
                   info@handmadura.com
@@ -35,7 +35,7 @@
               </li>
               <li>
                 <a href="https://wa.me/6281938041535" target="_blank" class="flex items-center hover:text-lime-600 dark:hover:text-lime-400 w-fit cursor-pointer group">
-                  <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-3 text-slate-450 dark:text-slate-500 group-hover:bg-lime-50 dark:group-hover:bg-lime-950/30 group-hover:text-lime-600 dark:group-hover:text-lime-400">
+                  <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-3 text-slate-400 dark:text-slate-500 group-hover:bg-lime-50 dark:group-hover:bg-lime-950/30 group-hover:text-lime-600 dark:group-hover:text-lime-400">
                     <i class="fa-brands fa-whatsapp text-lg"></i>
                   </div>
                   +62 819 3804 1535

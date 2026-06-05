@@ -47,7 +47,7 @@ if (isset($_POST['tambah_keranjang'])) {
                     <img 
                         src="<?= $data_produk['gambar']; ?>" 
                         alt="<?= $data_produk['nama_produk']; ?>" 
-                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        class="w-full h-full object-cover transition-transform duration-700"
                     >
                     <div class="absolute top-4 left-4 flex gap-2">
                         <span class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-3 py-1.5 rounded-xl text-[10px] font-bold text-slate-700 dark:text-slate-200 shadow-sm border border-slate-200 dark:border-slate-800 uppercase tracking-widest">
@@ -72,15 +72,15 @@ if (isset($_POST['tambah_keranjang'])) {
                     <span class="text-2xl font-extrabold text-lime-600 dark:text-lime-400">
                         Rp <?= number_format($data_produk['harga'], 0, ',', '.'); ?>
                     </span>
-                    <div class="h-4 w-px bg-slate-200 dark:bg-slate-850"></div>
-                    <span class="text-xs sm:text-sm text-slate-500 dark:text-slate-450 font-medium">
+                    <div class="h-4 w-px bg-slate-200 dark:bg-slate-800"></div>
+                    <span class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
                         Stok Tersedia: <span class="text-slate-800 dark:text-slate-200 font-bold"><?= $data_produk['stok']; ?></span> unit
                     </span>
                 </div>
 
-                <div class="bg-slate-50 dark:bg-slate-950/60 rounded-xl p-5 mb-6 border border-slate-200/60 dark:border-slate-850">
+                <div class="bg-slate-50 dark:bg-slate-950/20 rounded-xl p-5 mb-6 border border-slate-200/60 dark:border-slate-800">
                     <h3 class="text-xs font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-widest mb-2.5">Deskripsi Kerajinan</h3>
-                    <p class="text-slate-650 dark:text-slate-350 leading-relaxed text-xs sm:text-sm">
+                    <p class="text-slate-600 dark:text-slate-350 leading-relaxed text-xs sm:text-sm">
                         <?= nl2br($data_produk['deskripsi']); ?>
                     </p>
                 </div>
@@ -88,21 +88,21 @@ if (isset($_POST['tambah_keranjang'])) {
                 <form action="" method="POST" class="space-y-5">
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-widest">Pilih Jumlah</label>
-                        <div class="inline-flex items-center border border-slate-250 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 p-1 shadow-sm">
-                            <button type="button" onclick="ubahJumlah(-1)" class="w-9 h-9 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg transition-colors text-slate-450 dark:text-slate-500 cursor-pointer">
+                        <div class="inline-flex items-center border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 p-1 shadow-sm">
+                            <button type="button" onclick="ubahJumlah(-1)" class="w-9 h-9 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg transition-colors text-slate-400 dark:text-slate-500 cursor-pointer">
                                 <i class="fa-solid fa-minus text-xs"></i>
                             </button>
                             
-                            <input type="number" name="jumlah" id="masukanJumlah" value="1" min="1" max="<?= $data_produk['stok']; ?>" class="w-12 text-center font-extrabold text-slate-800 dark:text-slate-255 bg-transparent border-none focus:ring-0 outline-none p-0 text-sm">
+                            <input type="number" name="jumlah" id="masukanJumlah" value="1" min="1" max="<?= $data_produk['stok']; ?>" class="w-12 text-center font-extrabold text-slate-800 dark:text-slate-200 bg-transparent border-none focus:ring-0 outline-none p-0 text-sm">
                             
-                            <button type="button" onclick="ubahJumlah(1)" class="w-9 h-9 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg transition-colors text-slate-450 dark:text-slate-500 cursor-pointer">
+                            <button type="button" onclick="ubahJumlah(1)" class="w-9 h-9 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg transition-colors text-slate-400 dark:text-slate-500 cursor-pointer">
                                 <i class="fa-solid fa-plus text-xs"></i>
                             </button>
                         </div>
                     </div>
 
-                    <button type="submit" name="tambah_keranjang" class="group w-full sm:w-auto inline-flex bg-lime-600 text-white py-3.5 px-8 rounded-xl font-bold text-sm hover:bg-lime-700 hover:shadow-lg hover:shadow-lime-200/40 hover:-translate-y-0.5 transition-all duration-300 items-center justify-center cursor-pointer border-none">
-                        <i class="fa-solid fa-cart-plus mr-2.5 group-hover:scale-110 transition-transform"></i> Tambahkan Ke Keranjang
+                    <button type="submit" name="tambah_keranjang" class="group w-full sm:w-auto inline-flex bg-lime-600 text-white py-3.5 px-8 rounded-xl font-bold text-sm hover:bg-lime-700 transition-all duration-300 items-center justify-center cursor-pointer border-none">
+                        <i class="fa-solid fa-cart-plus mr-2.5"></i> Tambahkan Ke Keranjang
                     </button>
                 </form>                
             </div>
