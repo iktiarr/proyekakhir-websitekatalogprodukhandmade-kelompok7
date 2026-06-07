@@ -37,10 +37,14 @@ if (isset($_POST['simpan_profil'])) {
     $konfirmasi_sandi = $_POST['konfirmasi_password'];
 
     // Validasi server-side
-    if (empty($nama) || empty($email)) {
-        $galat = "Nama Lengkap dan Email tidak boleh kosong!";
+    if (empty($nama) || empty($email) || empty($no_telp)) {
+        $galat = "Nama Lengkap, Email, dan Nomor Telepon tidak boleh kosong!";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $galat = "Format email tidak valid!";
+    } elseif (strlen($no_telp) < 12) {
+        $galat = "Nomor Telepon/WhatsApp minimal harus terdiri dari 12 digit!";
+    } elseif (!preg_match("/^[0-9]+$/", $no_telp)) {
+        $galat = "Nomor Telepon/WhatsApp hanya boleh berisi angka!";
     } else {
         // Periksa apakah email sudah digunakan oleh pengguna lain
         $periksa_email = kueri("SELECT id FROM pengguna WHERE email = ? AND id != ?", [$email, $id_pengguna]);
@@ -141,7 +145,7 @@ if (isset($_POST['simpan_profil'])) {
 
                 <div>
                     <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Nomor Telepon / WhatsApp</label>
-                    <input type="tel" name="no_telp" value="<?= htmlspecialchars($data_pengguna['no_telp'] ?? ''); ?>" class="w-full px-4 py-2.5 bg-white rounded-xl border border-slate-200 outline-none text-sm text-slate-800 placeholder-slate-400" placeholder="Contoh: 08123456789">
+                    <input type="tel" name="no_telp" value="<?= htmlspecialchars($data_pengguna['no_telp'] ?? ''); ?>" required minlength="12" pattern="[0-9]{12,}" title="Nomor telepon minimal harus terdiri dari 12 digit angka" class="w-full px-4 py-2.5 bg-white rounded-xl border border-slate-200 outline-none text-sm text-slate-800 placeholder-slate-400" placeholder="Contoh: 081234567890" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
 
                 <div>

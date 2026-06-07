@@ -11,14 +11,20 @@ $galat = '';
 
 if (isset($_POST['daftar'])) {
     $nama = $_POST['nama'];
-    $email = $_POST['email'];
+    $email = $_POST[' '];
     $alamat = $_POST['alamat'];
     $no_telp = $_POST['no_telp'];
     $kata_sandi = $_POST['password'];
     $konfirmasi = $_POST['konfirmasi_password'];
 
-    if ($kata_sandi !== $konfirmasi) {
+    if (empty($nama) || empty($email) || empty($no_telp) || empty($alamat) || empty($kata_sandi)) {
+        $galat = "Semua kolom wajib diisi!";
+    } elseif ($kata_sandi !== $konfirmasi) {
         $galat = "Konfirmasi password tidak cocok!";
+    } elseif (strlen($no_telp) < 12) {
+        $galat = "Nomor telepon minimal harus terdiri dari 12 digit!";
+    } elseif (!preg_match("/^[0-9]+$/", $no_telp)) {
+        $galat = "Nomor telepon hanya boleh berisi angka!";
     } else {
         $periksa = kueri("SELECT id FROM pengguna WHERE email = ?", [$email]);
         if ($periksa && mysqli_num_rows($periksa) > 0) {
@@ -76,7 +82,7 @@ if (isset($_POST['daftar'])) {
 
             <div>
                 <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Nomor Telepon</label>
-                <input type="tel" name="no_telp" required class="w-full px-4 py-3 bg-white rounded-xl border border-slate-200 outline-none text-sm text-slate-800 placeholder-slate-400" placeholder="Contoh: 08123456789">
+                <input type="tel" name="no_telp" required minlength="12" pattern="[0-9]{12,}" title="Nomor telepon minimal harus terdiri dari 12 digit angka" class="w-full px-4 py-3 bg-white rounded-xl border border-slate-200 outline-none text-sm text-slate-800 placeholder-slate-400" placeholder="Contoh: 081234567890" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             </div>
 
             <div>

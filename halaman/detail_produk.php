@@ -95,7 +95,7 @@ if (isset($_POST['tambah_keranjang'])) {
                             
                             <input type="number" name="jumlah" id="masukanJumlah" value="1" min="1" max="<?= $data_produk['stok']; ?>" class="w-12 text-center font-extrabold text-slate-800 dark:text-slate-200 bg-transparent border-none focus:ring-0 outline-none p-0 text-sm">
                             
-                            <button type="button" onclick="ubahJumlah(1)" class="w-9 h-9 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg transition-colors text-slate-400 dark:text-slate-500 cursor-pointer">
+                            <button type="button" onclick="ubahJumlah(1)" class="w-9 h-9 flex items-center justify-center bg-white hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-lime-600 dark:hover:text-lime-400 rounded-lg transition-colors text-slate-400 dark:text-slate-500 cursor-pointer">
                                 <i class="fa-solid fa-plus text-xs"></i>
                             </button>
                         </div>

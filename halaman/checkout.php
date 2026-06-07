@@ -43,15 +43,22 @@ while ($baris = mysqli_fetch_assoc($kueri_keranjang)) {
 }
 
 if (isset($_POST['buat_pesanan'])) {
-    $alamat_lengkap = $_POST['alamat'];
-    $no_telepon = $_POST['no_telp'];
-    $alamat = $alamat_lengkap . " | Telp: " . $no_telepon;
+    $alamat_lengkap = trim($_POST['alamat']);
+    $no_telepon = trim($_POST['no_telp']);
     $metode_pembayaran = $_POST['metode_pembayaran'];
 
-    mysqli_begin_transaction($koneksi);
+    if (empty($alamat_lengkap) || empty($no_telepon)) {
+        $galat = "Alamat dan Nomor Telepon wajib diisi!";
+    } elseif (strlen($no_telepon) < 12) {
+        $galat = "Nomor telepon minimal harus terdiri dari 12 digit!";
+    } elseif (!preg_match("/^[0-9]+$/", $no_telepon)) {
+        $galat = "Nomor telepon hanya boleh berisi angka!";
+    } else {
+        $alamat = $alamat_lengkap . " | Telp: " . $no_telepon;
+        mysqli_begin_transaction($koneksi);
 
-    try {
-        $berhasil_pesan = kueri("INSERT INTO pesanan (id_pengguna, total_harga, status, alamat, metode_pembayaran) VALUES (?, ?, 'menunggu', ?, ?)", [$id_pengguna, $total_harga, $alamat, $metode_pembayaran]);
+        try {
+            $berhasil_pesan = kueri("INSERT INTO pesanan (id_pengguna, total_harga, status, alamat, metode_pembayaran) VALUES (?, ?, 'menunggu', ?, ?)", [$id_pengguna, $total_harga, $alamat, $metode_pembayaran]);
         $id_pesanan = mysqli_insert_id($koneksi);
         
         $nama_pembeli = $_SESSION['nama'];
@@ -82,13 +89,14 @@ if (isset($_POST['buat_pesanan'])) {
             kueri("DELETE FROM keranjang WHERE id_pengguna = ? AND id IN ($placeholders_dibayar)", $params_dibayar);
         }
 
-        mysqli_commit($koneksi);
-        
-        header("Location: bayar.php?id=$id_pesanan");
-        exit();
-    } catch (Exception $e) {
-        mysqli_rollback($koneksi);
-        $galat = "Terjadi kesalahan: " . $e->getMessage();
+            mysqli_commit($koneksi);
+            
+            header("Location: bayar.php?id=$id_pesanan");
+            exit();
+        } catch (Exception $e) {
+            mysqli_rollback($koneksi);
+            $galat = "Terjadi kesalahan: " . $e->getMessage();
+        }
     }
 }
 ?>
@@ -130,7 +138,7 @@ if (isset($_POST['buat_pesanan'])) {
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Nomor Telepon</label>
-                            <input type="tel" name="no_telp" value="<?= $autofill_no_telp; ?>" required class="w-full px-4 py-3 bg-white rounded-xl border border-slate-200 outline-none text-sm text-slate-800 placeholder-slate-400">
+                            <input type="tel" name="no_telp" value="<?= htmlspecialchars($autofill_no_telp); ?>" required minlength="12" pattern="[0-9]{12,}" title="Nomor telepon minimal harus terdiri dari 12 digit angka" class="w-full px-4 py-3 bg-white rounded-xl border border-slate-200 outline-none text-sm text-slate-800 placeholder-slate-400" placeholder="Contoh: 081234567890" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Alamat Lengkap Tujuan</label>
