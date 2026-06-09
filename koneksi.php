@@ -1,15 +1,26 @@
 <?php
+
 $host = 'gateway01.ap-southeast-1.prod.aws.tidbcloud.com';
 $port = 4000;
 $user = 'o1gMRaidvREj2xW.root';
-$pass = 'S4eBrzT8gyBXQETx';
+$pass = 'DTSeLqd5xztVM0r1';
 $db   = 'uas_bersama';
 
 $koneksi = mysqli_init();
 
-mysqli_ssl_set($koneksi, NULL, NULL, NULL, NULL, NULL);
+mysqli_ssl_set($koneksi, null, null, null, null, null);
+mysqli_options($koneksi, MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, true);
 
-$berhasil_koneksi = mysqli_real_connect($koneksi, $host, $user, $pass, $db, $port, NULL, MYSQLI_CLIENT_SSL);
+$berhasil_koneksi = mysqli_real_connect(
+    $koneksi,
+    $host,
+    $user,
+    $pass,
+    $db,
+    $port,
+    null,
+    MYSQLI_CLIENT_SSL
+);
 
 if (!$berhasil_koneksi) {
     die("Koneksi Gagal: " . mysqli_connect_error());
@@ -17,7 +28,7 @@ if (!$berhasil_koneksi) {
 
 date_default_timezone_set('Asia/Jakarta');
 
-if (session_status() == PHP_SESSION_NONE) {
+if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 

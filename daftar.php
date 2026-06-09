@@ -11,7 +11,7 @@ $galat = '';
 
 if (isset($_POST['daftar'])) {
     $nama = $_POST['nama'];
-    $email = $_POST[' '];
+    $email = $_POST['email'];
     $alamat = $_POST['alamat'];
     $no_telp = $_POST['no_telp'];
     $kata_sandi = $_POST['password'];

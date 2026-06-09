@@ -120,6 +120,9 @@ if (isset($_GET['delete']) && $id_testimoni > 0) {
             <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
                 <i class="fa-solid fa-users mr-2.5 w-4 text-center"></i> Pengguna
             </a>
+            <a href="laporan.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
+                <i class="fa-solid fa-file-invoice mr-2.5 w-4 text-center"></i> Laporan
+            </a>
         </nav>
         
         <div class="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">

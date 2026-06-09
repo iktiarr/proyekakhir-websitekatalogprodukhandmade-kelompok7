@@ -65,8 +65,13 @@ $kueri_pesanan = kueri("SELECT * FROM pesanan WHERE id_pengguna = ? ORDER BY tan
                                         <i class="fa-solid fa-credit-card mr-1 text-[10px]"></i> Bayar Sekarang
                                     </a>
                                 <?php elseif ($baris['status'] === 'selesai'): ?>
-                                    <a href="tambah_ulasan.php" class="inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition-all duration-200 border-none cursor-pointer">
+                                    <a href="tambah_ulasan.php" class="inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition-all duration-200 border-none cursor-pointer mr-2">
                                         <i class="fa-solid fa-pen-to-square mr-1 text-[10px]"></i> Beri Ulasan
+                                    </a>
+                                <?php endif; ?>
+                                <?php if (in_array($baris['status'], ['dibayar', 'dikirim', 'selesai'])): ?>
+                                    <a href="cetak_struk.php?id=<?= $baris['id']; ?>" target="_blank" class="inline-flex items-center justify-center bg-slate-600 hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition-all duration-200 border-none cursor-pointer">
+                                        <i class="fa-solid fa-print mr-1 text-[10px]"></i> Cetak Struk
                                     </a>
                                 <?php endif; ?>
                             </div>
