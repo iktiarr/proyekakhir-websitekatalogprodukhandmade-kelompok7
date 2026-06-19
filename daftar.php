@@ -129,6 +129,7 @@ if (isset($_POST['daftar'])) {
 
 <!-- Script Pembantu Tampilkan/Sembunyikan Sandi -->
 <script>
+    // Menampilkan atau menyembunyikan teks kata sandi (password visibility toggle)
     function tampilkanSandi(sandiId, ikonId) {
         const masukan = document.getElementById(sandiId);
         const ikon = document.getElementById(ikonId);

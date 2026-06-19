@@ -1,4 +1,6 @@
 <?php
+// halaman/katalog.php: Halaman katalog produk lengkap bagi pembeli, menyediakan fitur cari produk serta filter kategori dan asal daerah kabupaten.
+
 $awalan = "../";
 include '../koneksi.php';
 
@@ -9,7 +11,7 @@ $pencarian = isset($_GET['cari']) ? trim($_GET['cari']) : '';
 $hasil_kategori = kueri("SELECT * FROM kategori");
 $hasil_daerah = kueri("SELECT * FROM daerah");
 
-$kondisi = [];
+$kondisi = ["p.stok > 0"];
 $params = [];
 if ($id_kategori > 0) {
     $kondisi[] = "p.id_kategori = ?";
@@ -112,7 +114,7 @@ $hasil_produk = kueri("SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p 
                     
                     <div class="relative w-full aspect-square md:h-52 overflow-hidden bg-slate-100 dark:bg-slate-800">
                         <img 
-                            src="<?= $baris['gambar']; ?>" 
+                            src="<?= dapatkan_jalur_gambar($baris['gambar']); ?>" 
                             alt="<?= $baris['nama_produk']; ?>" 
                             class="w-full h-full object-cover"
                         >

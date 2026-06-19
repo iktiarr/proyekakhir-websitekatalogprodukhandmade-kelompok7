@@ -1,4 +1,6 @@
 <?php
+// halaman/detail_produk.php: Halaman rincian detail produk, menampilkan detail deskripsi, kategori, daerah asal, sisa stok, serta form untuk menambahkan ke keranjang belanja.
+
 $awalan = "../";
 include '../koneksi.php';
 
@@ -11,18 +13,18 @@ $id_produk = (int)$_GET['id'];
 $kueri_produk = kueri("SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id WHERE p.id = ?", [$id_produk]);
 $data_produk = mysqli_fetch_assoc($kueri_produk);
 
-if (!$data_produk) {
+if (!$data_produk || $data_produk['stok'] <= 0) {
     header("Location: katalog.php");
     exit();
 }
 
 if (isset($_POST['tambah_keranjang'])) {
-    if (!isset($_SESSION['user_id'])) {
+    if (!isset($_SESSION['user']['id'])) {
         header("Location: ../masuk.php");
         exit();
     }
 
-    $id_pengguna = $_SESSION['user_id'];
+    $id_pengguna = $_SESSION['user']['id'];
     $jumlah = (int)$_POST['jumlah'];
     
     $cek_keranjang = kueri("SELECT * FROM keranjang WHERE id_pengguna = ? AND id_produk = ?", [$id_pengguna, $id_produk]);
@@ -45,7 +47,7 @@ if (isset($_POST['tambah_keranjang'])) {
             <div class="lg:w-5/12 w-full mb-8 lg:mb-0 max-w-md mx-auto lg:max-w-none">
                 <div class="relative rounded-xl overflow-hidden shadow-sm border border-slate-200/60 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 aspect-square group">
                     <img 
-                        src="<?= $data_produk['gambar']; ?>" 
+                        src="<?= dapatkan_jalur_gambar($data_produk['gambar']); ?>" 
                         alt="<?= $data_produk['nama_produk']; ?>" 
                         class="w-full h-full object-cover transition-transform duration-700"
                     >
@@ -112,6 +114,7 @@ if (isset($_POST['tambah_keranjang'])) {
 </div>
 
 <script>
+    // Menambah atau mengurangi kuantitas pesanan produk dengan batas minimum 1 dan maksimum stok tersedia
     function ubahJumlah(nilaiTambahan) {
         const masukan = document.getElementById('masukanJumlah');
         let nilai = parseInt(masukan.value) + nilaiTambahan;

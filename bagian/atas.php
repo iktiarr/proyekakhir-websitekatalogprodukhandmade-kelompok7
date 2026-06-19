@@ -7,18 +7,12 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
-$sudah_masuk = isset($_SESSION['user_id']);
-$adalah_admin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
-
-// Jika admin mengakses halaman frontend non-utama, alihkan ke dashboard admin
-if ($adalah_admin && basename($_SERVER['PHP_SELF']) !== 'index.php' && !str_contains($_SERVER['PHP_SELF'], 'admin/')) {
-    header("Location: " . ($awalan ?? '') . "admin/index.php");
-    exit();
-}
+$sudah_masuk = isset($_SESSION['user']['id']);
+$adalah_admin = isset($_SESSION['admin']['role']) && $_SESSION['admin']['role'] === 'admin';
 
 $nama_depan_pengguna = '';
-if ($sudah_masuk && isset($_SESSION['nama'])) {
-    $bagian_nama = explode(' ', trim($_SESSION['nama']));
+if ($sudah_masuk && isset($_SESSION['user']['nama'])) {
+    $bagian_nama = explode(' ', trim($_SESSION['user']['nama']));
     $nama_depan_pengguna = $bagian_nama[0];
 }
 
@@ -61,24 +55,18 @@ if (!isset($awalan)) {
                 
                 <!-- Logo Aplikasi -->
                 <div class="flex items-center flex-shrink-0">
-                    <a href="<?= $adalah_admin ? $awalan . 'admin/index.php' : $awalan . 'index.php'; ?>" class="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">
+                    <a href="<?= $awalan; ?>index.php" class="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">
                         Hand<span class="text-lime-600">Madura.</span>
                     </a>
                 </div>
                 
                 <!-- Menu Navigasi Desktop -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <?php if ($adalah_admin): ?>
-                        <a href="<?= $awalan; ?>admin/index.php" class="bg-lime-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-lime-700 flex items-center gap-2">
-                            <i class="fa-solid fa-user-shield text-xs"></i> Dasbor Admin
-                        </a>
-                    <?php else: ?>
-                        <a href="<?= $awalan; ?>index.php" class="text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400 font-semibold text-sm">Beranda</a>
-                        <a href="<?= $awalan; ?>halaman/katalog.php" class="text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400 font-semibold text-sm">Katalog</a>
-                        <?php if ($sudah_masuk): ?>
-                            <a href="<?= $awalan; ?>halaman/riwayat.php" class="text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400 font-semibold text-sm">Riwayat</a>
-                            <a href="<?= $awalan; ?>halaman/profil.php" class="text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400 font-semibold text-sm">Profil</a>
-                        <?php endif; ?>
+                    <a href="<?= $awalan; ?>index.php" class="text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400 font-semibold text-sm">Beranda</a>
+                    <a href="<?= $awalan; ?>halaman/katalog.php" class="text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400 font-semibold text-sm">Katalog</a>
+                    <?php if ($sudah_masuk): ?>
+                        <a href="<?= $awalan; ?>halaman/riwayat.php" class="text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400 font-semibold text-sm">Riwayat</a>
+                        <a href="<?= $awalan; ?>halaman/profil.php" class="text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400 font-semibold text-sm">Profil</a>
                     <?php endif; ?>
                 </div>
 
@@ -95,7 +83,7 @@ if (!isset($awalan)) {
                             Halo, <a href="<?= $awalan; ?>halaman/profil.php" class="font-bold text-slate-800 dark:text-slate-200 hover:text-lime-600 dark:hover:text-lime-400 ml-1"><?= $nama_depan_pengguna; ?></a>!
                         </div>
 
-                        <?php if (!$adalah_admin): ?>
+                        <?php if ($sudah_masuk): ?>
                         <!-- Icon Keranjang Belanja -->
                         <a href="<?= $awalan; ?>halaman/keranjang.php" class="relative text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
                             <i class="fa-solid fa-cart-shopping text-lg"></i>
@@ -130,17 +118,11 @@ if (!isset($awalan)) {
         <!-- Menu Seluler Dropdown -->
         <div id="menu-seluler" class="hidden md:hidden border-t border-slate-100 dark:border-slate-800/80 bg-white dark:bg-slate-900">
             <div class="px-4 pt-3 pb-4 space-y-2">
-                <?php if ($adalah_admin): ?>
-                    <a href="<?= $awalan; ?>admin/index.php" class="block bg-lime-600 text-white px-4 py-2.5 rounded-xl text-base font-bold hover:bg-lime-700 flex items-center gap-2">
-                        <i class="fa-solid fa-user-shield"></i> Dasbor Admin
-                    </a>
-                <?php else: ?>
-                    <a href="<?= $awalan; ?>index.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Beranda</a>
-                    <a href="<?= $awalan; ?>halaman/katalog.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Katalog</a>
-                    <?php if ($sudah_masuk): ?>
-                        <a href="<?= $awalan; ?>halaman/riwayat.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Riwayat Transaksi</a>
-                        <a href="<?= $awalan; ?>halaman/profil.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Profil Saya</a>
-                    <?php endif; ?>
+                <a href="<?= $awalan; ?>index.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Beranda</a>
+                <a href="<?= $awalan; ?>halaman/katalog.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Katalog</a>
+                <?php if ($sudah_masuk): ?>
+                    <a href="<?= $awalan; ?>halaman/riwayat.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Riwayat Transaksi</a>
+                    <a href="<?= $awalan; ?>halaman/profil.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Profil Saya</a>
                 <?php endif; ?>
                 
                 <?php if ($sudah_masuk): ?>

@@ -2,12 +2,12 @@
 $awalan = "../";
 include '../koneksi.php';
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user']['id'])) {
     header("Location: ../masuk.php");
     exit();
 }
 
-$id_pengguna = $_SESSION['user_id'];
+$id_pengguna = $_SESSION['user']['id'];
 $kueri_pesanan = kueri("SELECT * FROM pesanan WHERE id_pengguna = ? ORDER BY tanggal_pesanan DESC", [$id_pengguna]);
 ?>
 

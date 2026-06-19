@@ -7,7 +7,7 @@
             <h2 class="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-1">Apa Kata Kolektor?</h2>
             <p class="text-slate-500 dark:text-slate-400 text-sm max-w-xl mx-auto mb-5 leading-relaxed">Kepuasan Anda mengoleksi mahakarya kerajinan tradisional Madura adalah kebanggaan terbesar kami.</p>
             
-            <?php if (isset($_SESSION['user_id'])): ?>
+            <?php if (isset($_SESSION['user']['id'])): ?>
                 <!-- Tombol Berbagi Ulasan (Untuk User Terkoneksi) -->
                 <a href="<?= $awalan; ?>halaman/tambah_ulasan.php" class="inline-flex items-center gap-1.5 bg-lime-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-lime-700">
                     <i class="fa-solid fa-pen-to-square"></i> Bagikan Ulasan Anda
@@ -82,7 +82,7 @@
                 <h3 class="text-base font-bold text-slate-800 dark:text-slate-200 mb-1">Belum ada ulasan</h3>
                 <p class="text-slate-500 dark:text-slate-400 text-xs mb-4 px-4">Jadilah yang pertama untuk membagikan pengalaman Anda mengoleksi kerajinan khas Madura bersama kami.</p>
                 
-                <?php if (isset($_SESSION['user_id'])): ?>
+                <?php if (isset($_SESSION['user']['id'])): ?>
                     <a href="<?= $awalan; ?>halaman/tambah_ulasan.php" class="inline-flex items-center gap-1.5 bg-lime-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-lime-700">
                         <i class="fa-solid fa-pen"></i> Tulis Ulasan Pertama
                     </a>

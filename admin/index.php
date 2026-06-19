@@ -1,7 +1,9 @@
 <?php
+// admin/index.php: Halaman dasbor panel admin, menampilkan statistik toko, ringkasan transaksi, serta log aktivitas sistem terbaru.
+
 include '../koneksi.php';
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['admin']) || $_SESSION['admin']['role'] !== 'admin') {
     header("Location: ../masuk.php");
     exit();
 }
@@ -87,7 +89,7 @@ $pendapatan_total = mysqli_fetch_assoc(kueri("SELECT SUM(total_harga) AS total F
 
 
 
-$nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
+$nama_depan_admin = explode(' ', trim($_SESSION['admin']['nama']))[0];
 ?>
 
 <!doctype html>
@@ -102,6 +104,17 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        /* Mobile Sidebar Custom Transitions */
+        @media (max-width: 767px) {
+            #sidebar {
+                transform: translateX(-100%) !important;
+                transition: transform 0.3s ease-in-out !important;
+            }
+            #sidebar.active {
+                transform: translateX(0) !important;
+            }
+        }
     </style>
     <style type="text/tailwindcss">
         @import "tailwindcss";
@@ -118,8 +131,8 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col md:flex-row selection:bg-lime-200 selection:text-lime-900 transition-colors duration-300 min-h-screen">
     
     <!-- Header Seluler (Mobile Navbar) -->
-    <header class="md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 sticky top-0 z-40 flex items-center gap-3 w-full transition-colors duration-300">
-        <button id="tombol-menu-mobile" class="p-2 -ml-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors focus:outline-none flex items-center justify-center cursor-pointer">
+    <header class="md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-3 py-2.5 sticky top-0 z-40 flex items-center gap-3 w-full transition-colors duration-300">
+        <button id="tombol-menu-mobile" class="p-1.5 -ml-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors focus:outline-none flex items-center justify-center cursor-pointer">
             <i class="fa-solid fa-bars text-lg"></i>
         </button>
         <a href="../index.php" class="text-lg font-extrabold text-slate-800 dark:text-slate-200 tracking-tight">
@@ -127,60 +140,58 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
         </a>
     </header>
 
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:sticky md:h-screen md:top-0 overflow-y-auto flex-shrink-0">
-        <div class="p-5 pb-3 flex items-center justify-between">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-56 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 md:sticky md:h-screen md:top-0 overflow-y-auto flex-shrink-0 shadow-lg md:shadow-none">
+        <div class="p-3 pb-2 flex items-center justify-between">
             <div>
-                <a href="../index.php" class="text-xl font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block">
+                <a href="../index.php" class="text-lg font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block">
                     Hand<span class="text-lime-600">Madura.</span>
                 </a>
-                <p class="text-[9px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold mt-0.5">Admin Panel</p>
+                <p class="text-[8px] uppercase tracking-widest text-slate-400 dark:text-slate-550 font-bold mt-0.5">Admin Panel</p>
             </div>
-            <button id="tombol-tutup-sidebar" class="md:hidden p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Tutup Sidebar">
+            <button id="tombol-tutup-sidebar" class="md:hidden p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Tutup Sidebar">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
         
-        <nav class="flex-1 px-3 space-y-1">
-            <a href="index.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-xl font-bold text-sm transition-colors">
-                <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center"></i> Dasbor
+        <nav class="flex-1 px-2 space-y-0.5">
+            <a href="index.php" class="flex items-center px-2.5 py-1.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-xl font-bold text-xs transition-colors">
+                <i class="fa-solid fa-chart-pie mr-2 w-4 text-center"></i> Dasbor
             </a>
-            <a href="produk.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-box-open mr-2.5 w-4 text-center"></i> Produk
+            <a href="produk.php" class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
+                <i class="fa-solid fa-box-open mr-2 w-4 text-center"></i> Produk
             </a>
-            <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center"></i> Pembayaran
+            <a href="pembayaran.php" class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
+                <i class="fa-solid fa-credit-card mr-2 w-4 text-center"></i> Pembayaran
                 <?php if ($pembayaran_tertunda > 0): ?>
                     <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pembayaran_tertunda; ?></span>
                 <?php endif; ?>
             </a>
-            <a href="testimoni.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-comments mr-2.5 w-4 text-center"></i> Testimonial
+            <a href="testimoni.php" class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
+                <i class="fa-solid fa-comments mr-2 w-4 text-center"></i> Testimonial
                 <?php if ($testimoni_tertunda > 0): ?>
                     <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $testimoni_tertunda; ?></span>
                 <?php endif; ?>
             </a>
-            <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-users mr-2.5 w-4 text-center"></i> Pengguna
-            </a>
-            <a href="laporan.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-file-invoice mr-2.5 w-4 text-center"></i> Laporan
+            <a href="pengguna.php" class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
+                <i class="fa-solid fa-users mr-2 w-4 text-center"></i> Pengguna
             </a>
         </nav>
         
-        <div class="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
-            <a href="../keluar.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl font-bold text-sm transition-colors group flex-grow">
-                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center"></i> Keluar
+        <div class="p-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
+            <a href="../keluar.php?dari=admin" class="flex items-center px-2.5 py-1.5 text-slate-400 dark:text-slate-555 hover:text-red-655 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl font-bold text-xs transition-colors group flex-grow">
+                <i class="fa-solid fa-arrow-right-from-bracket mr-2 w-4 text-center"></i> Keluar
             </a>
-            <button id="tombol-tema" class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Ubah Tema">
+            <button id="tombol-tema" class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Ubah Tema">
                 <i id="ikon-tombol-tema" class="fa-solid fa-moon text-base"></i>
             </button>
         </div>
     </aside>
 
     <!-- Latar Buram Seluler (Backdrop Overlay) -->
-    <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden transition-opacity duration-300 opacity-0"></div>
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+    <div class="hidden opacity-100 pointer-events-auto"></div>
 
-    <main class="flex-grow p-4 sm:p-6 w-full max-w-7xl mx-auto overflow-x-hidden">
+    <main class="flex-grow p-4 sm:p-6 w-full max-w-6xl mx-auto overflow-x-hidden">
         
 
 
@@ -189,7 +200,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
             <!-- Total Pengguna -->
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
                 <div>
-                    <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Pengguna</p>
+                    <p class="text-slate-400 dark:text-slate-550 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Pengguna</p>
                     <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100"><?= $jumlah_pengguna; ?></h2>
                 </div>
                 <div class="w-8 h-8 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-400 flex-shrink-0">
@@ -200,7 +211,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
             <!-- Total Produk -->
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
                 <div>
-                    <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Produk</p>
+                    <p class="text-slate-400 dark:text-slate-550 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Produk</p>
                     <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100"><?= $jumlah_produk; ?></h2>
                 </div>
                 <div class="w-8 h-8 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-400 flex-shrink-0">
@@ -211,7 +222,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
             <!-- Total Admin -->
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
                 <div>
-                    <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Admin</p>
+                    <p class="text-slate-400 dark:text-slate-550 text-[9px] font-bold uppercase tracking-widest mb-0.5">Total Admin</p>
                     <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100"><?= $jumlah_admin; ?></h2>
                 </div>
                 <div class="w-8 h-8 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-400 flex-shrink-0">
@@ -222,7 +233,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
             <!-- Ulasan Pending -->
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
                 <div>
-                    <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-0.5">Ulasan Pending</p>
+                    <p class="text-slate-400 dark:text-slate-550 text-[9px] font-bold uppercase tracking-widest mb-0.5">Ulasan Pending</p>
                     <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100"><?= $testimoni_tertunda; ?></h2>
                 </div>
                 <div class="w-8 h-8 <?= $testimoni_tertunda > 0 ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400' : 'bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400'; ?> rounded-xl flex items-center justify-center flex-shrink-0">
@@ -237,7 +248,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                 <!-- Hari Ini -->
                 <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm">
                     <div class="flex items-center justify-between gap-2">
-                        <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest">Hari Ini</p>
+                        <p class="text-slate-400 dark:text-slate-550 text-[9px] font-bold uppercase tracking-widest">Hari Ini</p>
                         <span class="w-7 h-7 bg-lime-50 dark:bg-lime-900/40 rounded-lg flex items-center justify-center text-lime-600 dark:text-lime-400 text-[11px] font-bold">1H</span>
                     </div>
                     <h2 class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100 mt-2.5">
@@ -248,7 +259,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                 <!-- Seminggu -->
                 <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm">
                     <div class="flex items-center justify-between gap-2">
-                        <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest">Seminggu</p>
+                        <p class="text-slate-400 dark:text-slate-555 text-[9px] font-bold uppercase tracking-widest">Seminggu</p>
                         <span class="w-7 h-7 bg-lime-50 dark:bg-lime-900/40 rounded-lg flex items-center justify-center text-lime-600 dark:text-lime-400 text-[11px] font-bold">7H</span>
                     </div>
                     <h2 class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100 mt-2.5">
@@ -259,7 +270,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                 <!-- Sebulan -->
                 <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm">
                     <div class="flex items-center justify-between gap-2">
-                        <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest">Sebulan</p>
+                        <p class="text-slate-400 dark:text-slate-550 text-[9px] font-bold uppercase tracking-widest">Sebulan</p>
                         <span class="w-7 h-7 bg-lime-50 dark:bg-lime-900/40 rounded-lg flex items-center justify-center text-lime-600 dark:text-lime-400 text-[11px] font-bold">30H</span>
                     </div>
                     <h2 class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100 mt-2.5">
@@ -270,7 +281,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                 <!-- Total Semua -->
                 <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm">
                     <div class="flex items-center justify-between gap-2">
-                        <p class="text-slate-400 dark:text-slate-500 text-[9px] font-bold uppercase tracking-widest">Total Pendapatan</p>
+                        <p class="text-slate-400 dark:text-slate-550 text-[9px] font-bold uppercase tracking-widest">Total Pendapatan</p>
                         <span class="w-7 h-7 bg-lime-50 dark:bg-lime-900/40 rounded-lg flex items-center justify-center text-lime-600 dark:text-lime-400 text-[11px] font-bold">ALL</span>
                     </div>
                     <h2 class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100 mt-2.5">
@@ -305,7 +316,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                                 </div>
                                 <div>
                                     <p class="text-xs font-bold text-slate-800 dark:text-slate-200"><?= $baris['nama']; ?></p>
-                                    <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5"><i class="fa-regular fa-clock mr-1"></i><?= date('H:i, d M Y', strtotime($baris['tanggal_pesanan'])); ?></p>
+                                    <p class="text-[10px] text-slate-400 dark:text-slate-550 mt-0.5"><i class="fa-regular fa-clock mr-1"></i><?= date('H:i, d M Y', strtotime($baris['tanggal_pesanan'])); ?></p>
                                 </div>
                             </div>
                             <span class="text-xs font-extrabold text-slate-800 dark:text-slate-200">Rp <?= number_format($baris['total_harga'], 0, ',', '.'); ?></span>
@@ -351,7 +362,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
                                     <span class="font-bold text-slate-800 dark:text-slate-200"><?= $aktivitas['nama_pengguna']; ?></span> 
                                     <?= $aktivitas['keterangan']; ?>
                                 </p>
-                                <span class="text-[9px] text-slate-400 dark:text-slate-500 block mt-0.5"><i class="fa-regular fa-clock mr-1"></i><?= date('H:i, d M', strtotime($aktivitas['tanggal_dibuat'])); ?></span>
+                                <span class="text-[9px] text-slate-400 dark:text-slate-550 block mt-0.5"><i class="fa-regular fa-clock mr-1"></i><?= date('H:i, d M', strtotime($aktivitas['tanggal_dibuat'])); ?></span>
                             </div>
                         </div>
                         <?php
@@ -377,6 +388,7 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
         const tombolTema = document.getElementById('tombol-tema');
         const ikonTema = document.getElementById('ikon-tombol-tema');
 
+        // Menyelaraskan ikon tombol tema dengan mode warna aktif (gelap/terang)
         function perbaruiIkon() {
             if (document.documentElement.classList.contains('dark')) {
                 if (ikonTema) {
@@ -421,24 +433,22 @@ $nama_depan_admin = explode(' ', trim($_SESSION['nama']))[0];
         const tombolMenuMobile = document.getElementById('tombol-menu-mobile');
         const tombolTutupSidebar = document.getElementById('tombol-tutup-sidebar');
 
+        // Membuka navigasi sidebar pada mode seluler (mobile)
         function bukaSidebar() {
             if (sidebar && backdrop) {
-                sidebar.classList.remove('-translate-x-full');
-                backdrop.classList.remove('hidden');
-                setTimeout(() => {
-                    backdrop.classList.add('opacity-100');
-                }, 10);
+                sidebar.classList.add('active');
+                backdrop.classList.replace('opacity-0', 'opacity-100');
+                backdrop.classList.replace('pointer-events-none', 'pointer-events-auto');
                 document.body.style.overflow = 'hidden';
             }
         }
 
+        // Menutup navigasi sidebar pada mode seluler (mobile)
         function tutupSidebar() {
             if (sidebar && backdrop) {
-                sidebar.classList.add('-translate-x-full');
-                backdrop.classList.remove('opacity-100');
-                setTimeout(() => {
-                    backdrop.classList.add('hidden');
-                }, 300);
+                sidebar.classList.remove('active');
+                backdrop.classList.replace('opacity-100', 'opacity-0');
+                backdrop.classList.replace('pointer-events-auto', 'pointer-events-none');
                 document.body.style.overflow = '';
             }
         }

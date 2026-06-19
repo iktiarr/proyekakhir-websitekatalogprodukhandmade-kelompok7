@@ -8,7 +8,7 @@
           <!-- Identitas HandMadura -->
           <div class="space-y-4">
             <?php 
-            $kaki_adalah_admin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+            $kaki_adalah_admin = isset($_SESSION['admin']['role']) && $_SESSION['admin']['role'] === 'admin';
             if (!isset($awalan)) {
                 $awalan = '';
             }

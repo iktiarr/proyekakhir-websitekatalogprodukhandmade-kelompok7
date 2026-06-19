@@ -1,4 +1,4 @@
-<!-- Bagian Produk Unggulan -->
+<!-- Bagian Produk Unggulan: Menampilkan grid produk unggulan/terbaru dari database yang stoknya di atas 0. -->
 <section class="py-16 bg-slate-50 dark:bg-slate-950">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     
@@ -18,7 +18,7 @@
     <!-- Grid Produk Unggulan (2 Kolom di Seluler, 4 Kolom di Desktop) -->
     <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
       <?php
-      $data_produk = mysqli_query($koneksi, "SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id LIMIT 4");
+      $data_produk = kueri("SELECT p.*, k.nama_kategori, d.nama_daerah FROM produk p LEFT JOIN kategori k ON p.id_kategori = k.id LEFT JOIN daerah d ON p.id_daerah = d.id WHERE p.stok > 0 LIMIT 4");
       if (mysqli_num_rows($data_produk) > 0):
         while($baris = mysqli_fetch_assoc($data_produk)):
       ?>
@@ -27,7 +27,7 @@
         <!-- Foto Produk dan Badge Daerah -->
         <div class="relative w-full aspect-square md:h-52 overflow-hidden bg-slate-100 dark:bg-slate-800">
           <img 
-            src="<?= $baris['gambar']; ?>" 
+            src="<?= dapatkan_jalur_gambar($baris['gambar']); ?>" 
             alt="<?= $baris['nama_produk']; ?>" 
             class="w-full h-full object-cover"
           >

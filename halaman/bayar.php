@@ -7,12 +7,12 @@
 $awalan = "../";
 include '../koneksi.php';
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user']['id'])) {
     header("Location: ../masuk.php");
     exit();
 }
 
-$id_pengguna = $_SESSION['user_id'];
+$id_pengguna = $_SESSION['user']['id'];
 $berhasil = '';
 $galat = '';
 
@@ -60,7 +60,7 @@ if (isset($_GET['id'])) {
         $kueri_perbarui = kueri("UPDATE pesanan SET bukti_pembayaran = ?, status = 'dibayar' WHERE id = ?", [$kode_pembayaran, $id_pesanan]);
         if ($kueri_perbarui) {
             $berhasil = "Pembayaran Berhasil! Pesanan Anda telah lunas dan siap dikirim.";
-            $nama_pembeli = $_SESSION['nama'];
+            $nama_pembeli = $_SESSION['user']['nama'];
             $tag = "#HM-" . str_pad($id_pesanan, 5, '0', STR_PAD_LEFT);
             kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES (?, ?, 'pesanan', 'dibayar', ?)", [$id_pengguna, $nama_pembeli, "Melakukan konfirmasi pembayaran untuk $tag"]);
             header("Refresh: 2; url=riwayat.php");

@@ -2,12 +2,12 @@
 $awalan = "../";
 include '../koneksi.php';
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user']['id'])) {
     header("Location: ../masuk.php");
     exit();
 }
 
-$id_pengguna = $_SESSION['user_id'];
+$id_pengguna = $_SESSION['user']['id'];
 $galat = '';
 
 $kueri_pengguna_info = kueri("SELECT alamat, no_telp FROM pengguna WHERE id = ?", [$id_pengguna]);
@@ -61,7 +61,7 @@ if (isset($_POST['buat_pesanan'])) {
             $berhasil_pesan = kueri("INSERT INTO pesanan (id_pengguna, total_harga, status, alamat, metode_pembayaran) VALUES (?, ?, 'menunggu', ?, ?)", [$id_pengguna, $total_harga, $alamat, $metode_pembayaran]);
         $id_pesanan = mysqli_insert_id($koneksi);
         
-        $nama_pembeli = $_SESSION['nama'];
+        $nama_pembeli = $_SESSION['user']['nama'];
         $tag = "#HM-" . str_pad($id_pesanan, 5, '0', STR_PAD_LEFT);
         kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES (?, ?, 'pesanan', 'tambah', ?)", [$id_pengguna, $nama_pembeli, "Membuat pesanan baru $tag"]);
 
@@ -134,7 +134,7 @@ if (isset($_POST['buat_pesanan'])) {
                     <div class="space-y-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Nama Penerima</label>
-                            <input type="text" value="<?= $_SESSION['nama']; ?>" readonly class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-100 text-slate-500 outline-none cursor-not-allowed text-sm">
+                            <input type="text" value="<?= $_SESSION['user']['nama']; ?>" readonly class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-100 text-slate-500 outline-none cursor-not-allowed text-sm">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Nomor Telepon</label>

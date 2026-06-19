@@ -1,8 +1,10 @@
 <?php
+// admin/cetak_laporan.php: Halaman khusus cetak laporan (print view) untuk mencetak data keuangan, ulasan, atau pengguna dalam format cetak ramah printer.
+
 include_once '../koneksi.php';
 
 // Otorisasi Admin
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['admin']) || $_SESSION['admin']['role'] !== 'admin') {
     header("Location: ../masuk.php");
     exit();
 }
@@ -101,7 +103,7 @@ $total_pendapatan = 0;
     <div class="max-w-6xl mx-auto mb-6 no-print">
         <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm flex items-center justify-between gap-4">
             <div class="flex items-center gap-3">
-                <a href="laporan.php" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-850 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-350 transition-colors">
+                <a href="javascript:window.close()" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-850 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-350 transition-colors">
                     <i class="fa-solid fa-arrow-left"></i>
                 </a>
                 <div>
@@ -291,6 +293,7 @@ $total_pendapatan = 0;
         const tombolTema = document.getElementById('tombol-tema');
         const ikonTema = document.getElementById('ikon-tombol-tema');
 
+        // Menyelaraskan ikon tombol tema dengan mode warna aktif (gelap/terang)
         function perbaruiIkon() {
             if (document.documentElement.classList.contains('dark')) {
                 if (ikonTema) {
@@ -329,9 +332,12 @@ $total_pendapatan = 0;
             });
         }
 
-        // Auto print trigger
+        // Auto print trigger and auto close
         setTimeout(() => {
             window.print();
+            setTimeout(() => {
+                window.close();
+            }, 100);
         }, 600);
     });
     </script>

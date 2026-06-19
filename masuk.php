@@ -23,11 +23,21 @@ if (isset($_POST['masuk'])) {
         $data_pengguna = mysqli_fetch_assoc($kueri);
         
         if (password_verify($kata_sandi, $data_pengguna['password'])) {
-            $_SESSION['user_id'] = $data_pengguna['id'];
-            $_SESSION['nama'] = $data_pengguna['nama'];
-            $_SESSION['role'] = $data_pengguna['role'];
-
-            header("Location: " . ($data_pengguna['role'] === 'admin' ? "admin/index.php" : "index.php"));
+            if ($data_pengguna['role'] === 'admin') {
+                $_SESSION['admin'] = [
+                    'id' => $data_pengguna['id'],
+                    'nama' => $data_pengguna['nama'],
+                    'role' => $data_pengguna['role']
+                ];
+                header("Location: admin/index.php");
+            } else {
+                $_SESSION['user'] = [
+                    'id' => $data_pengguna['id'],
+                    'nama' => $data_pengguna['nama'],
+                    'role' => $data_pengguna['role']
+                ];
+                header("Location: index.php");
+            }
             exit();
         } else {
             $galat = "Password salah!";
@@ -105,6 +115,7 @@ if (isset($_POST['masuk'])) {
 
 <!-- Script Pembantu Tampilkan/Sembunyikan Sandi -->
 <script>
+    // Menampilkan atau menyembunyikan teks kata sandi (password visibility toggle)
     function tampilkanSandi(sandiId, ikonId) {
         const masukan = document.getElementById(sandiId);
         const ikon = document.getElementById(ikonId);

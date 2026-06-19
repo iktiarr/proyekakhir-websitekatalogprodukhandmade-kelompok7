@@ -1,12 +1,14 @@
 <?php
+// bagian/galeri.php: Komponen galeri seni, menampilkan portofolio gambar produk/karya berdasarkan kabupaten asal di Madura.
+
 $daftar_daerah = ['Bangkalan', 'Sampang', 'Pamekasan', 'Sumenep'];
 
 $daftar_galeri = [];
-$hasil_produk = mysqli_query($koneksi, "
+$hasil_produk = kueri("
     SELECT p.gambar, d.nama_daerah 
     FROM produk p 
     JOIN daerah d ON p.id_daerah = d.id 
-    WHERE p.gambar IS NOT NULL AND p.gambar != ''
+    WHERE p.gambar IS NOT NULL AND p.gambar != '' AND p.stok > 0
 ");
 
 if ($hasil_produk && mysqli_num_rows($hasil_produk) > 0) {
@@ -49,7 +51,7 @@ $daerah_bawaan = 'Bangkalan';
       <div class="item-galeri relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-800" 
            data-daerah="<?= $item['daerah']; ?>">
         <img 
-          src="<?= $item['gambar']; ?>" 
+          src="<?= dapatkan_jalur_gambar($item['gambar']); ?>" 
           alt="Karya Seni Madura" 
           class="w-full h-full object-cover select-none pointer-events-none"
         >
@@ -62,6 +64,7 @@ $daerah_bawaan = 'Bangkalan';
 </section>
 
 <script>
+  // Menyaring dan menampilkan item galeri seni sesuai dengan kabupaten asal Madura yang dipilih
   function saringDaerah(daerah) {
       const tombol = document.querySelectorAll('.tombol-saring-daerah');
       tombol.forEach(btn => {

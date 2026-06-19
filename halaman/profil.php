@@ -9,12 +9,12 @@ $awalan = "../";
 include '../koneksi.php';
 
 // Proteksi halaman: pastikan pengguna sudah masuk
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user']['id'])) {
     header("Location: ../masuk.php");
     exit();
 }
 
-$id_pengguna = $_SESSION['user_id'];
+$id_pengguna = $_SESSION['user']['id'];
 $galat = '';
 $sukses = '';
 
@@ -78,7 +78,7 @@ if (isset($_POST['simpan_profil'])) {
                     $sukses = "Profil Anda berhasil diperbarui!";
                     
                     // Perbarui sesi nama pengguna agar header langsung berubah
-                    $_SESSION['nama'] = $nama;
+                    $_SESSION['user']['nama'] = $nama;
                     
                     // Log aktivitas pengguna
                     $keterangan_log = $ganti_sandi ? 'Memperbarui data profil dan kata sandi' : 'Memperbarui data profil diri';
@@ -196,6 +196,7 @@ if (isset($_POST['simpan_profil'])) {
 
 <!-- Script Tampilkan/Sembunyikan Kata Sandi -->
 <script>
+    // Menampilkan atau menyembunyikan teks kata sandi (password visibility toggle)
     function tampilkanSandi(sandiId, ikonId) {
         const masukan = document.getElementById(sandiId);
         const ikon = document.getElementById(ikonId);

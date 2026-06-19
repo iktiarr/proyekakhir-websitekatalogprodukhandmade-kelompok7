@@ -1,7 +1,10 @@
 <?php
+// admin/produk.php: Halaman panel admin untuk mengelola katalog produk (tambah, edit, hapus) dengan opsi upload file gambar lokal atau menggunakan tautan URL online.
+
 include '../koneksi.php';
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+// Memastikan pengguna telah masuk sebagai admin
+if (!isset($_SESSION['admin']) || $_SESSION['admin']['role'] !== 'admin') {
     header("Location: ../masuk.php");
     exit();
 }
@@ -9,6 +12,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 $berhasil = '';
 $galat = '';
 
+// Menangani penyimpanan data produk (Tambah atau Edit)
 if (isset($_POST['simpan'])) {
     $id_produk = isset($_POST['id']) ? (int)$_POST['id'] : 0;
     $nama = trim($_POST['nama']);
@@ -19,26 +23,77 @@ if (isset($_POST['simpan'])) {
     $id_daerah = isset($_POST['id_daerah']) ? (int)$_POST['id_daerah'] : 0;
     $val_daerah = $id_daerah > 0 ? $id_daerah : null;
     
-    $gambar_mentah = trim($_POST['gambar']);
+    $gambar_mentah = '';
     
-    if (stripos($gambar_mentah, 'unsplash.com') !== false && stripos($gambar_mentah, 'images.unsplash.com') === false) {
-        $jalur = parse_url($gambar_mentah, PHP_URL_PATH);
-        if ($jalur) {
-            $segmen = explode('/', trim($jalur, '/'));
-            $segmen_terakhir = end($segmen);
-            if ($segmen_terakhir) {
-                $sub_segmen = explode('-', $segmen_terakhir);
-                $id_unsplash = end($sub_segmen);
-                if ($id_unsplash) {
-                    $gambar_mentah = "https://unsplash.com/photos/" . $id_unsplash . "/download";
+    // 1. Proses upload file gambar jika ada yang diunggah
+    if (isset($_FILES['gambar_upload']) && $_FILES['gambar_upload']['error'] === UPLOAD_ERR_OK) {
+        $file_tmp = $_FILES['gambar_upload']['tmp_name'];
+        $file_nama = $_FILES['gambar_upload']['name'];
+        $ekstensi = strtolower(pathinfo($file_nama, PATHINFO_EXTENSION));
+        $ekstensi_diperbolehkan = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        
+        if (in_array($ekstensi, $ekstensi_diperbolehkan)) {
+            $nama_baru = uniqid('img_', true) . '.' . $ekstensi;
+            $folder_tujuan = '../uploads/';
+            
+            // Membuat folder uploads jika belum ada
+            if (!is_dir($folder_tujuan)) {
+                mkdir($folder_tujuan, 0755, true);
+            }
+            
+            if (move_uploaded_file($file_tmp, $folder_tujuan . $nama_baru)) {
+                $gambar_mentah = 'uploads/' . $nama_baru;
+                
+                // Hapus file gambar lokal yang lama jika sedang mengedit
+                if ($id_produk > 0 && !empty($_POST['gambar_lama'])) {
+                    $gambar_lama = trim($_POST['gambar_lama']);
+                    if (strpos($gambar_lama, 'uploads/') === 0 && file_exists('../' . $gambar_lama)) {
+                        @unlink('../' . $gambar_lama);
+                    }
+                }
+            } else {
+                $galat = "Gagal mengunggah file gambar ke server.";
+            }
+        } else {
+            $galat = "Format file tidak valid! Gunakan JPG, JPEG, PNG, GIF, atau WEBP.";
+        }
+    }
+    
+    // 2. Jika tidak ada file baru yang diunggah, periksa metode input link atau fallback gambar lama
+    if (empty($gambar_mentah) && empty($galat)) {
+        $opsi_sumber = $_POST['sumber_gambar_opsi'];
+        if ($opsi_sumber === 'link') {
+            $gambar_mentah = trim($_POST['gambar']);
+            
+            // Mengubah link share Unsplash menjadi tautan download langsung
+            if (stripos($gambar_mentah, 'unsplash.com') !== false && stripos($gambar_mentah, 'images.unsplash.com') === false) {
+                $jalur = parse_url($gambar_mentah, PHP_URL_PATH);
+                if ($jalur) {
+                    $segmen = explode('/', trim($jalur, '/'));
+                    $segmen_terakhir = end($segmen);
+                    if ($segmen_terakhir) {
+                        $sub_segmen = explode('-', $segmen_terakhir);
+                        $id_unsplash = end($sub_segmen);
+                        if ($id_unsplash) {
+                            $gambar_mentah = "https://unsplash.com/photos/" . $id_unsplash . "/download";
+                        }
+                    }
                 }
             }
+        } else {
+            // Gunakan gambar lama jika mengedit dan memilih tab upload tanpa memilih file baru
+            $gambar_mentah = trim($_POST['gambar_lama']);
         }
     }
 
+    if (empty($gambar_mentah) && empty($galat)) {
+        $galat = "Gambar produk wajib ditentukan (menggunakan link atau upload file)!";
+    }
+
+    // Validasi harga dan stok tidak boleh negatif
     if ($harga < 0 || $stok < 0) {
         $galat = "Gagal menyimpan: Harga dan Stok tidak boleh bernilai negatif!";
-    } else {
+    } elseif (empty($galat)) {
         if ($id_produk > 0) {
             $sql = "UPDATE produk SET nama_produk=?, deskripsi=?, harga=?, stok=?, gambar=?, id_kategori=?, id_daerah=? WHERE id=?";
             $params = [$nama, $deskripsi, $harga, $stok, $gambar_mentah, $id_kategori, $val_daerah, $id_produk];
@@ -57,12 +112,18 @@ if (isset($_POST['simpan'])) {
     }
 }
 
+// Menangani penghapusan produk
 if (isset($_GET['hapus'])) {
     $id_produk = (int)$_GET['hapus'];
-    $res_p = kueri("SELECT nama_produk FROM produk WHERE id=?", [$id_produk]);
+    $res_p = kueri("SELECT nama_produk, gambar FROM produk WHERE id=?", [$id_produk]);
     if ($row_p = mysqli_fetch_assoc($res_p)) {
         $nama_p = $row_p['nama_produk'];
+        $gambar_p = $row_p['gambar'];
         if (kueri("DELETE FROM produk WHERE id=?", [$id_produk])) {
+            // Hapus file gambar lokal dari server jika ada
+            if (!empty($gambar_p) && strpos($gambar_p, 'uploads/') === 0 && file_exists('../' . $gambar_p)) {
+                @unlink('../' . $gambar_p);
+            }
             catat_log('produk', 'hapus', "Menghapus produk '$nama_p'");
         }
     }
@@ -88,6 +149,17 @@ $testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM te
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        /* Mobile Sidebar Custom Transitions */
+        @media (max-width: 767px) {
+            #sidebar {
+                transform: translateX(-100%) !important;
+                transition: transform 0.3s ease-in-out !important;
+            }
+            #sidebar.active {
+                transform: translateX(0) !important;
+            }
+        }
     </style>
     <style type="text/tailwindcss">
         @import "tailwindcss";
@@ -104,8 +176,8 @@ $testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM te
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col md:flex-row selection:bg-lime-200 selection:text-lime-900 transition-colors duration-300 min-h-screen">
     
     <!-- Header Seluler (Mobile Navbar) -->
-    <header class="md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 sticky top-0 z-40 flex items-center gap-3 w-full transition-colors duration-300">
-        <button id="tombol-menu-mobile" class="p-2 -ml-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors focus:outline-none flex items-center justify-center cursor-pointer">
+    <header class="md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-3 py-2.5 sticky top-0 z-40 flex items-center gap-3 w-full transition-colors duration-300">
+        <button id="tombol-menu-mobile" class="p-1.5 -ml-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors focus:outline-none flex items-center justify-center cursor-pointer">
             <i class="fa-solid fa-bars text-lg"></i>
         </button>
         <a href="../index.php" class="text-lg font-extrabold text-slate-800 dark:text-slate-200 tracking-tight">
@@ -113,60 +185,58 @@ $testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM te
         </a>
     </header>
 
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:sticky md:h-screen md:top-0 overflow-y-auto flex-shrink-0">
-        <div class="p-5 pb-3 flex items-center justify-between">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-56 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 md:sticky md:h-screen md:top-0 overflow-y-auto flex-shrink-0 shadow-lg md:shadow-none">
+        <div class="p-3 pb-2 flex items-center justify-between">
             <div>
-                <a href="../index.php" class="text-xl font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block">
+                <a href="../index.php" class="text-lg font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block">
                     Hand<span class="text-lime-600">Madura.</span>
                 </a>
-                <p class="text-[9px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold mt-0.5">Admin Panel</p>
+                <p class="text-[8px] uppercase tracking-widest text-slate-400 dark:text-slate-550 font-bold mt-0.5">Admin Panel</p>
             </div>
-            <button id="tombol-tutup-sidebar" class="md:hidden p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Tutup Sidebar">
+            <button id="tombol-tutup-sidebar" class="md:hidden p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Tutup Sidebar">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
         
-        <nav class="flex-1 px-3 space-y-1">
-            <a href="index.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-chart-pie mr-2.5 w-4 text-center"></i> Dasbor
+        <nav class="flex-1 px-2 space-y-0.5">
+            <a href="index.php" class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
+                <i class="fa-solid fa-chart-pie mr-2 w-4 text-center"></i> Dasbor
             </a>
-            <a href="produk.php" class="flex items-center px-3.5 py-2.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-xl font-bold text-sm transition-colors">
-                <i class="fa-solid fa-box-open mr-2.5 w-4 text-center"></i> Produk
+            <a href="produk.php" class="flex items-center px-2.5 py-1.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-xl font-bold text-xs transition-colors">
+                <i class="fa-solid fa-box-open mr-2 w-4 text-center"></i> Produk
             </a>
-            <a href="pembayaran.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-credit-card mr-2.5 w-4 text-center"></i> Pembayaran
+            <a href="pembayaran.php" class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
+                <i class="fa-solid fa-credit-card mr-2 w-4 text-center"></i> Pembayaran
                 <?php if ($pembayaran_tertunda > 0): ?>
                     <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pembayaran_tertunda; ?></span>
                 <?php endif; ?>
             </a>
-            <a href="testimoni.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-comments mr-2.5 w-4 text-center"></i> Testimonial
+            <a href="testimoni.php" class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
+                <i class="fa-solid fa-comments mr-2 w-4 text-center"></i> Testimonial
                 <?php if ($testimoni_tertunda > 0): ?>
                     <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $testimoni_tertunda; ?></span>
                 <?php endif; ?>
             </a>
-            <a href="pengguna.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-users mr-2.5 w-4 text-center"></i> Pengguna
-            </a>
-            <a href="laporan.php" class="flex items-center px-3.5 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-medium text-sm transition-colors group">
-                <i class="fa-solid fa-file-invoice mr-2.5 w-4 text-center"></i> Laporan
+            <a href="pengguna.php" class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
+                <i class="fa-solid fa-users mr-2 w-4 text-center"></i> Pengguna
             </a>
         </nav>
         
-        <div class="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
-            <a href="../keluar.php" class="flex items-center px-3.5 py-2.5 text-slate-400 dark:text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl font-bold text-sm transition-colors group flex-grow">
-                <i class="fa-solid fa-arrow-right-from-bracket mr-2.5 w-4 text-center"></i> Keluar
+        <div class="p-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
+            <a href="../keluar.php?dari=admin" class="flex items-center px-2.5 py-1.5 text-slate-400 dark:text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl font-bold text-xs transition-colors group flex-grow">
+                <i class="fa-solid fa-arrow-right-from-bracket mr-2 w-4 text-center"></i> Keluar
             </a>
-            <button id="tombol-tema" class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Ubah Tema">
+            <button id="tombol-tema" class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center" title="Ubah Tema">
                 <i id="ikon-tombol-tema" class="fa-solid fa-moon text-base"></i>
             </button>
         </div>
     </aside>
 
     <!-- Latar Buram Seluler (Backdrop Overlay) -->
-    <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden transition-opacity duration-300 opacity-0"></div>
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+    <div class="hidden opacity-100 pointer-events-auto"></div>
 
-    <main class="flex-grow p-4 sm:p-6 w-full max-w-7xl mx-auto overflow-x-hidden">
+    <main class="flex-grow p-4 sm:p-6 w-full max-w-6xl mx-auto overflow-x-hidden">
         
         <div class="flex justify-end mb-6">
             <button onclick="bukaModalTambah()" class="bg-lime-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-lime-700 transition-all duration-300 flex items-center cursor-pointer text-xs sm:text-sm">
@@ -207,13 +277,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM te
                     <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors duration-200 text-xs sm:text-sm">
                         <td class="px-4 py-3 pl-6">
                             <div class="flex items-center space-x-3">
-                                <?php 
-                                    $sumber_gambar = $produk['gambar'];
-                                    if (!empty($sumber_gambar) && strpos($sumber_gambar, 'http') !== 0) {
-                                        $sumber_gambar = '../' . $sumber_gambar;
-                                    }
-                                ?>
-                                    <img src="<?= $sumber_gambar; ?>" alt="<?= $produk['nama_produk']; ?>" class="w-10 h-10 rounded-xl object-cover border border-slate-100 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-950 flex-shrink-0">
+                                    <img src="<?= dapatkan_jalur_gambar($produk['gambar']); ?>" alt="<?= $produk['nama_produk']; ?>" class="w-10 h-10 rounded-xl object-cover border border-slate-100 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-950 flex-shrink-0">
                                 <span class="font-bold text-slate-800 dark:text-slate-200 line-clamp-1"><?= $produk['nama_produk']; ?></span>
                             </div>
                         </td>
@@ -269,8 +333,10 @@ $testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM te
                 </button>
             </div>
             
-            <form action="" method="POST" class="space-y-3.5">
+            <form action="" method="POST" enctype="multipart/form-data" class="space-y-3.5">
                 <input type="hidden" name="id" id="produk_id">
+                <input type="hidden" name="gambar_lama" id="produk_gambar_lama">
+                <input type="hidden" name="sumber_gambar_opsi" id="sumber_gambar_opsi" value="link">
                 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Produk</label>
@@ -313,10 +379,27 @@ $testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM te
                     </div>
                 </div>
  
+                <!-- Opsi Metode Input Gambar -->
                 <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Metode Foto Produk</label>
+                    <div class="grid grid-cols-2 gap-2 bg-slate-150 dark:bg-slate-850 p-1 rounded-xl">
+                        <button type="button" id="tab-link" onclick="setSumberGambar('link')" class="py-1.5 text-xs font-bold rounded-lg text-center transition-all cursor-pointer">Link URL</button>
+                        <button type="button" id="tab-upload" onclick="setSumberGambar('upload')" class="py-1.5 text-xs font-bold rounded-lg text-center transition-all cursor-pointer">Upload File</button>
+                    </div>
+                </div>
+
+                <!-- Input Menggunakan Link URL -->
+                <div id="container-link">
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Link Foto Produk</label>
-                    <input type="url" name="gambar" id="produk_gambar" required class="w-full px-3 py-2 bg-white text-slate-800 rounded-xl border border-slate-200 outline-none transition-all text-xs" placeholder="https://example.com/foto.jpg">
+                    <input type="url" name="gambar" id="produk_gambar" class="w-full px-3 py-2 bg-white text-slate-800 rounded-xl border border-slate-200 outline-none transition-all text-xs" placeholder="https://example.com/foto.jpg">
                     <p class="text-[9px] text-slate-400 dark:text-slate-500 mt-0.5 italic">*Gunakan link gambar online (misal dari Unsplash, Imgur, dsb.)</p>
+                </div>
+
+                <!-- Input Menggunakan Upload File -->
+                <div id="container-upload" class="hidden">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Upload File Foto</label>
+                    <input type="file" name="gambar_upload" id="produk_gambar_upload" accept="image/*" class="w-full px-3 py-1.5 bg-white text-slate-800 rounded-xl border border-slate-200 outline-none transition-all text-xs file:mr-3 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-lime-50 file:text-lime-700 hover:file:bg-lime-100 cursor-pointer">
+                    <p class="text-[9px] text-slate-400 dark:text-slate-550 mt-0.5 italic">*Pilih file gambar dari komputer Anda (Mendukung: JPG, PNG, WEBP)</p>
                 </div>
  
                 <div>
@@ -345,9 +428,46 @@ $testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM te
         const modal = document.getElementById('modalProduk');
         const kontenModal = document.getElementById('kontenModal');
 
+        // Mengatur tab metode gambar (Link URL vs Upload File) secara dinamis
+        function setSumberGambar(opsi) {
+            const tabLink = document.getElementById('tab-link');
+            const tabUpload = document.getElementById('tab-upload');
+            const containerLink = document.getElementById('container-link');
+            const containerUpload = document.getElementById('container-upload');
+            const inputOpsi = document.getElementById('sumber_gambar_opsi');
+            const inputGambar = document.getElementById('produk_gambar');
+            const inputUpload = document.getElementById('produk_gambar_upload');
+
+            inputOpsi.value = opsi;
+
+            if (opsi === 'link') {
+                tabLink.className = "py-1.5 text-xs font-bold rounded-lg text-center transition-all cursor-pointer bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm";
+                tabUpload.className = "py-1.5 text-xs font-bold rounded-lg text-center transition-all cursor-pointer text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300";
+                containerLink.classList.remove('hidden');
+                containerUpload.classList.add('hidden');
+                
+                // Set required hanya jika tambah produk baru
+                const isEdit = document.getElementById('produk_id').value !== "";
+                inputGambar.required = !isEdit;
+                inputUpload.required = false;
+            } else {
+                tabUpload.className = "py-1.5 text-xs font-bold rounded-lg text-center transition-all cursor-pointer bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm";
+                tabLink.className = "py-1.5 text-xs font-bold rounded-lg text-center transition-all cursor-pointer text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300";
+                containerUpload.classList.remove('hidden');
+                containerLink.classList.add('hidden');
+                
+                // Set required hanya jika tambah produk baru
+                const isEdit = document.getElementById('produk_id').value !== "";
+                inputUpload.required = !isEdit;
+                inputGambar.required = false;
+            }
+        }
+
+        // Membuka modal tambah produk baru dan mereset seluruh isian form
         function bukaModalTambah() {
             document.getElementById('judulModal').innerText = "Tambah Produk Baru";
             document.getElementById('produk_id').value = "";
+            document.getElementById('produk_gambar_lama').value = "";
             document.getElementById('produk_nama').value = "";
             document.getElementById('produk_harga').value = "";
             document.getElementById('produk_stok').value = "";
@@ -355,29 +475,43 @@ $testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM te
             document.getElementById('produk_daerah').value = "";
             document.getElementById('produk_deskripsi').value = "";
             document.getElementById('produk_gambar').value = "";
+            document.getElementById('produk_gambar_upload').value = "";
             
+            setSumberGambar('link');
             tampilkanModal();
         }
 
+        // Membuka modal edit produk dan mengisikan data produk terpilih ke dalam form
         function ubahProduk(data) {
             document.getElementById('judulModal').innerText = "Edit Produk";
             document.getElementById('produk_id').value = data.id;
+            document.getElementById('produk_gambar_lama').value = data.gambar;
             document.getElementById('produk_nama').value = data.nama_produk;
             document.getElementById('produk_harga').value = data.harga;
             document.getElementById('produk_stok').value = data.stok;
             document.getElementById('produk_kategori').value = data.id_kategori || "";
             document.getElementById('produk_daerah').value = data.id_daerah || "";
             document.getElementById('produk_deskripsi').value = data.deskripsi;
-            document.getElementById('produk_gambar').value = data.gambar;
+            document.getElementById('produk_gambar_upload').value = "";
+            
+            if (data.gambar && data.gambar.startsWith('uploads/')) {
+                document.getElementById('produk_gambar').value = "";
+                setSumberGambar('upload');
+            } else {
+                document.getElementById('produk_gambar').value = data.gambar;
+                setSumberGambar('link');
+            }
             
             tampilkanModal();
         }
 
+        // Menampilkan overlay modal kelola produk
         function tampilkanModal() {
             modal.classList.remove('opacity-0', 'invisible');
             kontenModal.classList.remove('scale-95');
         }
 
+        // Menyembunyikan overlay modal kelola produk
         function tutupModal() {
             kontenModal.classList.add('scale-95');
             modal.classList.add('opacity-0', 'invisible');
@@ -387,6 +521,7 @@ $testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM te
             const tombolTema = document.getElementById('tombol-tema');
             const ikonTema = document.getElementById('ikon-tombol-tema');
 
+            // Menyinkronkan tema warna tombol UI dengan tema aktif (gelap/terang)
             function perbaruiIkon() {
                 if (document.documentElement.classList.contains('dark')) {
                     if (ikonTema) {
@@ -429,24 +564,22 @@ $testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM te
             const tombolMenuMobile = document.getElementById('tombol-menu-mobile');
             const tombolTutupSidebar = document.getElementById('tombol-tutup-sidebar');
 
+            // Membuka sidebar panel admin pada mode seluler (mobile)
             function bukaSidebar() {
                 if (sidebar && backdrop) {
-                    sidebar.classList.remove('-translate-x-full');
-                    backdrop.classList.remove('hidden');
-                    setTimeout(() => {
-                        backdrop.classList.add('opacity-100');
-                    }, 10);
+                    sidebar.classList.add('active');
+                    backdrop.classList.replace('opacity-0', 'opacity-100');
+                    backdrop.classList.replace('pointer-events-none', 'pointer-events-auto');
                     document.body.style.overflow = 'hidden';
                 }
             }
 
+            // Menutup sidebar panel admin pada mode seluler (mobile)
             function tutupSidebar() {
                 if (sidebar && backdrop) {
-                    sidebar.classList.add('-translate-x-full');
-                    backdrop.classList.remove('opacity-100');
-                    setTimeout(() => {
-                        backdrop.classList.add('hidden');
-                    }, 300);
+                    sidebar.classList.remove('active');
+                    backdrop.classList.replace('opacity-100', 'opacity-0');
+                    backdrop.classList.replace('pointer-events-auto', 'pointer-events-none');
                     document.body.style.overflow = '';
                 }
             }

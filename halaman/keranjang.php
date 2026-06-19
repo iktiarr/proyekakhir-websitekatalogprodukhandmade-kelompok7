@@ -1,13 +1,15 @@
 <?php
+// halaman/keranjang.php: Halaman keranjang belanja bagi pembeli, untuk mengatur kuantitas, memilih item checkout, dan menghapus produk terpilih.
+
 $awalan = "../";
 include '../koneksi.php';
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user']['id'])) {
     header("Location: ../masuk.php");
     exit();
 }
 
-$id_pengguna = $_SESSION['user_id'];
+$id_pengguna = $_SESSION['user']['id'];
 
 if (isset($_GET['hapus'])) {
     $id_keranjang = (int)$_GET['hapus'];
@@ -25,7 +27,7 @@ if (isset($_POST['update_cart'])) {
     exit();
 }
 
-$kueri = kueri("SELECT k.*, p.nama_produk, p.harga, p.gambar, p.stok FROM keranjang k JOIN produk p ON k.id_produk = p.id WHERE k.id_pengguna = ?", [$id_pengguna]);
+$kueri = kueri("SELECT k.*, p.nama_produk, p.harga, p.gambar, p.stok FROM keranjang k JOIN produk p ON k.id_produk = p.id WHERE k.id_pengguna = ? AND p.stok > 0", [$id_pengguna]);
 
 $kueri_jumlah = mysqli_fetch_assoc(kueri("SELECT SUM(jumlah) as total_qty FROM keranjang WHERE id_pengguna = ?", [$id_pengguna]));
 $total_jumlah = (int)($kueri_jumlah['total_qty'] ?? 0);
@@ -76,7 +78,7 @@ $total_jumlah = (int)($kueri_jumlah['total_qty'] ?? 0);
 
                                 <!-- Foto Thumbnail Produk -->
                                 <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-900 flex-shrink-0 border border-slate-200 dark:border-slate-800">
-                                    <img src="<?= $baris['gambar']; ?>" alt="<?= $baris['nama_produk']; ?>" class="w-full h-full object-cover">
+                                    <img src="<?= dapatkan_jalur_gambar($baris['gambar']); ?>" alt="<?= $baris['nama_produk']; ?>" class="w-full h-full object-cover">
                                 </div>
                                 
                                 <!-- Informasi Kerajinan -->
@@ -175,6 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const daftarKotakCentang = document.querySelectorAll('.kotak-centang-keranjang');
     const daftarMasukanJumlah = document.querySelectorAll('.masukan-jumlah');
 
+    // Menghitung subtotal per item keranjang dan akumulasi total harga belanjaan yang dipilih
     function hitungTotal() {
         let total = 0;
         daftarKotakCentang.forEach(kotakCentang => {

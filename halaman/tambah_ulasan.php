@@ -2,7 +2,7 @@
 $awalan = "../";
 include '../koneksi.php';
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user']['id'])) {
     header("Location: ../masuk.php");
     exit();
 }
@@ -11,7 +11,7 @@ $galat = '';
 $berhasil = '';
 
 if (isset($_POST['submit_testimonial'])) {
-    $id_pengguna = $_SESSION['user_id'];
+    $id_pengguna = $_SESSION['user']['id'];
     $nama = $_POST['nama'];
     $pekerjaan = $_POST['pekerjaan'];
     $isi_ulasan = $_POST['isi_ulasan'];
@@ -71,7 +71,7 @@ if (isset($_POST['submit_testimonial'])) {
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-700 dark:text-slate-350 mb-1 uppercase tracking-wider">Nama Lengkap</label>
-                    <input type="text" name="nama" value="<?= $_SESSION['nama'] ?? ''; ?>" required 
+                    <input type="text" name="nama" value="<?= $_SESSION['user']['nama'] ?? ''; ?>" required 
                         class="w-full px-3 py-2 bg-white rounded-xl border border-slate-200 outline-none transition-all duration-300 text-slate-800 placeholder-slate-400 text-xs" 
                         placeholder="Masukkan nama Anda">
                 </div>

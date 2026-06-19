@@ -2,13 +2,13 @@
 $awalan = "../";
 include '../koneksi.php';
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user']['id']) && !isset($_SESSION['admin']['id'])) {
     header("Location: ../masuk.php");
     exit();
 }
 
-$id_pengguna = $_SESSION['user_id'];
-$adalah_admin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+$id_pengguna = $_SESSION['user']['id'] ?? null;
+$adalah_admin = isset($_SESSION['admin']['role']) && $_SESSION['admin']['role'] === 'admin';
 
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("ID Pesanan tidak valid.");

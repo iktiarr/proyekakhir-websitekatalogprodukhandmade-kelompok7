@@ -1,10 +1,14 @@
 <?php
+// admin/login_mock.php: File pembantu untuk mensimulasikan login admin secara instan untuk kebutuhan pengujian.
+
 include_once '../koneksi.php';
 
-$_SESSION['role'] = 'admin';
-$_SESSION['user_id'] = 1;
-$_SESSION['nama'] = 'Admin Test';
+$_SESSION['admin'] = [
+    'id' => 1,
+    'nama' => 'Admin Test',
+    'role' => 'admin'
+];
 
-header("Location: laporan.php");
+header("Location: index.php");
 exit();
 ?>
