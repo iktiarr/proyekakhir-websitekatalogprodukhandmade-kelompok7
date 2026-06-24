@@ -27,6 +27,7 @@ if (isset($_GET['hapus'])) {
 $kueri_pengguna = kueri("SELECT * FROM pengguna ORDER BY role ASC, nama ASC");
 $pembayaran_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
 $testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
+$laporan_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM laporan_kendala WHERE status = 'pending'"))['total'];
 ?>
 
 <!doctype html>
@@ -110,6 +111,12 @@ $testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM te
             </a>
             <a href="pengguna.php" class="flex items-center px-2.5 py-1.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-xl font-bold text-xs transition-colors">
                 <i class="fa-solid fa-users mr-2 w-4 text-center"></i> Pengguna
+            </a>
+            <a href="laporan.php" class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
+                <i class="fa-solid fa-circle-exclamation mr-2 w-4 text-center"></i> Laporan Kendala
+                <?php if ($laporan_tertunda > 0): ?>
+                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $laporan_tertunda; ?></span>
+                <?php endif; ?>
             </a>
         </nav>
         

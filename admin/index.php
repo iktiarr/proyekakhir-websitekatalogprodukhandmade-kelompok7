@@ -81,6 +81,7 @@ $jumlah_admin = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pengguna
 $jumlah_produk = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM produk"))['total'];
 $pembayaran_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
 $testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
+$laporan_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM laporan_kendala WHERE status = 'pending'"))['total'];
 
 $pendapatan_hari_ini = mysqli_fetch_assoc(kueri("SELECT SUM(total_harga) AS total FROM pesanan WHERE status IN ('dibayar', 'dikirim', 'selesai') AND DATE(tanggal_pesanan) = CURDATE()"))['total'] ?? 0;
 $pendapatan_seminggu = mysqli_fetch_assoc(kueri("SELECT SUM(total_harga) AS total FROM pesanan WHERE status IN ('dibayar', 'dikirim', 'selesai') AND tanggal_pesanan >= DATE_SUB(NOW(), INTERVAL 7 DAY)"))['total'] ?? 0;
@@ -174,6 +175,12 @@ $nama_depan_admin = explode(' ', trim($_SESSION['admin']['nama']))[0];
             </a>
             <a href="pengguna.php" class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
                 <i class="fa-solid fa-users mr-2 w-4 text-center"></i> Pengguna
+            </a>
+            <a href="laporan.php" class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
+                <i class="fa-solid fa-circle-exclamation mr-2 w-4 text-center"></i> Laporan Kendala
+                <?php if ($laporan_tertunda > 0): ?>
+                    <span class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $laporan_tertunda; ?></span>
+                <?php endif; ?>
             </a>
         </nav>
         

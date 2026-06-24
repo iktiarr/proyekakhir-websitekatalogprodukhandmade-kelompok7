@@ -67,6 +67,7 @@ if (!isset($awalan)) {
                     <?php if ($sudah_masuk): ?>
                         <a href="<?= $awalan; ?>halaman/riwayat.php" class="text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400 font-semibold text-sm">Riwayat</a>
                         <a href="<?= $awalan; ?>halaman/profil.php" class="text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400 font-semibold text-sm">Profil</a>
+                        <a href="<?= $awalan; ?>halaman/lapor.php" class="text-slate-500 dark:text-slate-400 hover:text-lime-600 dark:hover:text-lime-400 font-semibold text-sm">Lapor Kendala</a>
                     <?php endif; ?>
                 </div>
 
@@ -123,6 +124,7 @@ if (!isset($awalan)) {
                 <?php if ($sudah_masuk): ?>
                     <a href="<?= $awalan; ?>halaman/riwayat.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Riwayat Transaksi</a>
                     <a href="<?= $awalan; ?>halaman/profil.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Profil Saya</a>
+                    <a href="<?= $awalan; ?>halaman/lapor.php" class="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-lime-600 dark:hover:text-lime-400">Lapor Kendala</a>
                 <?php endif; ?>
                 
                 <?php if ($sudah_masuk): ?>

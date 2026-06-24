@@ -70,10 +70,13 @@ $kueri_pesanan = kueri("SELECT * FROM pesanan WHERE id_pengguna = ? ORDER BY tan
                                     </a>
                                 <?php endif; ?>
                                 <?php if (in_array($baris['status'], ['dibayar', 'dikirim', 'selesai'])): ?>
-                                    <a href="cetak_struk.php?id=<?= $baris['id']; ?>" target="_blank" class="inline-flex items-center justify-center bg-slate-600 hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition-all duration-200 border-none cursor-pointer">
+                                    <a href="cetak_struk.php?id=<?= $baris['id']; ?>" target="_blank" class="inline-flex items-center justify-center bg-slate-600 hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition-all duration-200 border-none cursor-pointer mr-2">
                                         <i class="fa-solid fa-print mr-1 text-[10px]"></i> Cetak Struk
                                     </a>
                                 <?php endif; ?>
+                                <a href="lapor.php?id_pesanan=<?= $baris['id']; ?>" class="inline-flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-950/30 dark:text-red-400 dark:hover:bg-red-900/30 text-xs font-bold px-3.5 py-1.5 rounded-xl transition-all duration-200 border border-red-200 dark:border-red-900/40 cursor-pointer">
+                                    <i class="fa-solid fa-triangle-exclamation mr-1 text-[10px]"></i> Laporkan Kendala
+                                </a>
                             </div>
                             
                         </div>
