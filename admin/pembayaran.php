@@ -36,139 +36,19 @@ $kueri_pesanan = kueri("SELECT p.*, u.nama, u.email FROM pesanan p JOIN pengguna
 $pembayaran_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
 $testimoni_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM testimonial WHERE status = 'pending'"))['total'];
 $laporan_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM laporan_kendala WHERE status = 'pending'"))['total'];
+
+// Statistik Status Pesanan untuk Cards
+$stat_dibayar = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
+$stat_dibatalkan = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibatalkan'"))['total'];
+$stat_selesai = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'selesai'"))['total'];
+$stat_dikirim = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'dikirim'"))['total'];
 ?>
 
-<!doctype html>
-<html lang="id">
-
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Verifikasi Pembayaran - HandMadura Admin</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        /* Mobile Sidebar Custom Transitions */
-        @media (max-width: 767px) {
-            #sidebar {
-                transform: translateX(-100%) !important;
-                transition: transform 0.3s ease-in-out !important;
-            }
-
-            #sidebar.active {
-                transform: translateX(0) !important;
-            }
-        }
-    </style>
-    <style type="text/tailwindcss">
-        @import "tailwindcss";
-        @custom-variant dark (&:where(.dark, .dark *));
-    </style>
-    <script>
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    </script>
-</head>
-
-<body
-    class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col md:flex-row selection:bg-lime-200 selection:text-lime-900 transition-colors duration-300 min-h-screen">
-
-    <!-- Header Seluler (Mobile Navbar) -->
-    <header
-        class="md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-3 py-2.5 sticky top-0 z-40 flex items-center gap-3 w-full transition-colors duration-300">
-        <button id="tombol-menu-mobile"
-            class="p-1.5 -ml-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors focus:outline-none flex items-center justify-center cursor-pointer">
-            <i class="fa-solid fa-bars text-lg"></i>
-        </button>
-        <a href="../index.php" class="text-lg font-extrabold text-slate-800 dark:text-slate-200 tracking-tight">
-            Hand<span class="text-lime-600">Madura.</span>
-        </a>
-    </header>
-
-    <aside id="sidebar"
-        class="fixed inset-y-0 left-0 z-50 w-56 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 md:sticky md:h-screen md:top-0 overflow-y-auto flex-shrink-0 shadow-lg md:shadow-none">
-        <div class="p-3 pb-2 flex items-center justify-between">
-            <div>
-                <a href="../index.php"
-                    class="text-lg font-extrabold text-slate-800 dark:text-slate-200 tracking-tight inline-block">
-                    Hand<span class="text-lime-600">Madura.</span>
-                </a>
-                <p class="text-[8px] uppercase tracking-widest text-slate-400 dark:text-slate-550 font-bold mt-0.5">
-                    Admin Panel</p>
-            </div>
-            <button id="tombol-tutup-sidebar"
-                class="md:hidden p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center"
-                title="Tutup Sidebar">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-        </div>
-
-        <nav class="flex-1 px-2 space-y-0.5">
-            <a href="index.php"
-                class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
-                <i class="fa-solid fa-chart-pie mr-2 w-4 text-center"></i> Dasbor
-            </a>
-            <a href="produk.php"
-                class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
-                <i class="fa-solid fa-box-open mr-2 w-4 text-center"></i> Produk
-            </a>
-            <a href="pembayaran.php"
-                class="flex items-center px-2.5 py-1.5 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 rounded-xl font-bold text-xs transition-colors">
-                <i class="fa-solid fa-credit-card mr-2 w-4 text-center"></i> Pembayaran
-                <?php if ($pembayaran_tertunda > 0): ?>
-                    <span
-                        class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $pembayaran_tertunda; ?></span>
-                <?php endif; ?>
-            </a>
-            <a href="testimoni.php"
-                class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
-                <i class="fa-solid fa-comments mr-2 w-4 text-center"></i> Testimonial
-                <?php if ($testimoni_tertunda > 0): ?>
-                    <span
-                        class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $testimoni_tertunda; ?></span>
-                <?php endif; ?>
-            </a>
-            <a href="pengguna.php"
-                class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
-                <i class="fa-solid fa-users mr-2 w-4 text-center"></i> Pengguna
-            </a>
-            <a href="laporan.php"
-                class="flex items-center px-2.5 py-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-lime-600 dark:hover:text-lime-400 rounded-xl font-bold text-xs transition-colors group">
-                <i class="fa-solid fa-circle-exclamation mr-2 w-4 text-center"></i> Laporan Kendala
-                <?php if ($laporan_tertunda > 0): ?>
-                    <span
-                        class="ml-auto bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?= $laporan_tertunda; ?></span>
-                <?php endif; ?>
-            </a>
-        </nav>
-
-        <div class="p-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
-            <a href="../keluar.php?dari=admin"
-                class="flex items-center px-2.5 py-1.5 text-slate-400 dark:text-slate-550 hover:text-red-655 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl font-bold text-xs transition-colors group flex-grow">
-                <i class="fa-solid fa-arrow-right-from-bracket mr-2 w-4 text-center"></i> Keluar
-            </a>
-            <button id="tombol-tema"
-                class="text-slate-400 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 p-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center justify-center"
-                title="Ubah Tema">
-                <i id="ikon-tombol-tema" class="fa-solid fa-moon text-base"></i>
-            </button>
-        </div>
-    </aside>
-
-    <!-- Latar Buram Seluler (Backdrop Overlay) -->
-    <div id="sidebar-backdrop"
-        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
-    </div>
-    <div class="hidden opacity-100 pointer-events-auto"></div>
+<?php
+$halaman_aktif = 'pembayaran';
+$judul_halaman = 'Verifikasi Pembayaran';
+include 'bagian/atas.php';
+?>
 
     <main class="flex-grow p-4 sm:p-6 w-full max-w-6xl mx-auto overflow-x-hidden">
 
@@ -183,6 +63,46 @@ $laporan_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM lapo
                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold transition-all duration-300 flex items-center cursor-pointer text-xs sm:text-sm shadow-sm flex-shrink-0">
                 <i class="fa-solid fa-file-pdf mr-1.5"></i> Cetak Laporan Keuangan
             </a>
+        </div>
+
+        <!-- Ringkasan Statistik Status Transaksi -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
+                <div>
+                    <p class="text-slate-400 dark:text-slate-550 text-[9px] font-bold uppercase tracking-widest mb-0.5">Dibayar</p>
+                    <h2 class="text-lg font-extrabold text-slate-800 dark:text-slate-100"><?= $stat_dibayar; ?></h2>
+                </div>
+                <div class="w-8 h-8 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-wallet text-xs"></i>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
+                <div>
+                    <p class="text-slate-400 dark:text-slate-550 text-[9px] font-bold uppercase tracking-widest mb-0.5">Dikirim</p>
+                    <h2 class="text-lg font-extrabold text-slate-800 dark:text-slate-100"><?= $stat_dikirim; ?></h2>
+                </div>
+                <div class="w-8 h-8 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-truck-fast text-xs"></i>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
+                <div>
+                    <p class="text-slate-400 dark:text-slate-550 text-[9px] font-bold uppercase tracking-widest mb-0.5">Selesai</p>
+                    <h2 class="text-lg font-extrabold text-slate-800 dark:text-slate-100"><?= $stat_selesai; ?></h2>
+                </div>
+                <div class="w-8 h-8 bg-lime-50 dark:bg-lime-900/20 text-lime-700 dark:text-lime-400 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-circle-check text-xs"></i>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-sm transition-colors duration-300">
+                <div>
+                    <p class="text-slate-400 dark:text-slate-550 text-[9px] font-bold uppercase tracking-widest mb-0.5">Dibatalkan</p>
+                    <h2 class="text-lg font-extrabold text-slate-800 dark:text-slate-100"><?= $stat_dibatalkan; ?></h2>
+                </div>
+                <div class="w-8 h-8 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-circle-xmark text-xs"></i>
+                </div>
+            </div>
         </div>
 
 
@@ -207,11 +127,11 @@ $laporan_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM lapo
                         if (mysqli_num_rows($kueri_pesanan) > 0):
                             while ($baris = mysqli_fetch_assoc($kueri_pesanan)):
                                 $warna_status = [
-                                    'menunggu' => 'bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/30',
-                                    'dibayar' => 'bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-900/30',
-                                    'dikirim' => 'bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-900/30',
-                                    'selesai' => 'bg-lime-50 dark:bg-lime-950/20 text-lime-700 dark:text-lime-400 border-lime-200 dark:border-lime-900/30',
-                                    'dibatalkan' => 'bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/30'
+                                    'menunggu' => 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/30',
+                                    'dibayar' => 'bg-sky-50 dark:bg-sky-950/20 text-sky-700 dark:text-sky-400 border-sky-200 dark:border-sky-900/30',
+                                    'dikirim' => 'bg-purple-50 dark:bg-purple-950/20 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-900/30',
+                                    'selesai' => 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/30',
+                                    'dibatalkan' => 'bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-900/30'
                                 ];
 
                                 // Ambil rincian produk pesanan
@@ -236,8 +156,8 @@ $laporan_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM lapo
                                 <tr
                                     class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 text-xs sm:text-sm transition-colors duration-200">
                                     <td
-                                        class="px-4 py-3 pl-6 font-mono text-[11px] font-bold text-slate-400 dark:text-slate-500 whitespace-nowrap">
-                                        #HM-<?= str_pad($baris['id'], 5, '0', STR_PAD_LEFT); ?>
+                                        class="px-4 py-3 pl-6 font-mono text-[11px] font-bold text-slate-400 dark:text-slate-550 whitespace-nowrap">
+                                        #KM-<?= str_pad($baris['id'], 5, '0', STR_PAD_LEFT); ?>
                                     </td>
                                     <td class="px-4 py-3">
                                         <span class="font-bold text-slate-800 dark:text-slate-200"><?= $baris['nama']; ?></span>
@@ -281,7 +201,7 @@ $laporan_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM lapo
                                                     <button type="button"
                                                         class="w-full text-left block px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer border-none bg-transparent tombol-lihat-detail"
                                                         data-id="<?= $baris['id']; ?>"
-                                                        data-tag="#HM-<?= str_pad($baris['id'], 5, '0', STR_PAD_LEFT); ?>"
+                                                        data-tag="#KM-<?= str_pad($baris['id'], 5, '0', STR_PAD_LEFT); ?>"
                                                         data-tanggal="<?= date('d M Y, H:i', strtotime($baris['tanggal_pesanan'])); ?> WIB"
                                                         data-nama="<?= htmlspecialchars($baris['nama']); ?>"
                                                         data-email="<?= htmlspecialchars($baris['email']); ?>"
@@ -630,77 +550,9 @@ $laporan_tertunda = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM lapo
 
             // Expose function globally so inline button calls work
             window.tutupModalPesanan = tutupModalPesanan;
-            const tombolTema = document.getElementById('tombol-tema');
-            const ikonTema = document.getElementById('ikon-tombol-tema');
-
-            // Menyelaraskan tampilan ikon tombol tema dengan pengaturan gelap/terang
-            function perbaruiIkon() {
-                if (document.documentElement.classList.contains('dark')) {
-                    if (ikonTema) {
-                        ikonTema.classList.replace('fa-moon', 'fa-sun');
-                    }
-                } else {
-                    if (ikonTema) {
-                        ikonTema.classList.replace('fa-sun', 'fa-moon');
-                    }
-                }
-            }
-
-            perbaruiIkon();
-
-            if (tombolTema) {
-                tombolTema.addEventListener('click', () => {
-                    if (ikonTema) {
-                        ikonTema.style.transform = 'rotate(360deg)';
-                    }
-
-                    setTimeout(() => {
-                        if (document.documentElement.classList.contains('dark')) {
-                            document.documentElement.classList.remove('dark');
-                            localStorage.setItem('theme', 'light');
-                        } else {
-                            document.documentElement.classList.add('dark');
-                            localStorage.setItem('theme', 'dark');
-                        }
-                        perbaruiIkon();
-                        if (ikonTema) {
-                            ikonTema.style.transform = '';
-                        }
-                    }, 150);
-                });
-            }
-
-            // Pengontrol Sidebar Seluler
-            const sidebar = document.getElementById('sidebar');
-            const backdrop = document.getElementById('sidebar-backdrop');
-            const tombolMenuMobile = document.getElementById('tombol-menu-mobile');
-            const tombolTutupSidebar = document.getElementById('tombol-tutup-sidebar');
-
-            // Membuka sidebar pada resolusi mobile
-            function bukaSidebar() {
-                if (sidebar && backdrop) {
-                    sidebar.classList.add('active');
-                    backdrop.classList.replace('opacity-0', 'opacity-100');
-                    backdrop.classList.replace('pointer-events-none', 'pointer-events-auto');
-                    document.body.style.overflow = 'hidden';
-                }
-            }
-
-            // Menutup sidebar pada resolusi mobile
-            function tutupSidebar() {
-                if (sidebar && backdrop) {
-                    sidebar.classList.remove('active');
-                    backdrop.classList.replace('opacity-100', 'opacity-0');
-                    backdrop.classList.replace('pointer-events-auto', 'pointer-events-none');
-                    document.body.style.overflow = '';
-                }
-            }
-
-            if (tombolMenuMobile) tombolMenuMobile.addEventListener('click', bukaSidebar);
-            if (tombolTutupSidebar) tombolTutupSidebar.addEventListener('click', tutupSidebar);
-            if (backdrop) backdrop.addEventListener('click', tutupSidebar);
         });
     </script>
 </body>
 
 </html>
+<?php include 'bagian/bawah.php'; ?>

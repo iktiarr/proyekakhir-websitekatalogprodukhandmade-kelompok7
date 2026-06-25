@@ -19,6 +19,8 @@ if (isset($_POST['submit_testimonial'])) {
 
     if (empty($nama) || empty($isi_ulasan)) {
         $galat = "Nama dan ulasan wajib diisi!";
+    } elseif ($rating < 1 || $rating > 5) {
+        $galat = "Rating tidak valid! Harus bernilai antara 1 sampai 5.";
     } elseif (strlen($isi_ulasan) > 500) {
         $galat = "Ulasan maksimal 500 karakter!";
     } else {

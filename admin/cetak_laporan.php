@@ -110,6 +110,12 @@ if ($tipe === 'pengguna') {
     $transaksi_batal = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibatalkan'"))['total'];
     $transaksi_menunggu = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'menunggu'"))['total'];
     
+    // Breakdown status spesifik untuk kartu rincian
+    $status_dibayar = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibayar'"))['total'];
+    $status_dikirim = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'dikirim'"))['total'];
+    $status_selesai = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'selesai'"))['total'];
+    $status_dibatalkan = mysqli_fetch_assoc(kueri("SELECT COUNT(*) as total FROM pesanan WHERE status = 'dibatalkan'"))['total'];
+    
     $rata_rata_transaksi = $transaksi_sukses > 0 ? ($total_pendapatan / $transaksi_sukses) : 0;
 
     // Statistik Metode Pembayaran Terpopuler
@@ -368,38 +374,81 @@ if ($tipe === 'pengguna') {
                     </h3>
                     <p class="text-[10px] text-slate-500 mt-1">Dari total <?= $total_transaksi; ?> pesanan masuk</p>
                 </div>
-            </div>            <!-- Payment Methods Breakdown Section -->
-            <div class="mb-8 p-5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 rounded-3xl max-w-md">
-                <h3 class="text-xs font-bold text-slate-800 dark:text-slate-100 mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-credit-card text-lime-600"></i> Analisis Performa Metode Pembayaran
-                </h3>
-                <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-4">Penggunaan metode transaksi di kalangan pembeli HandMadura.</p>
-                
-                <div class="overflow-x-auto w-full">
-                    <table class="w-full text-left border-collapse text-[10px]">
-                        <thead>
-                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
-                                <th class="py-2 pl-2">Metode Pembayaran</th>
-                                <th class="py-2 text-right pr-2">Penggunaan (Persentase)</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 dark:divide-slate-850">
-                            <?php if (!empty($daftar_metode)): ?>
-                                <?php foreach ($daftar_metode as $met): 
-                                    $persen_met = $transaksi_sukses > 0 ? round(($met['jumlah'] / $transaksi_sukses) * 100) : 0;
-                                ?>
-                                    <tr class="hover:bg-slate-100/50 dark:hover:bg-slate-900/30">
-                                        <td class="py-2.5 pl-2 font-bold text-slate-700 dark:text-slate-350"><?= htmlspecialchars($met['metode_pembayaran'] ?? 'Lainnya/VA'); ?></td>
-                                        <td class="py-2.5 text-right font-black pr-2 text-lime-600 dark:text-lime-400"><?= $persen_met; ?>% <span class="text-slate-400 dark:text-slate-500 font-semibold text-[9px] ml-1">(<?= $met['jumlah']; ?> pesanan)</span></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="2" class="text-center py-4 text-slate-400">Belum ada data transaksi lunas.</td>
+            </div>            <!-- Grid for Payment Methods & Status Breakdown -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Payment Methods Breakdown Section -->
+                <div class="p-5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 rounded-3xl w-full">
+                    <h3 class="text-xs font-bold text-slate-800 dark:text-slate-100 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-credit-card text-lime-600"></i> Analisis Performa Metode Pembayaran
+                    </h3>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-4">Penggunaan metode transaksi di kalangan pembeli HandMadura.</p>
+                    
+                    <div class="overflow-x-auto w-full">
+                        <table class="w-full text-left border-collapse text-[10px]">
+                            <thead>
+                                <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+                                    <th class="py-2 pl-2">Metode Pembayaran</th>
+                                    <th class="py-2 text-right pr-2">Penggunaan (Persentase)</th>
                                 </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-850">
+                                <?php if (!empty($daftar_metode)): ?>
+                                    <?php foreach ($daftar_metode as $met): 
+                                        $persen_met = $transaksi_sukses > 0 ? round(($met['jumlah'] / $transaksi_sukses) * 100) : 0;
+                                    ?>
+                                        <tr class="hover:bg-slate-100/50 dark:hover:bg-slate-900/30">
+                                            <td class="py-2.5 pl-2 font-bold text-slate-700 dark:text-slate-350"><?= htmlspecialchars($met['metode_pembayaran'] ?? 'Lainnya/VA'); ?></td>
+                                            <td class="py-2.5 text-right font-black pr-2 text-lime-600 dark:text-lime-400"><?= $persen_met; ?>% <span class="text-slate-400 dark:text-slate-500 font-semibold text-[9px] ml-1">(<?= $met['jumlah']; ?> pesanan)</span></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="2" class="text-center py-4 text-slate-400">Belum ada data transaksi lunas.</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Status Breakdown Section (Daftar Status) -->
+                <div class="p-5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 rounded-3xl w-full">
+                    <h3 class="text-xs font-bold text-slate-800 dark:text-slate-100 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-simple text-lime-600"></i> Rincian Status Transaksi
+                    </h3>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-4">Pembagian jumlah transaksi berdasarkan status saat ini.</p>
+                    
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="font-semibold text-slate-600 dark:text-slate-400 flex items-center">
+                                <span class="w-2.5 h-2.5 rounded-full bg-blue-500 mr-2 flex-shrink-0"></span> Dibayar (Lunas)
+                            </span>
+                            <span class="font-extrabold text-slate-800 dark:text-slate-200"><?= $status_dibayar; ?> <span class="text-slate-400 dark:text-slate-500 font-normal text-[10px]">pesanan</span></span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="font-semibold text-slate-600 dark:text-slate-400 flex items-center">
+                                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 mr-2 flex-shrink-0"></span> Dikirim
+                            </span>
+                            <span class="font-extrabold text-slate-800 dark:text-slate-200"><?= $status_dikirim; ?> <span class="text-slate-400 dark:text-slate-500 font-normal text-[10px]">pesanan</span></span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="font-semibold text-slate-600 dark:text-slate-400 flex items-center">
+                                <span class="w-2.5 h-2.5 rounded-full bg-lime-600 mr-2 flex-shrink-0"></span> Selesai
+                            </span>
+                            <span class="font-extrabold text-slate-800 dark:text-slate-200"><?= $status_selesai; ?> <span class="text-slate-400 dark:text-slate-500 font-normal text-[10px]">pesanan</span></span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="font-semibold text-slate-600 dark:text-slate-400 flex items-center">
+                                <span class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2 flex-shrink-0"></span> Dibatalkan
+                            </span>
+                            <span class="font-extrabold text-slate-800 dark:text-slate-200"><?= $status_dibatalkan; ?> <span class="text-slate-400 dark:text-slate-500 font-normal text-[10px]">pesanan</span></span>
+                        </div>
+                        <div class="h-px bg-slate-200 dark:bg-slate-850 my-2"></div>
+                        <div class="flex justify-between items-center text-[11px] font-black">
+                            <span>Total Pesanan Masuk</span>
+                            <span class="text-lime-600 dark:text-lime-400"><?= $total_transaksi; ?> <span class="text-slate-400 dark:text-slate-500 font-normal text-[10px]">pesanan</span></span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -511,7 +560,7 @@ if ($tipe === 'pengguna') {
                         <?php if (mysqli_num_rows($data_result) > 0): ?>
                             <?php while ($row = mysqli_fetch_assoc($data_result)): ?>
                                 <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-955/20 transition-colors">
-                                    <td class="p-3 pl-4 font-mono font-bold text-slate-800 dark:text-slate-200">#HM-<?= str_pad($row['id'], 5, '0', STR_PAD_LEFT); ?></td>
+                                    <td class="p-3 pl-4 font-mono font-bold text-slate-800 dark:text-slate-200">#KM-<?= str_pad($row['id'], 5, '0', STR_PAD_LEFT); ?></td>
                                     <td class="p-3">
                                         <p class="font-bold text-slate-850 dark:text-slate-200"><?= htmlspecialchars($row['nama']); ?></p>
                                         <p class="text-[8px] text-slate-450 dark:text-slate-500 font-medium"><?= htmlspecialchars($row['email']); ?></p>
@@ -522,15 +571,15 @@ if ($tipe === 'pengguna') {
                                         <?php
                                         $warna_badge = '';
                                         if ($row['status'] === 'dibayar') {
-                                            $warna_badge = 'bg-blue-50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400 border border-blue-200 dark:border-blue-900/30';
+                                            $warna_badge = 'bg-sky-50 text-sky-700 dark:bg-sky-950/20 dark:text-sky-400 border border-sky-200 dark:border-sky-900/30';
                                         } elseif ($row['status'] === 'dikirim') {
-                                            $warna_badge = 'bg-indigo-50 text-indigo-750 dark:bg-indigo-950/20 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/30';
+                                            $warna_badge = 'bg-purple-50 text-purple-700 dark:bg-purple-950/20 dark:text-purple-400 border border-purple-200 dark:border-purple-900/30';
                                         } elseif ($row['status'] === 'selesai') {
-                                            $warna_badge = 'bg-lime-50 text-lime-750 dark:bg-lime-950/20 dark:text-lime-400 border border-lime-200 dark:border-lime-900/30';
+                                            $warna_badge = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/30';
                                         } elseif ($row['status'] === 'menunggu') {
-                                            $warna_badge = 'bg-amber-50 text-amber-600 dark:bg-amber-950/20 dark:text-amber-400 border border-amber-200 dark:border-amber-900/30';
+                                            $warna_badge = 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 border border-amber-200 dark:border-amber-900/30';
                                         } else {
-                                            $warna_badge = 'bg-red-50 text-red-650 dark:bg-red-950/20 dark:text-red-400 border border-red-200 dark:border-red-900/30';
+                                            $warna_badge = 'bg-rose-50 text-rose-700 dark:bg-rose-950/20 dark:text-rose-400 border border-rose-200 dark:border-rose-900/30';
                                         }
                                         ?>
                                         <span class="px-2 py-0.5 rounded text-[8px] font-bold uppercase <?= $warna_badge; ?>">

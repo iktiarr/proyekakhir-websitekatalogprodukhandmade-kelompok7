@@ -45,48 +45,71 @@ if (isset($_POST['kirim_laporan'])) {
         $ukuran_file = $file['size'];
         $error_file = $file['error'];
         
-        // Cek ekstensi file
-        $ekstensi_diperbolehkan = ['pdf', 'png', 'jpg', 'jpeg'];
-        $ekstensi_file = strtolower(pathinfo($nama_file, PATHINFO_EXTENSION));
-        
-        if (!in_array($ekstensi_file, $ekstensi_diperbolehkan)) {
-            $galat = "Format berkas tidak valid! Hanya diperbolehkan PDF, PNG, JPG, atau JPEG.";
-        } elseif ($ukuran_file > 5 * 1024 * 1024) { // 5MB limit
-            $galat = "Ukuran berkas terlalu besar! Maksimal ukuran adalah 5MB.";
-        } elseif ($error_file !== UPLOAD_ERR_OK) {
-            $galat = "Terjadi kesalahan saat mengunggah berkas.";
-        } else {
-            // Buat folder tujuan jika belum ada
-            $direktori_tujuan = '../uploads/laporan/';
-            if (!is_dir($direktori_tujuan)) {
-                mkdir($direktori_tujuan, 0777, true);
-            }
-            
-            // Generate nama file unik
-            $nama_file_baru = 'laporan_' . $id_pengguna . '_' . time() . '_' . rand(100, 999) . '.' . $ekstensi_file;
-            $jalur_simpan = $direktori_tujuan . $nama_file_baru;
-            $jalur_db = 'uploads/laporan/' . $nama_file_baru;
-            
-            if (move_uploaded_file($tmp_file, $jalur_simpan)) {
-                // Simpan ke database
-                $kueri_tambah = kueri("
-                    INSERT INTO laporan_kendala (id_pengguna, id_pesanan, tipe_laporan, deskripsi, file_laporan, status) 
-                    VALUES (?, ?, ?, ?, ?, 'pending')
-                ", [$id_pengguna, $id_pesanan, $tipe_laporan, $deskripsi, $jalur_db]);
-                
-                if ($kueri_tambah) {
-                    $sukses = "Laporan kendala Anda berhasil dikirim! Tim admin akan segera meninjau berkas Anda.";
-                    // Catat aktivitas
-                    $nama_pengirim = $_SESSION['user']['nama'];
-                    $keterangan_log = "Mengirim laporan kendala tipe '$tipe_laporan'" . ($id_pesanan ? " untuk pesanan #KM-" . str_pad($id_pesanan, 5, '0', STR_PAD_LEFT) : "");
-                    kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES (?, ?, 'laporan', 'tambah', ?)", [$id_pengguna, $nama_pengirim, $keterangan_log]);
-                } else {
-                    $galat = "Gagal menyimpan data laporan ke database.";
-                    // Hapus berkas yang terlanjur diunggah jika db gagal
-                    @unlink($jalur_simpan);
-                }
+        // Cek upload error dari PHP
+        if ($error_file !== UPLOAD_ERR_OK) {
+            if ($error_file === UPLOAD_ERR_INI_SIZE || $error_file === UPLOAD_ERR_FORM_SIZE) {
+                $galat = "Ukuran berkas terlalu besar! Melebihi batas maksimal yang diizinkan oleh server.";
+            } elseif ($error_file === UPLOAD_ERR_PARTIAL) {
+                $galat = "Berkas hanya terunggah sebagian. Silakan coba lagi.";
+            } elseif ($error_file === UPLOAD_ERR_NO_TMP_DIR) {
+                $galat = "Server hosting tidak memiliki folder penyimpanan sementara. Hubungi admin hosting.";
+            } elseif ($error_file === UPLOAD_ERR_CANT_WRITE) {
+                $galat = "Gagal menulis berkas ke penyimpanan server (masalah izin/kuota penuh).";
             } else {
-                $galat = "Gagal memindahkan berkas ke folder penyimpanan.";
+                $galat = "Terjadi kesalahan saat mengunggah berkas (Kode Error: $error_file).";
+            }
+        } else {
+            // Cek ekstensi file
+            $ekstensi_diperbolehkan = ['pdf', 'png', 'jpg', 'jpeg'];
+            $ekstensi_file = strtolower(pathinfo($nama_file, PATHINFO_EXTENSION));
+            
+            if (!in_array($ekstensi_file, $ekstensi_diperbolehkan)) {
+                $galat = "Format berkas tidak valid! Hanya diperbolehkan PDF, PNG, JPG, atau JPEG.";
+            } elseif ($ukuran_file > 5 * 1024 * 1024) { // 5MB limit
+                $galat = "Ukuran berkas terlalu besar! Maksimal ukuran adalah 5MB.";
+            } else {
+                // Gunakan path absolut yang aman untuk InfinityFree
+                $direktori_tujuan = dirname(__DIR__) . '/uploads/laporan/';
+                
+                // Pastikan direktori ada dan dapat ditulisi
+                if (!is_dir($direktori_tujuan)) {
+                    if (!@mkdir($direktori_tujuan, 0777, true)) {
+                        $galat = "Gagal membuat folder penyimpanan di server. Silakan buat folder 'uploads/laporan' secara manual melalui FTP FileZilla/cPanel.";
+                    }
+                }
+                
+                if (empty($galat)) {
+                    if (!is_writable($direktori_tujuan)) {
+                        $galat = "Folder penyimpanan di server tidak dapat ditulisi (not writable). Hubungi admin hosting atau atur chmod folder 'uploads/laporan' ke 777.";
+                    } else {
+                        // Generate nama file unik
+                        $nama_file_baru = 'laporan_' . $id_pengguna . '_' . time() . '_' . rand(100, 999) . '.' . $ekstensi_file;
+                        $jalur_simpan = $direktori_tujuan . $nama_file_baru;
+                        $jalur_db = 'uploads/laporan/' . $nama_file_baru;
+                        
+                        if (move_uploaded_file($tmp_file, $jalur_simpan)) {
+                            // Simpan ke database
+                            $kueri_tambah = kueri("
+                                INSERT INTO laporan_kendala (id_pengguna, id_pesanan, tipe_laporan, deskripsi, file_laporan, status) 
+                                VALUES (?, ?, ?, ?, ?, 'pending')
+                            ", [$id_pengguna, $id_pesanan, $tipe_laporan, $deskripsi, $jalur_db]);
+                            
+                            if ($kueri_tambah) {
+                                $sukses = "Laporan kendala Anda berhasil dikirim! Tim admin akan segera meninjau berkas Anda.";
+                                // Catat aktivitas
+                                $nama_pengirim = $_SESSION['user']['nama'];
+                                $keterangan_log = "Mengirim laporan kendala tipe '$tipe_laporan'" . ($id_pesanan ? " untuk pesanan #KM-" . str_pad($id_pesanan, 5, '0', STR_PAD_LEFT) : "");
+                                kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES (?, ?, 'laporan', 'tambah', ?)", [$id_pengguna, $nama_pengirim, $keterangan_log]);
+                            } else {
+                                $galat = "Gagal menyimpan data laporan ke database.";
+                                // Hapus berkas yang terlanjur diunggah jika db gagal
+                                @unlink($jalur_simpan);
+                            }
+                        } else {
+                            $galat = "Gagal memindahkan berkas ke folder penyimpanan. Pastikan folder 'uploads/laporan' memiliki izin menulis (writable).";
+                        }
+                    }
+                }
             }
         }
     }
