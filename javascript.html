@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belajar Array JavaScript Sederhana</title>
+</head>
+<body>
+    <h1>Daftar Buah (Menggunakan Array JavaScript)</h1>
+    
+    <!-- Element HTML tempat menampilkan array -->
+    <ul id="tampil-array"></ul>
+
+    <script>
+        // 1. Membuat variabel array
+        let buah = ["Apel", "Pisang", "Jeruk", "Mangga", "Semangka"];
+
+        // 2. Mengambil elemen HTML berdasarkan ID
+        let listHTML = document.getElementById("tampil-array");
+
+        // 3. Melakukan perulangan (loop) untuk menampilkan isi array ke HTML
+        buah.forEach(function(item) {
+            let li = document.createElement("li");
+            li.textContent = item;
+            listHTML.appendChild(li);
+        });
+    </script>
+</body>
+</html>

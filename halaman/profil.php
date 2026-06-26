@@ -20,7 +20,7 @@ $sukses = '';
 
 // Ambil data profil pengguna terbaru dari database
 $kueri_pengguna = kueri("SELECT * FROM pengguna WHERE id = ?", [$id_pengguna]);
-$data_pengguna = mysqli_fetch_assoc($kueri_pengguna);
+$data_pengguna = $kueri_pengguna ? mysqli_fetch_assoc($kueri_pengguna) : null;
 
 if (!$data_pengguna) {
     header("Location: ../keluar.php");
@@ -86,7 +86,7 @@ if (isset($_POST['simpan_profil'])) {
                     
                     // Muat ulang data terbaru dari database
                     $kueri_pengguna = kueri("SELECT * FROM pengguna WHERE id = ?", [$id_pengguna]);
-                    $data_pengguna = mysqli_fetch_assoc($kueri_pengguna);
+                    $data_pengguna = $kueri_pengguna ? mysqli_fetch_assoc($kueri_pengguna) : null;
                 } else {
                     $galat = "Terjadi kesalahan sistem saat memperbarui profil.";
                 }

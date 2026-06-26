@@ -21,7 +21,7 @@ $kueri_pesanan = kueri("SELECT * FROM pesanan WHERE id_pengguna = ? ORDER BY tan
             <p class="text-slate-500 dark:text-slate-400 mt-1.5 text-sm">Pantau status pengiriman HandMadura dan detail riwayat transaksi Anda di sini.</p>
         </div>
 
-        <?php if (mysqli_num_rows($kueri_pesanan) > 0): ?>
+        <?php if ($kueri_pesanan && mysqli_num_rows($kueri_pesanan) > 0): ?>
             <div class="space-y-5">
                 <?php while($baris = mysqli_fetch_assoc($kueri_pesanan)): 
                     $warna_status = [

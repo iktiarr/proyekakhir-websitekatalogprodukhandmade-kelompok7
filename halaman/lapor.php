@@ -4,6 +4,10 @@
  * Berfungsi untuk mengirim laporan masalah (seperti kegagalan sistem setelah pembayaran lunas)
  * dan mengunggah berkas bukti berformat gambar atau PDF.
  */
+// Aktifkan pelaporan error agar bisa dideteksi jika terjadi kesalahan pada hosting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 $awalan = "../";
 include '../koneksi.php';
 
@@ -20,8 +24,12 @@ $sukses = '';
 // Ambil daftar pesanan milik pengguna untuk opsi dropdown
 $res_pesanan = kueri("SELECT id, total_harga, status, tanggal_pesanan FROM pesanan WHERE id_pengguna = ? ORDER BY tanggal_pesanan DESC", [$id_pengguna]);
 $daftar_pesanan = [];
-while ($row = mysqli_fetch_assoc($res_pesanan)) {
-    $daftar_pesanan[] = $row;
+if ($res_pesanan) {
+    while ($row = mysqli_fetch_assoc($res_pesanan)) {
+        $daftar_pesanan[] = $row;
+    }
+} else {
+    $galat = "Gagal memuat data pesanan: " . mysqli_error($koneksi);
 }
 
 // Tangkap id_pesanan dari query parameter jika ada
@@ -101,7 +109,7 @@ if (isset($_POST['kirim_laporan'])) {
                                 $keterangan_log = "Mengirim laporan kendala tipe '$tipe_laporan'" . ($id_pesanan ? " untuk pesanan #KM-" . str_pad($id_pesanan, 5, '0', STR_PAD_LEFT) : "");
                                 kueri("INSERT INTO log_aktivitas (id_pengguna, nama_pengguna, tipe_aktivitas, aksi, keterangan) VALUES (?, ?, 'laporan', 'tambah', ?)", [$id_pengguna, $nama_pengirim, $keterangan_log]);
                             } else {
-                                $galat = "Gagal menyimpan data laporan ke database.";
+                                $galat = "Gagal menyimpan data laporan ke database: " . mysqli_error($koneksi);
                                 // Hapus berkas yang terlanjur diunggah jika db gagal
                                 @unlink($jalur_simpan);
                             }
@@ -123,6 +131,10 @@ $kueri_laporan = kueri("
     WHERE l.id_pengguna = ? 
     ORDER BY l.tanggal_dibuat DESC
 ", [$id_pengguna]);
+
+if ($kueri_laporan === false) {
+    $galat = "Gagal memuat riwayat laporan: " . mysqli_error($koneksi);
+}
 
 include '../bagian/atas.php';
 ?>
@@ -221,7 +233,7 @@ include '../bagian/atas.php';
                         <i class="fa-solid fa-clock-rotate-left text-slate-500"></i> Riwayat Laporan Kendala Anda
                     </h2>
 
-                    <?php if (mysqli_num_rows($kueri_laporan) > 0): ?>
+                    <?php if ($kueri_laporan && mysqli_num_rows($kueri_laporan) > 0): ?>
                         <div class="space-y-4">
                             <?php while ($lap = mysqli_fetch_assoc($kueri_laporan)): 
                                 $warna_status = [
